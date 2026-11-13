@@ -8,7 +8,12 @@ import {
   type RequestStatus,
 } from "@/lib/types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+const DATA_DIR = path.join(
+  process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
+    ? "/tmp"
+    : process.cwd(),
+  "redeemysoul-data",
+);
 const DATA_FILE = path.join(DATA_DIR, "requests.json");
 
 type StoreShape = {
