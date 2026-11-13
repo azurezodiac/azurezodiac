@@ -1,6 +1,6 @@
 /** Update these to your real inbox / WhatsApp (digits only, country code, no +). */
 export const CONTACT_EMAIL = "Roohaniilajkarachi@gmail.com";
-export const CONTACT_WHATSAPP = "923001234567";
+export const CONTACT_WHATSAPP = "923452845400";
 
 export const CONCERNS = [
   {
