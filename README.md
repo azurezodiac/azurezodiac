@@ -21,5 +21,12 @@ pnpm dev
 
 ```bash
 pnpm build
+```
+
+Static files land in `out/` — upload that folder to cPanel `public_html` for redeemysoul.com.
+
+For a Node host (Vercel / Cursor):
+
+```bash
 pnpm start
 ```
