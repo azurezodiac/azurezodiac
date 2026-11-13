@@ -33,18 +33,28 @@ export type ConsultationPayload = {
   name: string;
   motherName: string;
   location: string;
+  phone: string;
   note?: string;
+  trackingNumber?: string;
 };
 
 export function buildConsultationMessage(data: ConsultationPayload): string {
   const lines = [
     "Assalamu alaikum — Redeemysoul consultation request",
     "",
+  ];
+
+  if (data.trackingNumber) {
+    lines.push(`Tracking: ${data.trackingNumber}`);
+  }
+
+  lines.push(
     `Concern: ${data.concernTitle}`,
     `Name: ${data.name}`,
     `Mother's name: ${data.motherName}`,
     `Closest location: ${data.location}`,
-  ];
+    `Phone: ${data.phone}`,
+  );
 
   if (data.note?.trim()) {
     lines.push(`Note: ${data.note.trim()}`);

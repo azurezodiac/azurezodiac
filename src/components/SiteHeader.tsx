@@ -4,6 +4,7 @@ const links = [
   { href: "#services", label: "Services" },
   { href: "#path", label: "The Path" },
   { href: "/begin", label: "Begin" },
+  { href: "/track", label: "Track" },
 ];
 
 export function SiteHeader() {
