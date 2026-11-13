@@ -26,6 +26,19 @@ trap cleanup EXIT
 export CPANEL_STATIC=1
 pnpm build
 
+# Apache/cPanel expects folder/index.html for /begin/ style URLs.
+for route in begin track admin; do
+  if [[ -f "out/${route}.html" ]]; then
+    mkdir -p "out/${route}"
+    cp "out/${route}.html" "out/${route}/index.html"
+  fi
+done
+
+# Ensure htaccess is present in the static export root.
+if [[ -f public/.htaccess ]]; then
+  cp public/.htaccess out/.htaccess
+fi
+
 rm -f "$ZIP_PATH"
 (
   cd out
