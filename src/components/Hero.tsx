@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export function Hero() {
   return (
@@ -33,12 +34,12 @@ export function Hero() {
           — rooted in remembrance, not spectacle.
         </p>
         <div className="reveal reveal-delay-4 mt-10 flex flex-wrap items-center gap-4">
-          <a
-            href="#contact"
+          <Link
+            href="/begin"
             className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
           >
             Begin healing
-          </a>
+          </Link>
           <a
             href="#services"
             className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"

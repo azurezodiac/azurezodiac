@@ -1,7 +1,9 @@
+import Link from "next/link";
+
 const links = [
   { href: "#services", label: "Services" },
   { href: "#path", label: "The Path" },
-  { href: "#contact", label: "Begin" },
+  { href: "/begin", label: "Begin" },
 ];
 
 export function SiteHeader() {
@@ -15,22 +17,32 @@ export function SiteHeader() {
           Redeemysoul
         </a>
         <nav className="hidden items-center gap-8 text-sm tracking-[0.14em] uppercase text-fog md:flex">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="transition-colors duration-300 hover:text-gold-bright"
-            >
-              {link.label}
-            </a>
-          ))}
+          {links.map((link) =>
+            link.href.startsWith("/") ? (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="transition-colors duration-300 hover:text-gold-bright"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.href}
+                href={link.href}
+                className="transition-colors duration-300 hover:text-gold-bright"
+              >
+                {link.label}
+              </a>
+            ),
+          )}
         </nav>
-        <a
-          href="#contact"
+        <Link
+          href="/begin"
           className="border border-gold/50 px-4 py-2 text-xs tracking-[0.16em] uppercase text-gold transition-colors duration-300 hover:border-gold-bright hover:text-gold-bright md:px-5"
         >
           Consultation
-        </a>
+        </Link>
       </div>
     </header>
   );
