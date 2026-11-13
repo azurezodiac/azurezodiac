@@ -4,16 +4,29 @@ import { cookies } from "next/headers";
 const COOKIE = "rs_admin_session";
 
 function adminPassword(): string {
-  return process.env.ADMIN_PASSWORD || "redeemysoul-admin";
+  const fromEnv = process.env.ADMIN_PASSWORD?.trim();
+  if (fromEnv) return fromEnv;
+  if (process.env.NODE_ENV !== "production") return "redeemysoul-admin";
+  throw new Error("ADMIN_PASSWORD is required in production.");
+}
+
+function sessionSecret(): string {
+  const fromEnv = process.env.ADMIN_SESSION_SECRET?.trim();
+  if (fromEnv) return fromEnv;
+  return adminPassword();
 }
 
 function sign(value: string): string {
-  const secret = process.env.ADMIN_SESSION_SECRET || adminPassword();
-  return createHmac("sha256", secret).update(value).digest("hex");
+  return createHmac("sha256", sessionSecret()).update(value).digest("hex");
 }
 
 export function verifyAdminPassword(password: string): boolean {
-  const expected = adminPassword();
+  let expected: string;
+  try {
+    expected = adminPassword();
+  } catch {
+    return false;
+  }
   const a = Buffer.from(password);
   const b = Buffer.from(expected);
   if (a.length !== b.length) return false;
