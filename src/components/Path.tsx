@@ -1,15 +1,15 @@
 const steps = [
   {
-    title: "Listen",
-    copy: "Share what you are carrying — symptoms, dreams, history, and the questions that will not leave.",
+    title: "Share",
+    copy: "Tell us what you are carrying — sleep, dreams, family strain, fear, or the heaviness that will not lift.",
   },
   {
-    title: "Discern",
-    copy: "We separate spiritual strain from ordinary hardship with care, so the next step is honest.",
+    title: "Understand",
+    copy: "We listen carefully and separate spiritual concern from ordinary hardship, so guidance stays honest.",
   },
   {
-    title: "Restore",
-    copy: "A guided path of dua, remembrance, and practical rhythm — paced to your life, not a script.",
+    title: "Guide",
+    copy: "You receive a clear next step through dua, ruqyah-centered practice, and a rhythm you can keep.",
   },
 ];
 
@@ -19,14 +19,14 @@ export function Path() {
       <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32">
         <div className="max-w-2xl">
           <p className="text-xs tracking-[0.22em] uppercase text-gold">
-            The path
+            How it works
           </p>
           <h2 className="mt-5 font-display text-4xl leading-tight text-cream md:text-5xl">
-            Three movements. One intention.
+            A simple path from worry to clarity.
           </h2>
           <p className="mt-6 text-base leading-relaxed text-fog">
-            Modern in craft. Classical in spirit. Built to feel calm on every
-            screen.
+            No public exposure. No pressure. Just a private consultation flow
+            designed for trust.
           </p>
         </div>
 

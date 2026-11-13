@@ -15,14 +15,14 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Redeemysoul — Islamic Healing",
+  title: "Redeemysoul — Islamic Healing | Nazar, Sihr & Spiritual Care",
   description:
-    "Quiet, faith-centered Islamic healing for protection, clarity, and spiritual renewal.",
+    "Private Islamic healing for nazar, sihr concerns, and spiritual renewal — rooted in remembrance, dignity, and care.",
   metadataBase: new URL("https://redeemysoul.com"),
   openGraph: {
     title: "Redeemysoul — Islamic Healing",
     description:
-      "Quiet, faith-centered Islamic healing for protection, clarity, and spiritual renewal.",
+      "Private Islamic healing for nazar, sihr concerns, and spiritual renewal.",
     url: "https://redeemysoul.com",
     siteName: "Redeemysoul",
     type: "website",

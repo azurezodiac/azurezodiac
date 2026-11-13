@@ -5,6 +5,7 @@ import { Path } from "@/components/Path";
 import { Services } from "@/components/Services";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Trust } from "@/components/Trust";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
         <Services />
         <Atmosphere />
         <Path />
+        <Trust />
         <Contact />
       </main>
       <SiteFooter />

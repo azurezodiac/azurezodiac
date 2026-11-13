@@ -10,7 +10,7 @@ export function Hero() {
       <div className="absolute inset-0">
         <Image
           src="/images/hero.jpg"
-          alt="Quiet light over sacred architecture"
+          alt="Sacred light at the Kaaba"
           fill
           priority
           sizes="100vw"
@@ -27,11 +27,11 @@ export function Hero() {
         </p>
         <div className="gold-rule reveal reveal-delay-1 mt-6 h-px w-40 bg-gold md:w-56" />
         <h1 className="reveal reveal-delay-2 mt-8 max-w-2xl font-display text-2xl leading-tight text-cream sm:text-3xl md:text-4xl">
-          Islamic healing, stronger than fear.
+          Islamic healing for a heart under pressure.
         </h1>
         <p className="reveal reveal-delay-3 mt-5 max-w-xl text-base leading-relaxed text-fog md:text-lg">
-          Faith-centered guidance for protection, clarity, and spiritual renewal
-          — rooted in remembrance, not spectacle.
+          Ruqyah-centered guidance for nazar, sihr concerns, and spiritual
+          heaviness — private, respectful, and rooted in remembrance.
         </p>
         <div className="reveal reveal-delay-4 mt-10 flex flex-wrap items-center gap-4">
           <Link

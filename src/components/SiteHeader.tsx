@@ -2,9 +2,9 @@ import Link from "next/link";
 
 const links = [
   { href: "#services", label: "Services" },
-  { href: "#path", label: "The Path" },
+  { href: "#path", label: "How it works" },
+  { href: "#trust", label: "Privacy" },
   { href: "/begin", label: "Begin" },
-  { href: "/track", label: "Track" },
 ];
 
 export function SiteHeader() {

@@ -1,15 +1,15 @@
 const services = [
   {
-    title: "Evil eye & envy",
-    copy: "Calm, structured ruqyah-centered care for the weight of hasad and unsettled protection.",
+    title: "Nazar & hasad",
+    copy: "For sudden heaviness, unexplained fear, or the sense that envy has settled on your home, work, or children — with calm ruqyah-centered care.",
   },
   {
-    title: "Black magic concerns",
-    copy: "Discernment-first support when fear feels larger than life — with clarity, dignity, and faith.",
+    title: "Sihr & dark disturbance",
+    copy: "When dreams, pressure, or household strain feel beyond ordinary hardship, we begin with discernment, dignity, and faith — never fear spectacle.",
   },
   {
     title: "Spiritual renewal",
-    copy: "A quieter return to remembrance, dua, and daily rhythm when the heart feels distant.",
+    copy: "For a heart that feels distant from salah, dua, and inner quiet. A paced return to remembrance and daily rhythm that fits real life.",
   },
 ];
 
@@ -19,14 +19,14 @@ export function Services() {
       <div className="mx-auto grid max-w-7xl gap-14 px-6 py-24 md:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-32">
         <div>
           <p className="text-xs tracking-[0.22em] uppercase text-gold">
-            What we hold
+            Services
           </p>
           <h2 className="mt-5 font-display text-4xl leading-tight text-cream md:text-5xl">
-            Healing that stays close to the heart.
+            Care that listens before it speaks.
           </h2>
           <p className="mt-6 max-w-md text-base leading-relaxed text-fog">
-            No marketplace noise. No theatrical promises. Only careful listening
-            and faith-led practice for those seeking relief and return.
+            Redeemysoul serves seekers who want Islamic healing without noise,
+            shortcuts, or public display. Every consultation stays private.
           </p>
         </div>
 

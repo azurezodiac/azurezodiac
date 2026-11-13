@@ -84,7 +84,7 @@ export function BeginFlow() {
       trackingNumber,
       status: "pending",
       statusNote:
-        "Static hosting mode: notify via WhatsApp or email. Server tracking unlocks on Node hosting.",
+        "Your reference is ready. Send it on WhatsApp or email so guidance can begin.",
     });
     setStep(3);
   }
@@ -156,7 +156,7 @@ export function BeginFlow() {
         <span className="h-px flex-1 bg-line" />
         <StepPill active={step === 2} done={step > 2} label="02 Details" />
         <span className="h-px flex-1 bg-line" />
-        <StepPill active={step === 3} done={false} label="03 Tracking" />
+        <StepPill active={step === 3} done={false} label="03 Send" />
       </div>
 
       {step === 1 && (
@@ -169,8 +169,8 @@ export function BeginFlow() {
               What are you facing?
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-fog">
-              Choose the concern closest to your heart. You will receive a
-              unique tracking number to follow updates.
+              Choose the concern closest to your heart. Next we ask only what is
+              needed for a private, respectful consultation.
             </p>
           </div>
 
@@ -222,6 +222,10 @@ export function BeginFlow() {
             <p className="mt-4 max-w-xl text-base leading-relaxed text-fog">
               Concern selected:{" "}
               <span className="text-cream">{concern?.title}</span>
+            </p>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-fog/80">
+              Privacy: your name, mother&apos;s name, phone, and location are
+              used only to understand and respond to your request.
             </p>
           </div>
 
@@ -362,11 +366,11 @@ export function BeginFlow() {
               Request created
             </p>
             <h1 className="mt-4 font-display text-4xl leading-tight text-cream md:text-5xl">
-              Save your tracking number
+              Your message is ready
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-fog">
-              Use this number anytime to check status. You can also notify us on
-              WhatsApp or email with the same details.
+              Keep this reference. Send the prepared message on WhatsApp or
+              email — then wait for a calm, private reply.
             </p>
           </div>
 

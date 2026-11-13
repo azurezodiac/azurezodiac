@@ -5,23 +5,23 @@ export const CONTACT_WHATSAPP = "923452845400";
 export const CONCERNS = [
   {
     id: "evil-eye",
-    title: "Evil eye & envy",
-    hint: "Hasad, heaviness, or unsettled protection.",
+    title: "Nazar & hasad",
+    hint: "Sudden heaviness, envy, or unsettled protection around home or family.",
   },
   {
     id: "black-magic",
-    title: "Black magic concerns",
-    hint: "Fear, unusual strain, or spiritual disturbance.",
+    title: "Sihr & dark disturbance",
+    hint: "Unusual fear, dreams, or strain that feels beyond ordinary hardship.",
   },
   {
     id: "renewal",
     title: "Spiritual renewal",
-    hint: "Distance from remembrance, clarity, or peace.",
+    hint: "Distance from salah, dua, clarity, or inner peace.",
   },
   {
     id: "other",
     title: "Something else",
-    hint: "Another burden you want to name carefully.",
+    hint: "Another burden you want to share privately and carefully.",
   },
 ] as const;
 
@@ -40,27 +40,32 @@ export type ConsultationPayload = {
 
 export function buildConsultationMessage(data: ConsultationPayload): string {
   const lines = [
-    "Assalamu alaikum — Redeemysoul consultation request",
+    "Assalamu alaikum,",
+    "",
+    "I am requesting Islamic healing guidance from Redeemysoul.",
     "",
   ];
 
   if (data.trackingNumber) {
-    lines.push(`Tracking: ${data.trackingNumber}`);
+    lines.push(`Reference: ${data.trackingNumber}`, "");
   }
 
   lines.push(
     `Concern: ${data.concernTitle}`,
     `Name: ${data.name}`,
     `Mother's name: ${data.motherName}`,
-    `Closest location: ${data.location}`,
-    `Phone: ${data.phone}`,
+    `Location: ${data.location}`,
+    `WhatsApp: ${data.phone}`,
   );
 
   if (data.note?.trim()) {
-    lines.push(`Note: ${data.note.trim()}`);
+    lines.push(`Details: ${data.note.trim()}`);
   }
 
-  lines.push("", "Please guide me on the next step.");
+  lines.push(
+    "",
+    "Please guide me on the next step. JazakAllahu khairan.",
+  );
   return lines.join("\n");
 }
 
