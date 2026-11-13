@@ -1,5 +1,5 @@
 /** Update these to your real inbox / WhatsApp (digits only, country code, no +). */
-export const CONTACT_EMAIL = "hello@redeemysoul.com";
+export const CONTACT_EMAIL = "Roohaniilajkarachi@gmail.com";
 export const CONTACT_WHATSAPP = "923001234567";
 
 export const CONCERNS = [
