@@ -62,6 +62,33 @@ export function BeginFlow() {
     location.trim().length > 1 &&
     phone.replace(/\D/g, "").length >= 10;
 
+  function createStaticFallback() {
+    const phoneKey = phone.replace(/\D/g, "");
+    const storageKey = `rs-open-${phoneKey}`;
+    const existing = window.localStorage.getItem(storageKey);
+    if (existing) {
+      setDuplicate({
+        trackingNumber: existing,
+        status: "pending",
+        statusNote:
+          "A request is already pending for this number on this device. Contact admin to clear, or notify again on WhatsApp/email.",
+      });
+      setStep(3);
+      return;
+    }
+
+    const token = Math.random().toString(16).slice(2, 8).toUpperCase();
+    const trackingNumber = `RS-${new Date().getFullYear()}-${token}`;
+    window.localStorage.setItem(storageKey, trackingNumber);
+    setCreated({
+      trackingNumber,
+      status: "pending",
+      statusNote:
+        "Static hosting mode: notify via WhatsApp or email. Server tracking unlocks on Node hosting.",
+    });
+    setStep(3);
+  }
+
   async function submitRequest() {
     if (!concern || !detailsReady || submitting) return;
     setSubmitting(true);
@@ -81,6 +108,12 @@ export function BeginFlow() {
           note,
         }),
       });
+
+      // cPanel static hosting has no API — fall back to WhatsApp/email flow.
+      if (response.status === 404 || response.status === 405) {
+        createStaticFallback();
+        return;
+      }
 
       const data = (await response.json()) as {
         error?: string;
@@ -110,7 +143,7 @@ export function BeginFlow() {
       });
       setStep(3);
     } catch {
-      setError("Network error. Please try again.");
+      createStaticFallback();
     } finally {
       setSubmitting(false);
     }
