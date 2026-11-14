@@ -17,6 +17,7 @@ type Dictionary = {
     services: string;
     path: string;
     learn: string;
+    topics: string;
     about: string;
     visit: string;
     privacy: string;
@@ -176,6 +177,7 @@ const en: Dictionary = {
     services: "Services",
     path: "How it works",
     learn: "Learn",
+    topics: "Topics",
     about: "About",
     visit: "Visit",
     privacy: "Privacy",
@@ -582,6 +584,7 @@ const ur: Dictionary = {
     services: "خدمات",
     path: "طریقہ کار",
     learn: "سمجھیں",
+    topics: "موضوعات",
     about: "تعارف",
     visit: "مقام",
     privacy: "رازداری",

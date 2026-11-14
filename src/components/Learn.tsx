@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import { useLang } from "@/lib/i18n";
+import { SEO_TOPICS } from "@/lib/seo-topics";
 
 export function Learn() {
   const { t } = useLang();
@@ -115,15 +116,44 @@ export function Learn() {
           </div>
         </div>
 
+        <div className="mt-16 border-t border-line pt-10">
+          <h3 className="font-display text-2xl text-cream md:text-3xl">
+            {t.nav.topics}
+          </h3>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-fog">
+            Jadoo · Sihr · Sifli · Jinnat · Aseeb · Bandish · Taweez · Spiritual
+            Reiki · SAMADA Energies · Magic Grimoire · Ruqyah Karachi
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {SEO_TOPICS.map((topic) => (
+              <Link
+                key={topic.slug}
+                href={`/topics/${topic.slug}`}
+                className="border border-line px-4 py-2 text-sm text-fog transition-colors duration-300 hover:border-gold hover:text-gold-bright"
+              >
+                {topic.title}
+              </Link>
+            ))}
+          </div>
+        </div>
+
         <div className="mt-16 max-w-3xl border-t border-line pt-8">
           <p className="text-base leading-relaxed text-fog">{t.learn.closing}</p>
           <HealingDisclaimer className="mt-6" />
-          <Link
-            href="/begin"
-            className="mt-8 inline-flex bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
-          >
-            {t.nav.begin}
-          </Link>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/begin"
+              className="inline-flex bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
+            >
+              {t.nav.begin}
+            </Link>
+            <Link
+              href="/topics"
+              className="inline-flex border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
+            >
+              {t.nav.topics}
+            </Link>
+          </div>
         </div>
       </div>
     </section>

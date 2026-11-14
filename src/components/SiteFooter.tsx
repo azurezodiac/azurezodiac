@@ -73,11 +73,20 @@ export function SiteFooter() {
             <Link href="/#learn" className="hover:text-gold-bright">
               {t.nav.learn}
             </Link>
+            <Link href="/topics" className="hover:text-gold-bright">
+              {t.nav.topics}
+            </Link>
             <Link href="/#services" className="hover:text-gold-bright">
               {t.nav.services}
             </Link>
-            <Link href="/#faq" className="hover:text-gold-bright">
-              {t.nav.faq}
+            <Link href="/topics/jadoo-sihr-sifli" className="hover:text-gold-bright">
+              Jadoo / Sihr
+            </Link>
+            <Link href="/topics/jinnat-aseeb" className="hover:text-gold-bright">
+              Jinnat / Aseeb
+            </Link>
+            <Link href="/topics/bandish" className="hover:text-gold-bright">
+              Bandish
             </Link>
             <a
               href={`mailto:${SITE.email}`}

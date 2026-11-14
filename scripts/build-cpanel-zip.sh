@@ -26,13 +26,26 @@ trap cleanup EXIT
 export CPANEL_STATIC=1
 pnpm build
 
-# Apache/cPanel expects folder/index.html for /begin/ style URLs.
-for route in begin track admin; do
+# Apache/cPanel expects folder/index.html for pretty URLs.
+for route in begin track admin topics; do
   if [[ -f "out/${route}.html" ]]; then
     mkdir -p "out/${route}"
     cp "out/${route}.html" "out/${route}/index.html"
   fi
 done
+
+# Nested dynamic SEO topics: out/topics/<slug>.html -> out/topics/<slug>/index.html
+if [[ -d out/topics ]]; then
+  shopt -s nullglob
+  for html in out/topics/*.html; do
+    base="$(basename "$html" .html)"
+    if [[ "$base" != "index" ]]; then
+      mkdir -p "out/topics/${base}"
+      cp "$html" "out/topics/${base}/index.html"
+    fi
+  done
+  shopt -u nullglob
+fi
 
 # Ensure htaccess is present in the static export root.
 if [[ -f public/.htaccess ]]; then

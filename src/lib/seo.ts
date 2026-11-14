@@ -1,3 +1,5 @@
+import { DYNAMIC_SEO_KEYWORDS } from "@/lib/seo-topics";
+
 export const SITE_URL = "https://redeemysoul.com";
 
 export const SITE = {
@@ -24,28 +26,41 @@ export const SITE = {
 } as const;
 
 export const DEFAULT_TITLE =
-  "Spiritual Healing Shazli Karachi | Islamic Ruqyah, Nazar & Sihr Care | Redeemysoul";
+  "Spiritual Healing Shazli Karachi | Jadoo Sihr Jinnat Bandish Taweez Ruqyah | Redeemysoul";
 
 export const DEFAULT_DESCRIPTION =
-  "Spiritual Healing Shazli (Redeemysoul) offers private Islamic healing and ruqyah-centered guidance in Karachi for nazar, sihr/jadoo concerns, bandish, home cleansing, and spiritual renewal. Not a substitute for medical treatment. Shifa is from Allah alone. No guarantee of healing.";
+  "Spiritual Healing Shazli (Redeemysoul) — Karachi Islamic healing for jadoo, sihr, sifli sihr, jinnat, aseeb, bandish, taweez, nazar, home cleansing, and seekers of Spiritual Reiki, SAMADA Energies, or magic/grimoire clarity. Not medical treatment. Shifa from Allah alone. No guarantee of healing.";
 
-export const KEYWORDS = [
-  "Spiritual Healing Shazli",
-  "Redeemysoul",
-  "Islamic healing Karachi",
-  "ruqyah Karachi",
-  "spiritual healer Karachi",
-  "nazar ka ilaj",
-  "jadoo ka ilaj",
-  "sihr treatment Karachi",
-  "roohani ilaj Karachi",
-  "home cleansing spiritual",
-  "bandish ka ilaj",
-  "jinn spiritual care",
-  "Baldia Town spiritual healing",
-  "Ejaz Noor Shazli",
-  "Islamic ruqyah Pakistan",
-] as const;
+export const KEYWORDS = Array.from(
+  new Set([
+    "Spiritual Healing Shazli",
+    "Redeemysoul",
+    "Islamic healing Karachi",
+    "ruqyah Karachi",
+    "spiritual healer Karachi",
+    "nazar ka ilaj",
+    "jadoo ka ilaj",
+    "sihr treatment Karachi",
+    "roohani ilaj Karachi",
+    "home cleansing spiritual",
+    "bandish ka ilaj",
+    "jinn spiritual care",
+    "Baldia Town spiritual healing",
+    "Ejaz Noor Shazli",
+    "Islamic ruqyah Pakistan",
+    "Spiritual Reiki",
+    "SAMADA Energies",
+    "Magic Grimoire",
+    "Taweez",
+    "Jadoo",
+    "Jinnat",
+    "Bandish",
+    "Sifli Sihar",
+    "Sifli Sihr",
+    "Aseeb",
+    ...DYNAMIC_SEO_KEYWORDS,
+  ]),
+);
 
 /** English FAQ for FAQPage schema (matches default indexed language). */
 export const FAQ_SCHEMA_ITEMS = [
@@ -171,8 +186,14 @@ export function buildGraphJsonLd() {
       "Islamic ruqyah",
       "Nazar and hasad",
       "Sihr and spiritual disturbance",
-      "Home spiritual cleansing",
+      "Jadoo and sifli sihr",
+      "Jinnat and aseeb",
       "Bandish and marriage obstacles",
+      "Taweez-related concerns",
+      "Home spiritual cleansing",
+      "Spiritual Reiki seekers",
+      "SAMADA Energies seekers",
+      "Magic and grimoire spiritual strain",
       "Jinn-related spiritual care",
     ],
     slogan: SITE.tagline,
