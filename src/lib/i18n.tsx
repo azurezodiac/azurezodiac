@@ -177,15 +177,36 @@ type Dictionary = {
     hadiyaTxnHint: string;
     hadiyaTxnError: string;
     hadiyaNote: string;
+    receiptLabel: string;
+    receiptHint: string;
+    receiptOptional: string;
+    receiptChosen: string;
+    receiptClear: string;
+    receiptErrorType: string;
+    receiptErrorSize: string;
+    receiptWaHint: string;
     readyTitle: string;
     readyIntro: string;
     reference: string;
     track: string;
     notifyWa: string;
     notifyEmail: string;
+    downloadPrepPdf: string;
     pendingTitle: string;
     pendingIntro: string;
     checkStatus: string;
+    errors: {
+      pickConcern: string;
+      name: string;
+      mother: string;
+      location: string;
+      phone: string;
+      phoneShort: string;
+      txn: string;
+      submit: string;
+      fixDetails: string;
+      fixHadiya: string;
+    };
     concerns: { id: string; title: string; hint: string }[];
   };
   track: {
@@ -603,6 +624,16 @@ const en: Dictionary = {
     hadiyaTxnError: "Enter exactly 5 digits from your transaction.",
     hadiyaNote:
       "This Hadiya is for initial spiritual diagnosis only. It is not a medical fee. Shifa is from Allah alone; no guarantee of healing is offered.",
+    receiptLabel: "Receipt screenshot",
+    receiptHint:
+      "Optional. Upload a clear photo of your EasyPaisa / bank receipt. You will send it in WhatsApp after create.",
+    receiptOptional: "Optional",
+    receiptChosen: "Selected",
+    receiptClear: "Remove",
+    receiptErrorType: "Please choose an image file (JPG, PNG, or WEBP).",
+    receiptErrorSize: "Image must be under 2 MB.",
+    receiptWaHint:
+      "Send this receipt image in the WhatsApp chat after your text message.",
     readyTitle: "Your message is ready",
     readyIntro:
       "Keep this reference. Send the prepared message on WhatsApp or email — your Hadiya transaction digits are included so diagnosis can be verified.",
@@ -610,10 +641,23 @@ const en: Dictionary = {
     track: "Track status",
     notifyWa: "Notify on WhatsApp",
     notifyEmail: "Notify by email",
+    downloadPrepPdf: "PDF — what to prepare",
     pendingTitle: "Request already pending",
     pendingIntro:
       "This WhatsApp / mobile already has an open request. A new one cannot be created until it is cleared.",
     checkStatus: "Check status",
+    errors: {
+      pickConcern: "Please choose a concern before continuing.",
+      name: "Please enter your full name (at least 2 letters).",
+      mother: "Please enter your mother's name (at least 2 letters).",
+      location: "Please enter your city or area.",
+      phone: "Please enter a valid WhatsApp / mobile number.",
+      phoneShort: "Number looks too short — include country code if needed.",
+      txn: "Enter exactly 5 digits from your transaction ID.",
+      submit: "Could not create the request. Please try again.",
+      fixDetails: "Please fix the highlighted fields below.",
+      fixHadiya: "Complete Hadiya digits before creating your request.",
+    },
     concerns: [
       {
         id: "evil-eye",
@@ -1082,9 +1126,19 @@ const ur: Dictionary = {
     hadiyaTxnPh: "مثلاً ۴۸۲۹۱",
     hadiyaTxnHint:
       "ہدیہ بھیجنے کے بعد صرف ٹرانزیکشن آئی ڈی / رسید کے آخری ۵ ہندسے لکھیں۔",
-    hadiyaTxnError: "بالکل ۵ ہندسے درج کریں۔",
+    hadiyaTxnError: "بالکل ۵ ہندسے درج کریں — کم یا زیادہ نہیں۔",
     hadiyaNote:
       "یہ ہدیہ صرف ابتدائی روحانی تشخیص کے لیے ہے۔ یہ طبی فیس نہیں۔ شفا اللہ کی طرف سے ہے؛ شفا کی کوئی ضمانت نہیں۔",
+    receiptLabel: "رسید کا اسکرین شاٹ",
+    receiptHint:
+      "اختیاری۔ ایزی پیسہ / بینک رسید کی واضح تصویر لگائیں۔ درخواست بننے کے بعد اسے واٹس ایپ میں بھیجیں گے۔",
+    receiptOptional: "اختیاری",
+    receiptChosen: "منتخب",
+    receiptClear: "ہٹائیں",
+    receiptErrorType: "براہ کرم تصویر کا فائل چنیں (JPG، PNG یا WEBP)۔",
+    receiptErrorSize: "تصویر ۲ میگا بائٹ سے کم ہونی چاہیے۔",
+    receiptWaHint:
+      "متنی پیغام کے بعد واٹس ایپ چیٹ میں یہ رسید کی تصویر بھیج دیں۔",
     readyTitle: "آپ کا پیغام تیار ہے",
     readyIntro:
       "یہ حوالہ محفوظ رکھیں۔ تیار پیغام واٹس ایپ یا ای میل پر بھیجیں — ہدیہ کے لین دین کے ہندسے شامل ہیں تاکہ تشخیص کی تصدیق ہو سکے۔",
@@ -1092,10 +1146,23 @@ const ur: Dictionary = {
     track: "حالت دیکھیں",
     notifyWa: "واٹس ایپ پر بھیجیں",
     notifyEmail: "ای میل پر بھیجیں",
+    downloadPrepPdf: "پی ڈی ایف — کیا تیار رکھیں",
     pendingTitle: "درخواست پہلے سے زیر التوا ہے",
     pendingIntro:
       "اس واٹس ایپ / موبائل پر ایک کھلی درخواست موجود ہے۔ صاف ہونے تک نئی درخواست نہیں بنے گی۔",
     checkStatus: "حالت چیک کریں",
+    errors: {
+      pickConcern: "آگے بڑھنے سے پہلے مسئلہ منتخب کریں۔",
+      name: "براہ کرم اپنا پورا نام لکھیں (کم از کم ۲ حروف)۔",
+      mother: "براہ کرم والدہ کا نام لکھیں (کم از کم ۲ حروف)۔",
+      location: "براہ کرم اپنا شہر یا علاقہ لکھیں۔",
+      phone: "درست واٹس ایپ / موبائل نمبر درج کریں۔",
+      phoneShort: "نمبر بہت چھوٹا لگتا ہے — ضرورت ہو تو کنٹری کوڈ شامل کریں۔",
+      txn: "لین دین کے بالکل ۵ ہندسے درج کریں۔",
+      submit: "درخواست نہیں بن سکی۔ دوبارہ کوشش کریں۔",
+      fixDetails: "نیچے نشاندہی شدہ خانے درست کریں۔",
+      fixHadiya: "درخواست بنانے سے پہلے ہدیہ کے ۵ ہندسے مکمل کریں۔",
+    },
     concerns: [
       {
         id: "evil-eye",

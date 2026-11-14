@@ -9,7 +9,7 @@ export function SiteFooter() {
   const { t } = useLang();
 
   return (
-    <footer className="border-t border-line bg-ink">
+    <footer className="border-t border-line bg-ink max-md:pb-20">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 py-12 md:px-10 md:py-14">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <div>

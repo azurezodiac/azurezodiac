@@ -16,6 +16,7 @@ import {
   whatsappHref,
 } from "@/lib/consultation";
 import { useLang } from "@/lib/i18n";
+import { openPrepareGuidePdf } from "@/lib/prepare-guide";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -31,11 +32,32 @@ type DuplicateInfo = {
   statusNote: string;
 };
 
+type FieldErrors = {
+  concern?: string;
+  name?: string;
+  mother?: string;
+  location?: string;
+  phone?: string;
+  txn?: string;
+  receipt?: string;
+};
+
+const MAX_RECEIPT_BYTES = 2 * 1024 * 1024;
+const RECEIPT_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/jpg",
+]);
+
 const fieldClass =
   "w-full border border-line bg-ink/60 px-4 py-3 text-cream outline-none transition-colors duration-300 placeholder:text-fog/50 focus:border-gold";
 
+const fieldErrorClass =
+  "w-full border border-red-400/70 bg-ink/60 px-4 py-3 text-cream outline-none transition-colors duration-300 placeholder:text-fog/50 focus:border-red-300";
+
 export function BeginFlow() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const [step, setStep] = useState<Step>(1);
   const [concernId, setConcernId] = useState<ConcernId | null>(null);
   const [name, setName] = useState("");
@@ -50,9 +72,12 @@ export function BeginFlow() {
   const [hadiyaRegion, setHadiyaRegion] =
     useState<HadiyaRegion>("pakistan");
   const [txnLast5, setTxnLast5] = useState("");
+  const [receiptName, setReceiptName] = useState("");
+  const [receiptPreview, setReceiptPreview] = useState("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [created, setCreated] = useState<CreatedRequest | null>(null);
   const [duplicate, setDuplicate] = useState<DuplicateInfo | null>(null);
   const [waOpened, setWaOpened] = useState(false);
@@ -62,6 +87,7 @@ export function BeginFlow() {
 
   const txnClean = txnLast5.replace(/\D/g, "").slice(0, 5);
   const hadiyaReady = txnClean.length === 5;
+  const phoneDigits = phone.replace(/\D/g, "");
 
   const appointmentDayLabel =
     t.begin.appointmentDays[appointmentDay] ?? appointmentDay;
@@ -102,12 +128,6 @@ export function BeginFlow() {
     appointmentTimeLabel,
   ]);
 
-  const detailsReady =
-    name.trim().length > 1 &&
-    motherName.trim().length > 1 &&
-    location.trim().length > 1 &&
-    phone.replace(/\D/g, "").length >= 10;
-
   const selectedHadiya = HADIYA[hadiyaRegion];
   const waLink = message ? whatsappHref(message) : "";
 
@@ -128,6 +148,82 @@ export function BeginFlow() {
     } catch {
       setCopiedKey(null);
     }
+  }
+
+  function validateDetails(): FieldErrors {
+    const next: FieldErrors = {};
+    if (name.trim().length < 2) next.name = t.begin.errors.name;
+    if (motherName.trim().length < 2) next.mother = t.begin.errors.mother;
+    if (location.trim().length < 2) next.location = t.begin.errors.location;
+    if (phoneDigits.length === 0) next.phone = t.begin.errors.phone;
+    else if (phoneDigits.length < 10) next.phone = t.begin.errors.phoneShort;
+    return next;
+  }
+
+  function validateHadiya(): FieldErrors {
+    const next: FieldErrors = {};
+    if (txnClean.length !== 5) next.txn = t.begin.errors.txn;
+    return next;
+  }
+
+  function tryStep2() {
+    if (!concernId) {
+      setFieldErrors({ concern: t.begin.errors.pickConcern });
+      return;
+    }
+    setFieldErrors({});
+    setStep(2);
+  }
+
+  function tryStep3() {
+    const next = validateDetails();
+    setFieldErrors(next);
+    if (Object.keys(next).length > 0) {
+      setError(t.begin.errors.fixDetails);
+      return;
+    }
+    setError("");
+    setStep(3);
+  }
+
+  function onReceiptChange(file: File | null) {
+    setFieldErrors((prev) => ({ ...prev, receipt: undefined }));
+    if (!file) {
+      setReceiptName("");
+      setReceiptPreview("");
+      return;
+    }
+    if (!RECEIPT_TYPES.has(file.type)) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        receipt: t.begin.receiptErrorType,
+      }));
+      setReceiptName("");
+      setReceiptPreview("");
+      return;
+    }
+    if (file.size > MAX_RECEIPT_BYTES) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        receipt: t.begin.receiptErrorSize,
+      }));
+      setReceiptName("");
+      setReceiptPreview("");
+      return;
+    }
+    setReceiptName(file.name);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === "string" ? reader.result : "";
+      setReceiptPreview(result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearReceipt() {
+    setReceiptName("");
+    setReceiptPreview("");
+    setFieldErrors((prev) => ({ ...prev, receipt: undefined }));
   }
 
   function createStaticFallback() {
@@ -161,6 +257,16 @@ export function BeginFlow() {
         updatedAt: new Date().toISOString(),
       }),
     );
+    if (receiptPreview) {
+      try {
+        window.localStorage.setItem(
+          `rs-receipt-${trackingNumber}`,
+          JSON.stringify({ name: receiptName, dataUrl: receiptPreview }),
+        );
+      } catch {
+        // Quota — preview still in memory for this session.
+      }
+    }
     setCreated({
       trackingNumber,
       status: "pending",
@@ -176,13 +282,22 @@ export function BeginFlow() {
       `Txn last 5: ${txnClean}`,
       `Preferred day: ${appointmentDayLabel}`,
       `Preferred time: ${appointmentTimeLabel}`,
+      receiptName
+        ? `Receipt screenshot: ${receiptName} (send image in WhatsApp)`
+        : "Receipt screenshot: not attached",
     ].join(" | ");
     const base = note.trim();
     return base ? `${base}\n\n${extras}` : extras;
   }
 
   async function submitRequest() {
-    if (!concern || !detailsReady || !hadiyaReady || submitting) return;
+    const hadiyaErrors = validateHadiya();
+    setFieldErrors(hadiyaErrors);
+    if (Object.keys(hadiyaErrors).length > 0) {
+      setError(t.begin.errors.fixHadiya);
+      return;
+    }
+    if (!concern || submitting) return;
     setSubmitting(true);
     setError("");
     setDuplicate(null);
@@ -205,6 +320,7 @@ export function BeginFlow() {
           hadiyaTxnLast5: txnClean,
           appointmentDay,
           appointmentTime,
+          receiptFilename: receiptName || undefined,
         }),
       });
 
@@ -230,8 +346,19 @@ export function BeginFlow() {
       }
 
       if (!response.ok || !data.request) {
-        setError(data.message || data.error || "Could not create request.");
+        setError(data.message || data.error || t.begin.errors.submit);
         return;
+      }
+
+      if (receiptPreview) {
+        try {
+          window.localStorage.setItem(
+            `rs-receipt-${data.request.trackingNumber}`,
+            JSON.stringify({ name: receiptName, dataUrl: receiptPreview }),
+          );
+        } catch {
+          // ignore quota
+        }
       }
 
       setCreated({
@@ -245,6 +372,21 @@ export function BeginFlow() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function downloadPrep() {
+    if (!created || !concern) return;
+    openPrepareGuidePdf({
+      trackingNumber: created.trackingNumber,
+      concernTitle: concern.title,
+      name: name.trim(),
+      lang,
+      appointmentDayLabel,
+      appointmentTimeLabel,
+      hadiyaLabel: selectedHadiya.amountLabel,
+      txnLast5: txnClean,
+      hasReceipt: Boolean(receiptName),
+    });
   }
 
   return (
@@ -294,7 +436,10 @@ export function BeginFlow() {
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => setConcernId(item.id as ConcernId)}
+                  onClick={() => {
+                    setConcernId(item.id as ConcernId);
+                    setFieldErrors((prev) => ({ ...prev, concern: undefined }));
+                  }}
                   className={`border px-5 py-5 text-start transition-colors duration-300 ${
                     selected
                       ? "border-gold bg-gold/10"
@@ -312,11 +457,16 @@ export function BeginFlow() {
             })}
           </div>
 
+          {fieldErrors.concern ? (
+            <p className="text-sm text-red-300" role="alert">
+              {fieldErrors.concern}
+            </p>
+          ) : null}
+
           <button
             type="button"
-            disabled={!concernId}
-            onClick={() => setStep(2)}
-            className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright disabled:cursor-not-allowed disabled:opacity-40"
+            onClick={tryStep2}
+            className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
           >
             {t.begin.continue}
           </button>
@@ -341,54 +491,56 @@ export function BeginFlow() {
             </p>
           </div>
 
+          {error ? (
+            <p className="text-sm text-red-300" role="alert">
+              {error}
+            </p>
+          ) : null}
+
           <div className="space-y-5">
-            <label className="block">
-              <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
-                {t.begin.name}
-              </span>
-              <input
-                className={fieldClass}
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder={t.begin.namePh}
-                autoComplete="name"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
-                {t.begin.mother}
-              </span>
-              <input
-                className={fieldClass}
-                value={motherName}
-                onChange={(event) => setMotherName(event.target.value)}
-                placeholder={t.begin.motherPh}
-              />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
-                {t.begin.location}
-              </span>
-              <input
-                className={fieldClass}
-                value={location}
-                onChange={(event) => setLocation(event.target.value)}
-                placeholder={t.begin.locationPh}
-              />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
-                {t.begin.phone}
-              </span>
-              <input
-                className={fieldClass}
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
-                placeholder={t.begin.phonePh}
-                inputMode="tel"
-                autoComplete="tel"
-              />
-            </label>
+            <Field
+              label={t.begin.name}
+              error={fieldErrors.name}
+              value={name}
+              onChange={setName}
+              placeholder={t.begin.namePh}
+              autoComplete="name"
+              clearError={() =>
+                setFieldErrors((prev) => ({ ...prev, name: undefined }))
+              }
+            />
+            <Field
+              label={t.begin.mother}
+              error={fieldErrors.mother}
+              value={motherName}
+              onChange={setMotherName}
+              placeholder={t.begin.motherPh}
+              clearError={() =>
+                setFieldErrors((prev) => ({ ...prev, mother: undefined }))
+              }
+            />
+            <Field
+              label={t.begin.location}
+              error={fieldErrors.location}
+              value={location}
+              onChange={setLocation}
+              placeholder={t.begin.locationPh}
+              clearError={() =>
+                setFieldErrors((prev) => ({ ...prev, location: undefined }))
+              }
+            />
+            <Field
+              label={t.begin.phone}
+              error={fieldErrors.phone}
+              value={phone}
+              onChange={setPhone}
+              placeholder={t.begin.phonePh}
+              inputMode="tel"
+              autoComplete="tel"
+              clearError={() =>
+                setFieldErrors((prev) => ({ ...prev, phone: undefined }))
+              }
+            />
 
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="block">
@@ -449,16 +601,19 @@ export function BeginFlow() {
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={() => setStep(1)}
+              onClick={() => {
+                setError("");
+                setFieldErrors({});
+                setStep(1);
+              }}
               className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
             >
               {t.begin.back}
             </button>
             <button
               type="button"
-              disabled={!detailsReady}
-              onClick={() => setStep(3)}
-              className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={tryStep3}
+              className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
             >
               {t.begin.toHadiya}
             </button>
@@ -546,47 +701,112 @@ export function BeginFlow() {
             </div>
           </div>
 
-          <label className="block">
-            <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
-              {t.begin.hadiyaTxnLabel}
-            </span>
-            <input
-              className={fieldClass}
-              value={txnLast5}
-              onChange={(event) =>
-                setTxnLast5(event.target.value.replace(/\D/g, "").slice(0, 5))
-              }
-              placeholder={t.begin.hadiyaTxnPh}
-              inputMode="numeric"
-              maxLength={5}
-              autoComplete="off"
-            />
-            <span className="mt-2 block text-sm leading-relaxed text-fog/80">
-              {t.begin.hadiyaTxnHint}
-            </span>
-          </label>
+          <div className="grid gap-6 md:grid-cols-2">
+            <label className="block">
+              <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
+                {t.begin.hadiyaTxnLabel}
+              </span>
+              <input
+                className={fieldErrors.txn ? fieldErrorClass : fieldClass}
+                value={txnLast5}
+                onChange={(event) => {
+                  setTxnLast5(
+                    event.target.value.replace(/\D/g, "").slice(0, 5),
+                  );
+                  setFieldErrors((prev) => ({ ...prev, txn: undefined }));
+                }}
+                placeholder={t.begin.hadiyaTxnPh}
+                inputMode="numeric"
+                maxLength={5}
+                autoComplete="off"
+                aria-invalid={Boolean(fieldErrors.txn)}
+              />
+              <span className="mt-2 block text-sm leading-relaxed text-fog/80">
+                {t.begin.hadiyaTxnHint}
+              </span>
+              {fieldErrors.txn ? (
+                <span className="mt-2 block text-sm text-red-300" role="alert">
+                  {fieldErrors.txn}
+                </span>
+              ) : !hadiyaReady && txnLast5.length > 0 ? (
+                <span className="mt-2 block text-sm text-gold">
+                  {t.begin.hadiyaTxnError}
+                </span>
+              ) : null}
+            </label>
+
+            <div className="block">
+              <span className="mb-2 flex items-center gap-2 text-xs tracking-[0.16em] uppercase text-fog">
+                {t.begin.receiptLabel}
+                <span className="text-fog/60">({t.begin.receiptOptional})</span>
+              </span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="block w-full text-sm text-fog file:me-3 file:border-0 file:bg-gold/90 file:px-3 file:py-2 file:text-xs file:tracking-[0.12em] file:uppercase file:text-ink"
+                onChange={(event) =>
+                  onReceiptChange(event.target.files?.[0] ?? null)
+                }
+              />
+              <span className="mt-2 block text-sm leading-relaxed text-fog/80">
+                {t.begin.receiptHint}
+              </span>
+              {fieldErrors.receipt ? (
+                <span className="mt-2 block text-sm text-red-300" role="alert">
+                  {fieldErrors.receipt}
+                </span>
+              ) : null}
+              {receiptPreview ? (
+                <div className="mt-4 flex items-start gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={receiptPreview}
+                    alt=""
+                    className="h-20 w-20 object-cover border border-line"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-cream">
+                      {t.begin.receiptChosen}: {receiptName}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={clearReceipt}
+                      className="mt-2 text-xs tracking-[0.12em] uppercase text-gold hover:text-gold-bright"
+                    >
+                      {t.begin.receiptClear}
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
 
           <p className="text-sm leading-relaxed text-fog/85">
             {t.begin.hadiyaNote}
           </p>
 
-          {error ? <p className="text-sm text-red-300">{error}</p> : null}
-          {!hadiyaReady && txnLast5.length > 0 ? (
-            <p className="text-sm text-gold">{t.begin.hadiyaTxnError}</p>
+          {error ? (
+            <p className="text-sm text-red-300" role="alert">
+              {error}
+            </p>
           ) : null}
 
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={() => setStep(2)}
+              onClick={() => {
+                setError("");
+                setFieldErrors({});
+                setStep(2);
+              }}
               className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
             >
               {t.begin.back}
             </button>
             <button
               type="button"
-              disabled={!hadiyaReady || submitting}
-              onClick={submitRequest}
+              disabled={submitting}
+              onClick={() => void submitRequest()}
               className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright disabled:cursor-not-allowed disabled:opacity-40"
             >
               {submitting ? t.begin.submitting : t.begin.submit}
@@ -671,6 +891,21 @@ export function BeginFlow() {
             </p>
           </div>
 
+          {receiptPreview ? (
+            <div className="border border-line bg-ink/40 px-5 py-5">
+              <p className="text-sm text-gold">{t.begin.receiptWaHint}</p>
+              <div className="mt-4 flex items-center gap-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={receiptPreview}
+                  alt=""
+                  className="h-24 w-24 object-cover border border-line"
+                />
+                <p className="text-sm text-fog">{receiptName}</p>
+              </div>
+            </div>
+          ) : null}
+
           <pre className="overflow-x-auto whitespace-pre-wrap border border-line bg-ink/50 px-5 py-5 font-sans text-sm leading-relaxed text-mist">
             {message}
           </pre>
@@ -684,9 +919,16 @@ export function BeginFlow() {
             >
               {t.begin.openWaNow}
             </a>
+            <button
+              type="button"
+              onClick={downloadPrep}
+              className="border border-gold/50 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-gold transition-colors duration-300 hover:border-gold-bright hover:text-gold-bright"
+            >
+              {t.begin.downloadPrepPdf}
+            </button>
             <a
               href={emailHref(message)}
-              className="border border-gold/50 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-gold transition-colors duration-300 hover:border-gold-bright hover:text-gold-bright"
+              className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
             >
               {t.begin.notifyEmail}
             </a>
@@ -700,6 +942,51 @@ export function BeginFlow() {
         </section>
       )}
     </div>
+  );
+}
+
+function Field({
+  label,
+  error,
+  value,
+  onChange,
+  placeholder,
+  inputMode,
+  autoComplete,
+  clearError,
+}: {
+  label: string;
+  error?: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  inputMode?: "tel" | "text";
+  autoComplete?: string;
+  clearError: () => void;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
+        {label}
+      </span>
+      <input
+        className={error ? fieldErrorClass : fieldClass}
+        value={value}
+        onChange={(event) => {
+          onChange(event.target.value);
+          clearError();
+        }}
+        placeholder={placeholder}
+        inputMode={inputMode}
+        autoComplete={autoComplete}
+        aria-invalid={Boolean(error)}
+      />
+      {error ? (
+        <span className="mt-2 block text-sm text-red-300" role="alert">
+          {error}
+        </span>
+      ) : null}
+    </label>
   );
 }
 

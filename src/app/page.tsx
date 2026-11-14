@@ -8,6 +8,7 @@ import { Hero } from "@/components/Hero";
 import { Hours } from "@/components/Hours";
 import { Learn } from "@/components/Learn";
 import { Location } from "@/components/Location";
+import { MobileStickyBegin } from "@/components/MobileStickyBegin";
 import { Path } from "@/components/Path";
 import { Services } from "@/components/Services";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -55,6 +56,7 @@ export default function Home() {
         <Contact />
       </main>
       <SiteFooter />
+      <MobileStickyBegin />
     </>
   );
 }
