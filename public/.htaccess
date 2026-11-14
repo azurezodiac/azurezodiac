@@ -41,7 +41,13 @@ DirectoryIndex index.html
   RewriteRule ^track/?$ /track/index.html [L]
   RewriteRule ^admin/?$ /admin/index.html [L]
   RewriteRule ^pricing/?$ /pricing/index.html [L]
+  RewriteRule ^blog/?$ /blog/index.html [L]
+  RewriteRule ^blog/([a-z0-9-]+)/?$ /blog/$1/index.html [L]
+  RewriteRule ^locations/?$ /locations/index.html [L]
+  RewriteRule ^locations/([a-z0-9-]+)/?$ /locations/$1/index.html [L]
+  RewriteRule ^templates/?$ /templates/index.html [L]
   RewriteRule ^topics/?$ /topics/index.html [L]
+  RewriteRule ^topics/([a-z0-9-]+)/ur/?$ /topics/$1/ur/index.html [L]
   RewriteRule ^topics/([a-z0-9-]+)/?$ /topics/$1/index.html [L]
 
   # If a directory is requested and index.html exists, use it

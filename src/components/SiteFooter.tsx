@@ -76,6 +76,15 @@ export function SiteFooter() {
             <Link href="/topics" className="hover:text-gold-bright">
               {t.nav.topics}
             </Link>
+            <Link href="/blog" className="hover:text-gold-bright">
+              {t.nav.blog}
+            </Link>
+            <Link href="/locations" className="hover:text-gold-bright">
+              {t.nav.locations}
+            </Link>
+            <Link href="/templates" className="hover:text-gold-bright">
+              {t.nav.templates}
+            </Link>
             <Link href="/pricing" className="hover:text-gold-bright">
               {t.nav.pricing}
             </Link>
@@ -85,11 +94,14 @@ export function SiteFooter() {
             <Link href="/topics/jadoo-sihr-sifli" className="hover:text-gold-bright">
               Jadoo / Sihr
             </Link>
-            <Link href="/topics/jinnat-aseeb" className="hover:text-gold-bright">
-              Jinnat / Aseeb
+            <Link href="/topics/jadoo-sihr-sifli/ur" className="hover:text-gold-bright">
+              جادو / سحر
             </Link>
-            <Link href="/topics/bandish" className="hover:text-gold-bright">
-              Bandish
+            <Link href="/locations/lahore" className="hover:text-gold-bright">
+              Lahore
+            </Link>
+            <Link href="/locations/uk" className="hover:text-gold-bright">
+              UK
             </Link>
             <a
               href={`mailto:${SITE.email}`}

@@ -80,18 +80,26 @@ export default function TopicsIndexPage() {
           {SEO_TOPICS.map((topic) => {
             const intel = getTopicIntelligence(topic);
             return (
-              <Link
+              <div
                 key={topic.slug}
-                href={`/topics/${topic.slug}`}
                 className="border border-line bg-ink-soft/40 p-6 transition-colors duration-300 hover:border-gold/60"
               >
-                <h2 className="font-display text-2xl text-cream">
-                  {topic.title}
-                </h2>
-                <p className="mt-3 text-sm leading-relaxed text-fog">
-                  {intel.phoneticLattice.slice(0, 5).join(" · ")}
-                </p>
-              </Link>
+                <Link href={`/topics/${topic.slug}`}>
+                  <h2 className="font-display text-2xl text-cream">
+                    {topic.title}
+                  </h2>
+                  <p className="mt-3 text-sm leading-relaxed text-fog">
+                    {intel.phoneticLattice.slice(0, 5).join(" · ")}
+                  </p>
+                </Link>
+                <Link
+                  href={`/topics/${topic.slug}/ur`}
+                  hrefLang="ur"
+                  className="mt-4 inline-block text-xs tracking-[0.14em] uppercase text-gold transition-colors duration-300 hover:text-gold-bright"
+                >
+                  اردو
+                </Link>
+              </div>
             );
           })}
         </div>

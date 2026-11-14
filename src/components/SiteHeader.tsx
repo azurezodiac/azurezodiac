@@ -10,6 +10,7 @@ export function SiteHeader({ variant = "home" }: { variant?: "home" | "page" }) 
     { href: "#services", label: t.nav.services },
     { href: "#learn", label: t.nav.learn },
     { href: "/topics", label: t.nav.topics },
+    { href: "/blog", label: t.nav.blog },
     { href: "/pricing", label: t.nav.pricing },
     { href: "#visit", label: t.nav.visit },
     { href: "/begin", label: t.nav.begin },

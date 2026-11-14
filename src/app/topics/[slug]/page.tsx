@@ -22,6 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const intel = getTopicIntelligence(topic);
   const url = absoluteUrl(`/topics/${topic.slug}`);
+  const urUrl = absoluteUrl(`/topics/${topic.slug}/ur`);
 
   return {
     title: {
@@ -31,6 +32,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     keywords: intel.phoneticLattice,
     alternates: {
       canonical: url,
+      languages: {
+        en: url,
+        ur: urUrl,
+        "x-default": url,
+      },
     },
     openGraph: {
       url,

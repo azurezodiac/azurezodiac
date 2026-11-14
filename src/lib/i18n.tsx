@@ -18,6 +18,9 @@ type Dictionary = {
     path: string;
     learn: string;
     topics: string;
+    blog: string;
+    locations: string;
+    templates: string;
     about: string;
     visit: string;
     pricing: string;
@@ -224,6 +227,9 @@ const en: Dictionary = {
     path: "How it works",
     learn: "Learn",
     topics: "Topics",
+    blog: "Blog",
+    locations: "Cities",
+    templates: "WhatsApp",
     about: "About",
     visit: "Visit",
     pricing: "Pricing",
@@ -706,6 +712,9 @@ const ur: Dictionary = {
     path: "طریقہ کار",
     learn: "سمجھیں",
     topics: "موضوعات",
+    blog: "بلاگ",
+    locations: "شہر",
+    templates: "واٹس ایپ",
     about: "تعارف",
     visit: "مقام",
     pricing: "اخراجات",

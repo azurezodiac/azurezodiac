@@ -181,6 +181,13 @@ export function TopicPage({ topic }: { topic: SeoTopic }) {
             Begin healing
           </Link>
           <Link
+            href={`/topics/${topic.slug}/ur`}
+            className="border border-gold/40 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-gold transition-colors duration-300 hover:border-gold-bright hover:text-gold-bright"
+            hrefLang="ur"
+          >
+            اردو نسخہ
+          </Link>
+          <Link
             href="/topics"
             className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
           >

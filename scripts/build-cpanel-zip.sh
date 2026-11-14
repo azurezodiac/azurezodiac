@@ -27,25 +27,38 @@ export CPANEL_STATIC=1
 pnpm build
 
 # Apache/cPanel expects folder/index.html for pretty URLs.
-for route in begin track admin topics pricing; do
+for route in begin track admin topics pricing blog locations templates; do
   if [[ -f "out/${route}.html" ]]; then
     mkdir -p "out/${route}"
     cp "out/${route}.html" "out/${route}/index.html"
   fi
 done
 
-# Nested dynamic SEO topics: out/topics/<slug>.html -> out/topics/<slug>/index.html
-if [[ -d out/topics ]]; then
-  shopt -s nullglob
-  for html in out/topics/*.html; do
-    base="$(basename "$html" .html)"
-    if [[ "$base" != "index" ]]; then
-      mkdir -p "out/topics/${base}"
-      cp "$html" "out/topics/${base}/index.html"
-    fi
-  done
-  shopt -u nullglob
-fi
+# Nested dynamic routes: out/<section>/<slug>.html -> out/<section>/<slug>/index.html
+flatten_section() {
+  local section="$1"
+  if [[ -d "out/${section}" ]]; then
+    shopt -s nullglob
+    for html in "out/${section}"/*.html; do
+      base="$(basename "$html" .html)"
+      if [[ "$base" != "index" ]]; then
+        mkdir -p "out/${section}/${base}"
+        cp "$html" "out/${section}/${base}/index.html"
+      fi
+    done
+    # Urdu topic pages: out/topics/<slug>/ur.html -> out/topics/<slug>/ur/index.html
+    for html in "out/${section}"/*/ur.html; do
+      dir="$(dirname "$html")"
+      mkdir -p "${dir}/ur"
+      cp "$html" "${dir}/ur/index.html"
+    done
+    shopt -u nullglob
+  fi
+}
+
+flatten_section topics
+flatten_section blog
+flatten_section locations
 
 # Ensure htaccess is present in the static export root.
 if [[ -f public/.htaccess ]]; then
