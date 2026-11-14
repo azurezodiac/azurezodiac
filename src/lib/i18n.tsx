@@ -16,6 +16,7 @@ type Dictionary = {
   nav: {
     services: string;
     path: string;
+    learn: string;
     about: string;
     visit: string;
     privacy: string;
@@ -45,6 +46,24 @@ type Dictionary = {
     title: string;
     intro: string;
     steps: { title: string; copy: string }[];
+  };
+  learn: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    audience: string;
+    topics: { title: string; copy: string }[];
+    effectsTitle: string;
+    effectsIntro: string;
+    effects: string[];
+    marriageTitle: string;
+    marriageBody: string[];
+    refsTitle: string;
+    refsMuslimTitle: string;
+    refsMuslim: string[];
+    refsGeneralTitle: string;
+    refsGeneral: string[];
+    closing: string;
   };
   trust: {
     items: { eyebrow: string; title: string; copy: string }[];
@@ -155,6 +174,7 @@ const en: Dictionary = {
   nav: {
     services: "Services",
     path: "How it works",
+    learn: "Learn",
     about: "About",
     visit: "Visit",
     privacy: "Privacy",
@@ -234,6 +254,67 @@ const en: Dictionary = {
         copy: "You receive a clear next step through dua, ruqyah-centered practice, and a rhythm you can keep.",
       },
     ],
+  },
+  learn: {
+    eyebrow: "Learn",
+    title: "What sihr, jinn, bandish, and paranormal strain can mean.",
+    intro:
+      "Many viewers — Muslim and non-Muslim — arrive with the same quiet questions: What is jadoo? What are jinn? Why does a home feel heavy? Can spiritual harm delay marriage or push spouses apart? This section offers clear information without fear spectacle.",
+    audience:
+      "Muslims may read this through Qur’an and Sunnah. Non-Muslims may recognise similar concerns under other names — curse, spirit affliction, paranormal disturbance, or household ritual harm. In every case: seek medical and psychological care when needed. Spiritual guidance here is not a substitute for treatment, shifa is from Allah alone, and no healing is guaranteed.",
+    topics: [
+      {
+        title: "Sihr / jadoo (magic)",
+        copy: "In Islamic teaching, sihr is real, condemned, and harmful when practiced against people (Qur’an 2:102). People often describe sudden heaviness, disrupted sleep, fear without clear cause, or repeated life blockage after envy or conflict. Across many non-Muslim cultures, similar beliefs appear as curses, hexes, or malefic ritual. Careful guidance never treats this as entertainment, nor as a label for every difficulty.",
+      },
+      {
+        title: "Jinn",
+        copy: "The Qur’an affirms jinn as a creation of Allah (Qur’an 72; 55:15). Some seekers report presence, whispers, nightmares, pressure, or household unrest they connect to jinn. Other traditions speak of spirits or unseen entities. Honest care asks what is spiritual, what is ordinary hardship, and what needs a doctor — without rushing to dramatic claims.",
+      },
+      {
+        title: "Paranormal activity",
+        copy: "Unexplained sounds, movement, cold spots, a watched feeling, objects disturbed, or recurring nightmares. Some interpret these spiritually; others first check environment, stress, sleep disorders, or health. Redeemysoul listens with respect while urging viewers not to ignore medical or safety concerns.",
+      },
+      {
+        title: "Bandish (spiritual binding)",
+        copy: "In South Asian spiritual language, bandish often means a sensed binding or freeze: stalled proposals, blocked rizq, closed opportunities, or emotional distance that feels forced. It is a pastoral way of naming a pattern — not a medical diagnosis and not a promise that every delay is spiritual.",
+      },
+    ],
+    effectsTitle: "How these concerns may affect daily life",
+    effectsIntro:
+      "People commonly report one or more of the patterns below. Presence of a pattern does not prove sihr by itself; it is a reason to seek calm clarity.",
+    effects: [
+      "Disturbed sleep, heavy dreams, waking fear, or a sense of pressure at night",
+      "A home that feels restless, tense, or spiritually unclean",
+      "Work, business, or rizq that repeatedly stalls without clear worldly cause",
+      "Family conflict that escalates beyond ordinary disagreement",
+      "Children unsettled, fearful, or affected in mood and sleep",
+      "Marriage delayed, proposals failing, or nikah facing repeated unexplained obstacles",
+      "Coldness, suspicion, sudden dislike, or distance between husband and wife",
+    ],
+    marriageTitle: "Marriage delays and distance between spouses",
+    marriageBody: [
+      "Viewers often ask whether jadoo or bandish can block marriage — failed rishtas, last-minute obstacles, or years of unexplained delay. Others ask how spiritual harm is said to create coldness, arguments, or emotional distance between husband and wife after nikah.",
+      "In Islamic spiritual care, such patterns are taken seriously and handled with privacy. At the same time, ordinary causes must be checked: communication, family pressure, finances, personality conflict, trauma, and health. Non-Muslim couples may describe the same strain as curse-related conflict or paranormal stress in the home.",
+      "Guidance may include dua, ruqyah-centered practice, and practical next steps — never fear, never public exposure, and never a claim that results are guaranteed. Shifa is from Allah alone.",
+    ],
+    refsTitle: "References for further reading",
+    refsMuslimTitle: "Islamic sources",
+    refsMuslim: [
+      "Qur’an 2:102 — on sihr and its harm",
+      "Qur’an 113 (Al-Falaq) — seeking protection from envy and magic",
+      "Qur’an 114 (An-Nas) — seeking protection from whispers",
+      "Qur’an 72 (Al-Jinn) and 55:15 — on the creation and reality of jinn",
+      "Authentic Hadith literature on ruqyah and seeking refuge with Allah (collections such as Sahih al-Bukhari and Sahih Muslim)",
+    ],
+    refsGeneralTitle: "For a wider audience",
+    refsGeneral: [
+      "Anthropology of religion — cross-cultural studies of witchcraft, spirit affliction, and household ritual beliefs",
+      "Comparative religion writing on spirits, possession narratives, and protective prayer across faith communities",
+      "Clinical caution: unexplained fear, sleep disruption, or relationship crisis should also be assessed by qualified medical and mental-health professionals",
+    ],
+    closing:
+      "Information here is for understanding. It is not a diagnosis, not medical advice, and not a guarantee of outcome. If you wish private guidance, begin a consultation with dignity and calm.",
   },
   trust: {
     items: [
@@ -364,6 +445,14 @@ const en: Dictionary = {
         a: "No. Spiritual healing is not a substitute for medical treatment. Shifa is from Allah alone, and no guarantee of healing is offered. Please continue any medical or professional care you need.",
       },
       {
+        q: "What are sihr, jinn, and bandish?",
+        a: "Sihr (jadoo) refers to harmful magic condemned in the Qur’an. Jinn are a creation mentioned in the Qur’an. Bandish is a common South Asian term for sensed spiritual binding or blockage. Read the Learn section for fuller definitions, life effects, and references for Muslim and non-Muslim readers.",
+      },
+      {
+        q: "Can this affect marriage or create distance between spouses?",
+        a: "Many people report delayed marriage, repeated obstacles before nikah, or sudden coldness between husband and wife. Spiritual care takes such reports seriously while also checking ordinary causes. There is no guaranteed outcome; shifa is from Allah alone.",
+      },
+      {
         q: "How fast will I get a reply?",
         a: "We aim to respond with care, not haste. Most messages receive a first reply within 24–48 hours.",
       },
@@ -490,6 +579,7 @@ const ur: Dictionary = {
   nav: {
     services: "خدمات",
     path: "طریقہ کار",
+    learn: "سمجھیں",
     about: "تعارف",
     visit: "مقام",
     privacy: "رازداری",
@@ -567,6 +657,67 @@ const ur: Dictionary = {
         copy: "آپ کو دعا، رقیہ پر مبنی عمل اور ایک ایسا عملی قدم ملتا ہے جسے آپ جاری رکھ سکیں۔",
       },
     ],
+  },
+  learn: {
+    eyebrow: "سمجھیں",
+    title: "سحر، جنات، بندش اور غیر معمولی پریشانی کیا ہو سکتی ہے۔",
+    intro:
+      "بہت سے ناظرین — مسلم اور غیر مسلم — ایک ہی خاموش سوالات لے کر آتے ہیں: جادو کیا ہے؟ جنات کیا ہیں؟ گھر بھاری کیوں لگتا ہے؟ کیا روحانی نقصان شادی روک سکتا ہے یا میاں بیوی میں دوری پیدا کر سکتا ہے؟ یہ حصہ خوف کی نمائش کے بغیر واضح معلومات دیتا ہے۔",
+    audience:
+      "مسلم قارئین اسے قرآن و سنت کی روشنی میں پڑھ سکتے ہیں۔ غیر مسلم قارئین ملتے جلتے خدشات کو لعنت، روحانی ایذا، غیر معمولی واقعات، یا گھریلو رسم کے نقصان کے نام سے پہچان سکتے ہیں۔ ہر صورت میں: جہاں ضرورت ہو طبی اور نفسیاتی علاج ضرور لیں۔ یہاں روحانی رہنمائی علاج کا متبادل نہیں، شفا صرف اللہ کی طرف سے ہے، اور شفا کی کوئی ضمانت نہیں۔",
+    topics: [
+      {
+        title: "سحر / جادو",
+        copy: "اسلامی تعلیم میں سحر حقیقت ہے، حرام ہے، اور لوگوں کے خلاف استعمال ہونے پر نقصان دہ ہے (القرآن ۲:۱۰۲)۔ لوگ اکثر اچانک بوجھ، خراب نیند، بے وجہ خوف، یا حسد و جھگڑے کے بعد بار بار زندگی کی رکاوٹ بیان کرتے ہیں۔ بہت سی غیر مسلم تہذیبوں میں بھی لعنت، ہیکس، یا نقصان دہ رسم کے عقائد ملتے ہیں۔ محتاط رہنمائی اسے نہ تفریح بناتی ہے، نہ ہر مشکل کا لیبل۔",
+      },
+      {
+        title: "جنات",
+        copy: "قرآن جنات کو اللہ کی مخلوق قرار دیتا ہے (القرآن ۷۲؛ ۵۵:۱۵)۔ کچھ طالبین موجودگی، وسوسہ، خوفناک خواب، دباؤ، یا گھریلو بے چینی جنات سے جوڑتے ہیں۔ دوسری روایات میں ارواح یا غیر مرئی مخلوق کا ذکر ہوتا ہے۔ سچی نگہداشت پوچھتی ہے کیا روحانی ہے، کیا عام مشکل ہے، اور کیا ڈاکٹر کی ضرورت ہے — ڈرامائی دعووں کے بغیر۔",
+      },
+      {
+        title: "غیر معمولی / پار نارمل سرگرمی",
+        copy: "غیر واضح آوازیں، حرکت، سردی، نگاہیں محسوس ہونا، چیزوں کا ہلنا، یا بار بار خوفناک خواب۔ کچھ اسے روحانی سمجھتے ہیں؛ کچھ پہلے ماحول، تناؤ، نیند کی خرابی یا صحت چیک کرتے ہیں۔ ریڈیمی سول احترام سے سنتا ہے اور طبی یا حفاظتی خدشات نظرانداز نہ کرنے کی تاکید کرتا ہے۔",
+      },
+      {
+        title: "بندش",
+        copy: "جنوبی ایشیائی روحانی زبان میں بندش اکثر ایک محسوس شدہ جکڑ یا جمود کو کہتے ہیں: رشتے رک جانا، رزق بند ہونا، مواقع بند ہونا، یا جذباتی دوری جو زبردستی لگے۔ یہ ایک شبانی انداز میں پیٹرن کا نام ہے — طبی تشخیص نہیں، اور نہ یہ وعدہ کہ ہر تاخیر روحانی ہوتی ہے۔",
+      },
+    ],
+    effectsTitle: "ان پریشانیوں کا روزمرہ زندگی پر ممکنہ اثر",
+    effectsIntro:
+      "لوگ اکثر نیچے دیے گئے ایک یا کئی پیٹرن بتاتے ہیں۔ کسی پیٹرن کا ہونا خود سحر ثابت نہیں کرتا؛ یہ پرسکون وضاحت تلاش کرنے کی وجہ ہو سکتا ہے۔",
+    effects: [
+      "خراب نیند، بھاری خواب، جاگتے خوف، یا رات کو دباؤ کا احساس",
+      "گھر جو بے چین، تناؤ بھرا، یا روحانی طور پر غیر مطمئن لگے",
+      "کام، کاروبار یا رزق جو بار بار رکے بغیر واضح دنیاوی وجہ کے",
+      "خاندانی جھگڑے جو عام اختلاف سے زیادہ بڑھ جائیں",
+      "بچے بے چین، خوفزدہ، یا مزاج و نیند میں متاثر",
+      "شادی میں تاخیر، رشتے ٹوٹنا، یا نکاح سے پہلے بار بار غیر واضح رکاوٹیں",
+      "میاں بیوی میں سرد مہری، بدگمانی، اچانک نفرت، یا دوری",
+    ],
+    marriageTitle: "شادی میں رکاوٹ اور میاں بیوی میں دوری",
+    marriageBody: [
+      "ناظرین اکثر پوچھتے ہیں کہ کیا جادو یا بندش شادی روک سکتی ہے — ناکام رشتے، آخری لمحے کی رکاوٹیں، یا سالوں کی غیر واضح تاخیر۔ کچھ پوچھتے ہیں کہ نکاح کے بعد میاں بیوی میں سرد مہری، جھگڑے، یا جذباتی دوری روحانی نقصان سے کیسے پیدا ہو سکتی ہے۔",
+      "اسلامی روحانی نگہداشت ایسے پیٹرن کو سنجیدگی اور رازداری سے لیتی ہے۔ ساتھ ہی عام وجوہات بھی دیکھنی چاہئیں: بات چیت، خاندانی دباؤ، مالیات، مزاج کا ٹکراؤ، صدمہ، اور صحت۔ غیر مسلم جوڑے بھی اسے گھر میں لعنت یا غیر معمولی تناؤ کہہ کر بیان کر سکتے ہیں۔",
+      "رہنمائی میں دعا، رقیہ پر مبنی عمل، اور عملی اگلا قدم شامل ہو سکتا ہے — نہ خوف، نہ عوامی نمائش، نہ نتائج کی ضمانت۔ شفا صرف اللہ کی طرف سے ہے۔",
+    ],
+    refsTitle: "مزید مطالعہ کے حوالے",
+    refsMuslimTitle: "اسلامی مصادر",
+    refsMuslim: [
+      "القرآن ۲:۱۰۲ — سحر اور اس کے نقصان پر",
+      "القرآن ۱۱۳ (الفلق) — حسد اور جادو سے پناہ",
+      "القرآن ۱۱۴ (الناس) — وسوسوں سے پناہ",
+      "القرآن ۷۲ (الجن) اور ۵۵:۱۵ — جنات کی حقیقت پر",
+      "رقیہ اور اللہ کی پناہ سے متعلق معتبر احادیث (جیسے صحیح بخاری و صحیح مسلم)",
+    ],
+    refsGeneralTitle: "وسیع تر سامعین کے لیے",
+    refsGeneral: [
+      "مذہب کی بشریات — جادو ٹونا، روحانی ایذا، اور گھریلو رسم کے عقائد پر تہذیبی مطالعات",
+      "تقابلی مذہب کی تحریریں — ارواح، قبضے کی روایات، اور مختلف ایمانوں میں حفاظتی دعا",
+      "طبی احتیاط: بے وجہ خوف، نیند کی خرابی، یا ازدواجی بحران کا جائزہ اہل ڈاکٹر اور ذہنی صحت کے ماہرین سے بھی کروائیں",
+    ],
+    closing:
+      "یہ معلومات سمجھنے کے لیے ہیں۔ یہ تشخیص نہیں، طبی مشورہ نہیں، اور نتیجے کی ضمانت نہیں۔ اگر نجی رہنمائی چاہیں تو ادب اور سکون کے ساتھ مشاورت شروع کریں۔",
   },
   trust: {
     items: [
@@ -695,6 +846,14 @@ const ur: Dictionary = {
       {
         q: "کیا یہ طبی علاج کا متبادل ہے؟",
         a: "نہیں۔ روحانی شفا طبی علاج کا متبادل نہیں۔ شفا صرف اللہ کی طرف سے ہے، اور شفا کی کوئی ضمانت نہیں دی جاتی۔ جو طبی یا پیشہ ورانہ علاج درکار ہو وہ جاری رکھیں۔",
+      },
+      {
+        q: "سحر، جنات اور بندش کیا ہیں؟",
+        a: "سحر (جادو) نقصان دہ جادو ہے جسے قرآن میں محکوم کیا گیا۔ جنات قرآن میں مذکور مخلوق ہیں۔ بندش جنوبی ایشیا میں محسوس شدہ روحانی جکڑ یا رکاوٹ کے لیے عام اصطلاح ہے۔ مکمل تعریف، زندگی پر اثر، اور مسلم و غیر مسلم حوالوں کے لیے «سمجھیں» سیکشن پڑھیں۔",
+      },
+      {
+        q: "کیا اس سے شادی یا میاں بیوی میں دوری متاثر ہو سکتی ہے؟",
+        a: "بہت سے لوگ شادی میں تاخیر، نکاح سے پہلے بار بار رکاوٹ، یا میاں بیوی میں اچانک سرد مہری بتاتے ہیں۔ روحانی نگہداشت ایسے بیانات کو سنجیدگی سے لیتی ہے، ساتھ عام وجوہات بھی دیکھتی ہے۔ نتیجے کی ضمانت نہیں؛ شفا اللہ کی طرف سے ہے۔",
       },
       {
         q: "جواب کتنی جلدی آتا ہے؟",
