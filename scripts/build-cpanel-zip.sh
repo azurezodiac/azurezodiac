@@ -27,7 +27,7 @@ export CPANEL_STATIC=1
 pnpm build
 
 # Apache/cPanel expects folder/index.html for pretty URLs.
-for route in begin track admin topics; do
+for route in begin track admin topics pricing; do
   if [[ -f "out/${route}.html" ]]; then
     mkdir -p "out/${route}"
     cp "out/${route}.html" "out/${route}/index.html"

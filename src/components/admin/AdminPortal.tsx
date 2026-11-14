@@ -1,12 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { STATUS_LABELS, type ConsultationRequest, type RequestStatus } from "@/lib/types";
+import {
+  STATUS_LABELS,
+  STATUS_NOTES_DEFAULT,
+  type ConsultationRequest,
+  type RequestStatus,
+} from "@/lib/types";
 
 const statuses: RequestStatus[] = [
   "pending",
   "in_review",
   "active",
+  "diagnosis_completed",
   "resolved",
   "cleared",
 ];
@@ -197,19 +203,35 @@ export function AdminPortal() {
                 className="border border-line bg-ink px-3 py-2 text-cream outline-none"
                 placeholder="Status note shown to user"
               />
-              <button
-                type="button"
-                onClick={() =>
-                  void patchRequest(request.trackingNumber, {
-                    status: "cleared",
-                    statusNote:
-                      "This request was cleared by admin. You may submit a new request.",
-                  })
-                }
-                className="border border-gold/50 px-4 py-2 text-xs tracking-[0.14em] uppercase text-gold hover:border-gold-bright hover:text-gold-bright"
-              >
-                Clear lock
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    void patchRequest(request.trackingNumber, {
+                      status: "diagnosis_completed",
+                      statusNote:
+                        STATUS_NOTES_DEFAULT.diagnosis_completed ??
+                        "Diagnosis completed.",
+                    })
+                  }
+                  className="border border-mist/30 px-4 py-2 text-xs tracking-[0.14em] uppercase text-mist hover:border-gold hover:text-gold-bright"
+                >
+                  Diagnosis done
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    void patchRequest(request.trackingNumber, {
+                      status: "cleared",
+                      statusNote:
+                        "This request was cleared by admin. You may submit a new request.",
+                    })
+                  }
+                  className="border border-gold/50 px-4 py-2 text-xs tracking-[0.14em] uppercase text-gold hover:border-gold-bright hover:text-gold-bright"
+                >
+                  Clear lock
+                </button>
+              </div>
             </div>
           </article>
         ))}

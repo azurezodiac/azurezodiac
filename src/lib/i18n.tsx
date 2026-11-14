@@ -20,6 +20,7 @@ type Dictionary = {
     topics: string;
     about: string;
     visit: string;
+    pricing: string;
     privacy: string;
     faq: string;
     begin: string;
@@ -146,10 +147,17 @@ type Dictionary = {
     locationPh: string;
     phonePh: string;
     notePh: string;
+    appointmentDay: string;
+    appointmentTime: string;
+    appointmentHint: string;
+    appointmentDays: Record<string, string>;
+    appointmentTimes: Record<string, string>;
     back: string;
     toHadiya: string;
     submit: string;
     submitting: string;
+    autoWaHint: string;
+    openWaNow: string;
     hadiyaEyebrow: string;
     hadiyaTitle: string;
     hadiyaIntro: string;
@@ -184,6 +192,26 @@ type Dictionary = {
     placeholder: string;
     check: string;
     checking: string;
+    statusLabels: Record<string, string>;
+  };
+  pricing: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    diagnosisTitle: string;
+    diagnosisBody: string;
+    pkLabel: string;
+    pkAmount: string;
+    pkMethod: string;
+    intlLabel: string;
+    intlAmount: string;
+    intlMethod: string;
+    furtherTitle: string;
+    furtherBody: string;
+    appointmentTitle: string;
+    appointmentBody: string;
+    cta: string;
+    note: string;
   };
   whatsappFloat: string;
   langEn: string;
@@ -198,6 +226,7 @@ const en: Dictionary = {
     topics: "Topics",
     about: "About",
     visit: "Visit",
+    pricing: "Pricing",
     privacy: "Privacy",
     faq: "FAQ",
     begin: "Begin",
@@ -523,10 +552,32 @@ const en: Dictionary = {
     locationPh: "City / area",
     phonePh: "+92 3xx xxx xxxx",
     notePh: "A few honest lines, if you wish.",
+    appointmentDay: "Preferred office day",
+    appointmentTime: "Preferred time",
+    appointmentHint:
+      "For Baldia / Ittehad Town office visits after first message. Online guidance can begin sooner.",
+    appointmentDays: {
+      "no-preference": "No preference",
+      saturday: "Saturday",
+      sunday: "Sunday",
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+    },
+    appointmentTimes: {
+      "no-preference": "No preference",
+      morning: "Morning",
+      afternoon: "Afternoon",
+      evening: "Evening",
+    },
     back: "Back",
     toHadiya: "Continue to Hadiya",
     submit: "Create request",
     submitting: "Saving...",
+    autoWaHint:
+      "WhatsApp is opening with your full request (including Hadiya digits). If it does not open, tap the button below.",
+    openWaNow: "Open WhatsApp now",
     hadiyaEyebrow: "Spiritual diagnosis",
     hadiyaTitle: "Send Hadiya for initial diagnosis",
     hadiyaIntro:
@@ -612,6 +663,37 @@ const en: Dictionary = {
     placeholder: "RS-2026-XXXXXX",
     check: "Check",
     checking: "Checking...",
+    statusLabels: {
+      pending: "Pending",
+      in_review: "In review",
+      active: "Active / in progress",
+      diagnosis_completed: "Diagnosis completed",
+      resolved: "Resolved",
+      cleared: "Cleared — new request allowed",
+    },
+  },
+  pricing: {
+    eyebrow: "Pricing",
+    title: "Hadiya for diagnosis — clear and honest.",
+    intro:
+      "Initial spiritual diagnosis uses a fixed Hadiya so verification stays simple. Further guidance, if needed, is discussed privately after diagnosis — never as a medical fee, never with a guarantee of shifa.",
+    diagnosisTitle: "Initial spiritual diagnosis",
+    diagnosisBody:
+      "Send Hadiya, share the last 5 transaction digits, and create your request. This covers the first diagnosis review only.",
+    pkLabel: "Pakistan",
+    pkAmount: "PKR 5,000",
+    pkMethod: "EasyPaisa 03452845400",
+    intlLabel: "International",
+    intlAmount: "USD 50",
+    intlMethod: "IBAN PK50TMFB0000000014429642",
+    furtherTitle: "Further guidance",
+    furtherBody:
+      "If deeper care or an office appointment is needed after diagnosis, next steps and any further Hadiya are explained privately on WhatsApp. Nothing is forced. Outcomes rest with Allah.",
+    appointmentTitle: "Office appointment",
+    appointmentBody:
+      "Baldia / Ittehad Town visits are by appointment after the first message. You can suggest a preferred day and time when you begin.",
+    cta: "Begin diagnosis request",
+    note: "Spiritual healing is not a substitute for medical treatment. Shifa is from Allah alone. No guarantee of healing is offered.",
   },
   whatsappFloat: "WhatsApp",
   langEn: "EN",
@@ -626,6 +708,7 @@ const ur: Dictionary = {
     topics: "موضوعات",
     about: "تعارف",
     visit: "مقام",
+    pricing: "اخراجات",
     privacy: "رازداری",
     faq: "سوالات",
     begin: "شروع",
@@ -948,10 +1031,32 @@ const ur: Dictionary = {
     locationPh: "شہر / علاقہ",
     phonePh: "+۹۲ ۳xx xxx xxxx",
     notePh: "چند سچی سطریں، اگر چاہیں۔",
+    appointmentDay: "پسندیدہ دفتری دن",
+    appointmentTime: "پسندیدہ وقت",
+    appointmentHint:
+      "بلدیہ / اتحاد ٹاؤن دفتری ملاقات پہلے پیغام کے بعد بذریعہ اپائنٹمنٹ۔ آن لائن رہنمائی جلد شروع ہو سکتی ہے۔",
+    appointmentDays: {
+      "no-preference": "کوئی ترجیح نہیں",
+      saturday: "ہفتہ",
+      sunday: "اتوار",
+      monday: "پیر",
+      tuesday: "منگل",
+      wednesday: "بدھ",
+      thursday: "جمعرات",
+    },
+    appointmentTimes: {
+      "no-preference": "کوئی ترجیح نہیں",
+      morning: "صبح",
+      afternoon: "دوپہر",
+      evening: "شام",
+    },
     back: "واپس",
     toHadiya: "ہدیہ کی طرف جائیں",
     submit: "درخواست بنائیں",
     submitting: "محفوظ ہو رہا ہے...",
+    autoWaHint:
+      "واٹس ایپ آپ کی پوری درخواست (ہدیہ کے ہندسوں سمیت) کے ساتھ کھل رہا ہے۔ اگر نہ کھلے تو نیچے والا بٹن دبائیں۔",
+    openWaNow: "ابھی واٹس ایپ کھولیں",
     hadiyaEyebrow: "روحانی تشخیص",
     hadiyaTitle: "ابتدائی تشخیص کے لیے ہدیہ بھیجیں",
     hadiyaIntro:
@@ -1037,6 +1142,37 @@ const ur: Dictionary = {
     placeholder: "RS-2026-XXXXXX",
     check: "چیک کریں",
     checking: "چیک ہو رہا ہے...",
+    statusLabels: {
+      pending: "زیر التوا",
+      in_review: "جائزہ میں",
+      active: "جاری / فعال",
+      diagnosis_completed: "تشخیص مکمل",
+      resolved: "حل شدہ",
+      cleared: "صاف — نئی درخواست ممکن",
+    },
+  },
+  pricing: {
+    eyebrow: "اخراجات",
+    title: "تشخیص کے لیے ہدیہ — واضح اور ایماندار۔",
+    intro:
+      "ابتدائی روحانی تشخیص کے لیے مقررہ ہدیہ ہے تاکہ تصدیق آسان رہے۔ مزید رہنمائی، اگر درکار ہو، تشخیص کے بعد نجی طور پر بتائی جاتی ہے — نہ طبی فیس کے طور پر، نہ شفا کی ضمانت کے ساتھ۔",
+    diagnosisTitle: "ابتدائی روحانی تشخیص",
+    diagnosisBody:
+      "ہدیہ بھیجیں، لین دین کے آخری ۵ ہندسے بتائیں، اور درخواست بنائیں۔ یہ صرف پہلی تشخیص کے جائزے کے لیے ہے۔",
+    pkLabel: "پاکستان",
+    pkAmount: "۵،۰۰۰ روپے",
+    pkMethod: "ایزی پیسہ ۰۳۴۵۲۸۴۵۴۰۰",
+    intlLabel: "بین الاقوامی",
+    intlAmount: "۵۰ ڈالر",
+    intlMethod: "آئی بی اے این PK50TMFB0000000014429642",
+    furtherTitle: "مزید رہنمائی",
+    furtherBody:
+      "اگر تشخیص کے بعد گہری نگہداشت یا دفتری ملاقات درکار ہو تو اگلے قدم اور مزید ہدیہ واٹس ایپ پر نجی طور پر بتائے جاتے ہیں۔ کچھ زبردستی نہیں۔ انجام اللہ کے ہاتھ میں ہے۔",
+    appointmentTitle: "دفتری اپائنٹمنٹ",
+    appointmentBody:
+      "بلدیہ / اتحاد ٹاؤن کی ملاقات پہلے پیغام کے بعد بذریعہ اپائنٹمنٹ ہوتی ہے۔ شروع کرتے وقت پسندیدہ دن اور وقت بتا سکتے ہیں۔",
+    cta: "تشخیص کی درخواست شروع کریں",
+    note: "روحانی شفا طبی علاج کا متبادل نہیں۔ شفا صرف اللہ کی طرف سے ہے۔ شفا کی کوئی ضمانت نہیں دی جاتی۔",
   },
   whatsappFloat: "واٹس ایپ",
   langEn: "EN",

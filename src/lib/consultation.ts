@@ -22,6 +22,26 @@ export const HADIYA = {
 
 export type HadiyaRegion = keyof typeof HADIYA;
 
+export const APPOINTMENT_DAYS = [
+  "no-preference",
+  "saturday",
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+] as const;
+
+export const APPOINTMENT_TIMES = [
+  "no-preference",
+  "morning",
+  "afternoon",
+  "evening",
+] as const;
+
+export type AppointmentDay = (typeof APPOINTMENT_DAYS)[number];
+export type AppointmentTime = (typeof APPOINTMENT_TIMES)[number];
+
 export const CONCERNS = [
   {
     id: "evil-eye",
@@ -83,6 +103,10 @@ export type ConsultationPayload = {
   trackingNumber?: string;
   hadiyaRegion?: HadiyaRegion;
   hadiyaTxnLast5?: string;
+  appointmentDay?: AppointmentDay;
+  appointmentTime?: AppointmentTime;
+  appointmentDayLabel?: string;
+  appointmentTimeLabel?: string;
 };
 
 export function buildConsultationMessage(data: ConsultationPayload): string {
@@ -104,6 +128,13 @@ export function buildConsultationMessage(data: ConsultationPayload): string {
     `Location: ${data.location}`,
     `WhatsApp: ${data.phone}`,
   );
+
+  if (data.appointmentDayLabel || data.appointmentTimeLabel) {
+    lines.push(
+      `Preferred office day: ${data.appointmentDayLabel ?? "No preference"}`,
+      `Preferred time: ${data.appointmentTimeLabel ?? "No preference"}`,
+    );
+  }
 
   if (data.note?.trim()) {
     lines.push(`Details: ${data.note.trim()}`);

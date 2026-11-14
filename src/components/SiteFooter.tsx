@@ -76,6 +76,9 @@ export function SiteFooter() {
             <Link href="/topics" className="hover:text-gold-bright">
               {t.nav.topics}
             </Link>
+            <Link href="/pricing" className="hover:text-gold-bright">
+              {t.nav.pricing}
+            </Link>
             <Link href="/#services" className="hover:text-gold-bright">
               {t.nav.services}
             </Link>

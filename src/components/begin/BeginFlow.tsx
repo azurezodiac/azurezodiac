@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import {
+  APPOINTMENT_DAYS,
+  APPOINTMENT_TIMES,
   HADIYA,
+  type AppointmentDay,
+  type AppointmentTime,
   type ConcernId,
   type HadiyaRegion,
   buildConsultationMessage,
@@ -39,6 +43,10 @@ export function BeginFlow() {
   const [location, setLocation] = useState("");
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
+  const [appointmentDay, setAppointmentDay] =
+    useState<AppointmentDay>("no-preference");
+  const [appointmentTime, setAppointmentTime] =
+    useState<AppointmentTime>("no-preference");
   const [hadiyaRegion, setHadiyaRegion] =
     useState<HadiyaRegion>("pakistan");
   const [txnLast5, setTxnLast5] = useState("");
@@ -47,12 +55,18 @@ export function BeginFlow() {
   const [error, setError] = useState("");
   const [created, setCreated] = useState<CreatedRequest | null>(null);
   const [duplicate, setDuplicate] = useState<DuplicateInfo | null>(null);
+  const [waOpened, setWaOpened] = useState(false);
 
   const concern =
     t.begin.concerns.find((item) => item.id === concernId) ?? null;
 
   const txnClean = txnLast5.replace(/\D/g, "").slice(0, 5);
   const hadiyaReady = txnClean.length === 5;
+
+  const appointmentDayLabel =
+    t.begin.appointmentDays[appointmentDay] ?? appointmentDay;
+  const appointmentTimeLabel =
+    t.begin.appointmentTimes[appointmentTime] ?? appointmentTime;
 
   const message = useMemo(() => {
     if (!concern || !created) return "";
@@ -67,6 +81,10 @@ export function BeginFlow() {
       trackingNumber: created.trackingNumber,
       hadiyaRegion,
       hadiyaTxnLast5: txnClean,
+      appointmentDay,
+      appointmentTime,
+      appointmentDayLabel,
+      appointmentTimeLabel,
     });
   }, [
     concern,
@@ -78,6 +96,10 @@ export function BeginFlow() {
     note,
     hadiyaRegion,
     txnClean,
+    appointmentDay,
+    appointmentTime,
+    appointmentDayLabel,
+    appointmentTimeLabel,
   ]);
 
   const detailsReady =
@@ -87,6 +109,16 @@ export function BeginFlow() {
     phone.replace(/\D/g, "").length >= 10;
 
   const selectedHadiya = HADIYA[hadiyaRegion];
+  const waLink = message ? whatsappHref(message) : "";
+
+  useEffect(() => {
+    if (!created || !waLink || waOpened || duplicate) return;
+    setWaOpened(true);
+    const timer = window.setTimeout(() => {
+      window.open(waLink, "_blank", "noopener,noreferrer");
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [created, waLink, waOpened, duplicate]);
 
   async function copyText(key: string, value: string) {
     try {
@@ -115,6 +147,20 @@ export function BeginFlow() {
     const token = Math.random().toString(16).slice(2, 8).toUpperCase();
     const trackingNumber = `RS-${new Date().getFullYear()}-${token}`;
     window.localStorage.setItem(storageKey, trackingNumber);
+    window.localStorage.setItem(
+      `rs-req-${trackingNumber}`,
+      JSON.stringify({
+        trackingNumber,
+        status: "pending",
+        statusLabel: t.track.statusLabels.pending,
+        statusNote: t.begin.readyIntro,
+        concernTitle: concern?.title ?? "",
+        name: name.trim(),
+        location: location.trim(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }),
+    );
     setCreated({
       trackingNumber,
       status: "pending",
@@ -123,14 +169,16 @@ export function BeginFlow() {
     setStep(4);
   }
 
-  function buildNoteWithHadiya() {
-    const hadiyaLine = [
+  function buildNoteWithExtras() {
+    const extras = [
       `Hadiya (${hadiyaRegion === "pakistan" ? "Pakistan" : "International"}): ${selectedHadiya.amountLabel}`,
       `Method: ${selectedHadiya.method} ${selectedHadiya.account}`,
       `Txn last 5: ${txnClean}`,
+      `Preferred day: ${appointmentDayLabel}`,
+      `Preferred time: ${appointmentTimeLabel}`,
     ].join(" | ");
     const base = note.trim();
-    return base ? `${base}\n\n${hadiyaLine}` : hadiyaLine;
+    return base ? `${base}\n\n${extras}` : extras;
   }
 
   async function submitRequest() {
@@ -138,8 +186,9 @@ export function BeginFlow() {
     setSubmitting(true);
     setError("");
     setDuplicate(null);
+    setWaOpened(false);
 
-    const noteWithHadiya = buildNoteWithHadiya();
+    const noteWithExtras = buildNoteWithExtras();
 
     try {
       const response = await fetch("/api/requests", {
@@ -151,9 +200,11 @@ export function BeginFlow() {
           motherName,
           location,
           phone,
-          note: noteWithHadiya,
+          note: noteWithExtras,
           hadiyaRegion,
           hadiyaTxnLast5: txnClean,
+          appointmentDay,
+          appointmentTime,
         }),
       });
 
@@ -338,6 +389,49 @@ export function BeginFlow() {
                 autoComplete="tel"
               />
             </label>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
+                  {t.begin.appointmentDay}
+                </span>
+                <select
+                  className={fieldClass}
+                  value={appointmentDay}
+                  onChange={(event) =>
+                    setAppointmentDay(event.target.value as AppointmentDay)
+                  }
+                >
+                  {APPOINTMENT_DAYS.map((day) => (
+                    <option key={day} value={day}>
+                      {t.begin.appointmentDays[day]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
+                  {t.begin.appointmentTime}
+                </span>
+                <select
+                  className={fieldClass}
+                  value={appointmentTime}
+                  onChange={(event) =>
+                    setAppointmentTime(event.target.value as AppointmentTime)
+                  }
+                >
+                  {APPOINTMENT_TIMES.map((slot) => (
+                    <option key={slot} value={slot}>
+                      {t.begin.appointmentTimes[slot]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <p className="text-sm leading-relaxed text-fog/80">
+              {t.begin.appointmentHint}
+            </p>
+
             <label className="block">
               <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
                 {t.begin.note}
@@ -429,7 +523,7 @@ export function BeginFlow() {
                   : t.begin.hadiyaIban}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
-                <p className="font-display text-xl text-cream break-all md:text-2xl">
+                <p className="break-all font-display text-xl text-cream md:text-2xl">
                   {selectedHadiya.account}
                 </p>
                 <button
@@ -558,6 +652,9 @@ export function BeginFlow() {
             <p className="mt-4 max-w-xl text-base leading-relaxed text-fog">
               {t.begin.readyIntro}
             </p>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-gold">
+              {t.begin.autoWaHint}
+            </p>
           </div>
 
           <div className="border border-gold/40 bg-gold/10 px-5 py-5">
@@ -569,7 +666,8 @@ export function BeginFlow() {
             </p>
             <p className="mt-4 text-sm text-fog">{created.statusNote}</p>
             <p className="mt-3 text-sm text-fog">
-              Hadiya txn ···{txnClean}
+              Hadiya txn ···{txnClean} · {appointmentDayLabel} ·{" "}
+              {appointmentTimeLabel}
             </p>
           </div>
 
@@ -578,19 +676,13 @@ export function BeginFlow() {
           </pre>
 
           <div className="flex flex-wrap gap-3">
-            <Link
-              href={`/track?id=${encodeURIComponent(created.trackingNumber)}`}
-              className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
-            >
-              {t.begin.track}
-            </Link>
             <a
-              href={whatsappHref(message)}
+              href={waLink}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
             >
-              {t.begin.notifyWa}
+              {t.begin.openWaNow}
             </a>
             <a
               href={emailHref(message)}
@@ -598,6 +690,12 @@ export function BeginFlow() {
             >
               {t.begin.notifyEmail}
             </a>
+            <Link
+              href={`/track?id=${encodeURIComponent(created.trackingNumber)}`}
+              className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
+            >
+              {t.begin.track}
+            </Link>
           </div>
         </section>
       )}

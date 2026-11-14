@@ -4,6 +4,7 @@ import path from "path";
 import { Pool, type QueryResultRow } from "pg";
 import {
   OPEN_STATUSES,
+  STATUS_NOTES_DEFAULT,
   type ConsultationRequest,
   type RequestStatus,
 } from "@/lib/types";
@@ -219,7 +220,11 @@ export async function updateRequest(
     ...current,
     status: nextStatus,
     statusNote:
-      patch.statusNote !== undefined ? patch.statusNote : current.statusNote,
+      patch.statusNote !== undefined
+        ? patch.statusNote
+        : nextStatus !== current.status && STATUS_NOTES_DEFAULT[nextStatus]
+          ? STATUS_NOTES_DEFAULT[nextStatus]!
+          : current.statusNote,
     updatedAt: new Date().toISOString(),
     clearedAt:
       nextStatus === "cleared" ? new Date().toISOString() : current.clearedAt,

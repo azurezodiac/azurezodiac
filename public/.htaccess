@@ -40,6 +40,7 @@ DirectoryIndex index.html
   RewriteRule ^begin/?$ /begin/index.html [L]
   RewriteRule ^track/?$ /track/index.html [L]
   RewriteRule ^admin/?$ /admin/index.html [L]
+  RewriteRule ^pricing/?$ /pricing/index.html [L]
   RewriteRule ^topics/?$ /topics/index.html [L]
   RewriteRule ^topics/([a-z0-9-]+)/?$ /topics/$1/index.html [L]
 
