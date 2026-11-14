@@ -51,11 +51,18 @@ export function Faq() {
                   id={panelId}
                   role="region"
                   aria-labelledby={buttonId}
-                  className={isOpen ? "mt-3" : "sr-only"}
+                  className="faq-answer"
+                  data-open={isOpen}
                 >
-                  <p className="max-w-xl text-base leading-relaxed text-fog">
-                    {item.a}
-                  </p>
+                  <div>
+                    <p
+                      className={`max-w-xl text-base leading-relaxed text-fog ${
+                        isOpen ? "mt-3 pb-1" : "sr-only"
+                      }`}
+                    >
+                      {item.a}
+                    </p>
+                  </div>
                 </div>
               </div>
             );

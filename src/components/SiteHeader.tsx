@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLang } from "@/lib/i18n";
 
 export function SiteHeader({ variant = "home" }: { variant?: "home" | "page" }) {
   const { t } = useLang();
+  const [scrolled, setScrolled] = useState(false);
   const links = [
     { href: "#services", label: t.nav.services },
     { href: "#learn", label: t.nav.learn },
@@ -16,28 +18,40 @@ export function SiteHeader({ variant = "home" }: { variant?: "home" | "page" }) 
     { href: "/begin", label: t.nav.begin },
   ];
 
+  useEffect(() => {
+    if (variant !== "home") return;
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [variant]);
+
   return (
     <header
       className={
         variant === "home"
-          ? "absolute inset-x-0 top-0 z-20"
-          : "border-b border-line"
+          ? "site-header-shell fixed inset-x-0 top-0 z-30"
+          : "border-b border-line bg-ink/90 backdrop-blur-md"
       }
+      data-scrolled={variant === "home" ? scrolled : undefined}
     >
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-6 py-6 md:px-10">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-6 py-5 md:px-10 md:py-6">
         <a
           href={variant === "home" ? "#top" : "/"}
-          className="font-display text-xl tracking-[0.08em] text-cream md:text-2xl"
+          className="font-display text-xl tracking-[0.08em] text-cream transition-opacity duration-300 hover:opacity-90 md:text-2xl"
         >
           Redeemysoul
         </a>
-        <nav className="hidden items-center gap-8 text-sm tracking-[0.14em] uppercase text-fog md:flex">
+        <nav
+          className="hidden items-center gap-7 text-[11px] tracking-[0.16em] uppercase text-fog lg:flex"
+          aria-label="Primary"
+        >
           {links.map((link) =>
             link.href.startsWith("/") ? (
               <Link
                 key={link.href}
                 href={link.href}
-                className="transition-colors duration-300 hover:text-gold-bright"
+                className="relative transition-colors duration-300 hover:text-gold-bright after:absolute after:-bottom-1 after:start-0 after:h-px after:w-0 after:bg-gold after:transition-[width] after:duration-300 hover:after:w-full"
               >
                 {link.label}
               </Link>
@@ -45,7 +59,7 @@ export function SiteHeader({ variant = "home" }: { variant?: "home" | "page" }) 
               <a
                 key={link.href}
                 href={variant === "home" ? link.href : `/${link.href}`}
-                className="transition-colors duration-300 hover:text-gold-bright"
+                className="relative transition-colors duration-300 hover:text-gold-bright after:absolute after:-bottom-1 after:start-0 after:h-px after:w-0 after:bg-gold after:transition-[width] after:duration-300 hover:after:w-full"
               >
                 {link.label}
               </a>
@@ -54,10 +68,7 @@ export function SiteHeader({ variant = "home" }: { variant?: "home" | "page" }) 
         </nav>
         <div className="flex items-center gap-2 md:gap-3">
           <LanguageToggle />
-          <Link
-            href="/begin"
-            className="border border-gold/50 px-3 py-2 text-[11px] tracking-[0.14em] uppercase text-gold transition-colors duration-300 hover:border-gold-bright hover:text-gold-bright md:px-5 md:text-xs"
-          >
+          <Link href="/begin" className="btn-secondary !px-3 !py-2 text-[11px] md:!px-5 md:text-xs">
             {t.nav.consultation}
           </Link>
         </div>

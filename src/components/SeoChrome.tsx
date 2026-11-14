@@ -11,8 +11,12 @@ export function SeoChrome({
   extraLinks?: { href: string; label: string }[];
 }) {
   return (
-    <header className="border-b border-line" lang={lang} dir={dir}>
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-6 py-6 md:px-10">
+    <header
+      className="border-b border-line bg-ink/90 backdrop-blur-md"
+      lang={lang}
+      dir={dir}
+    >
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-6 py-5 md:px-10 md:py-6">
         <Link
           href="/"
           className="font-display text-xl tracking-[0.08em] text-cream md:text-2xl"
@@ -30,10 +34,7 @@ export function SeoChrome({
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/begin"
-            className="border border-gold/50 px-3 py-2 text-[11px] tracking-[0.14em] uppercase text-gold transition-colors duration-300 hover:border-gold-bright hover:text-gold-bright"
-          >
+          <Link href="/begin" className="btn-secondary !px-3 !py-2 text-[11px]">
             Begin
           </Link>
         </div>

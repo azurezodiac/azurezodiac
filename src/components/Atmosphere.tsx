@@ -20,6 +20,7 @@ export function Atmosphere() {
       </div>
       <div className="relative mx-auto flex min-h-[28rem] max-w-7xl items-center px-6 py-24 md:px-10 md:py-28">
         <blockquote className="max-w-2xl">
+          <div className="mb-8 h-px w-16 bg-gold" />
           <p className="font-display text-3xl leading-snug text-cream md:text-5xl">
             {t.atmosphere.quote}
           </p>

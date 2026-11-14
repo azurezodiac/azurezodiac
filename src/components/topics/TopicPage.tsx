@@ -174,23 +174,17 @@ export function TopicPage({ topic }: { topic: SeoTopic }) {
         </section>
 
         <div className="mt-12 flex flex-wrap gap-3">
-          <Link
-            href="/begin"
-            className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
-          >
+          <Link href="/begin" className="btn-primary">
             Begin healing
           </Link>
           <Link
             href={`/topics/${topic.slug}/ur`}
-            className="border border-gold/40 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-gold transition-colors duration-300 hover:border-gold-bright hover:text-gold-bright"
+            className="btn-secondary"
             hrefLang="ur"
           >
             اردو نسخہ
           </Link>
-          <Link
-            href="/topics"
-            className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
-          >
+          <Link href="/topics" className="btn-ghost">
             All topics
           </Link>
         </div>

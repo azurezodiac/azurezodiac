@@ -50,11 +50,8 @@ const RECEIPT_TYPES = new Set([
   "image/jpg",
 ]);
 
-const fieldClass =
-  "w-full border border-line bg-ink/60 px-4 py-3 text-cream outline-none transition-colors duration-300 placeholder:text-fog/50 focus:border-gold";
-
-const fieldErrorClass =
-  "w-full border border-red-400/70 bg-ink/60 px-4 py-3 text-cream outline-none transition-colors duration-300 placeholder:text-fog/50 focus:border-red-300";
+const fieldClass = "field-input";
+const fieldErrorClass = "field-input field-input-error";
 
 export function BeginFlow() {
   const { t, lang } = useLang();
@@ -391,29 +388,22 @@ export function BeginFlow() {
 
   return (
     <div className="mx-auto w-full max-w-3xl">
-      <div className="mb-10 flex flex-wrap items-center gap-2 text-[10px] tracking-[0.14em] uppercase text-fog sm:gap-3 sm:text-xs sm:tracking-[0.18em]">
-        <StepPill
-          active={step === 1}
-          done={step > 1}
-          label={t.begin.stepConcern}
-        />
-        <span className="h-px flex-1 bg-line" />
-        <StepPill
-          active={step === 2}
-          done={step > 2}
-          label={t.begin.stepDetails}
-        />
-        <span className="h-px flex-1 bg-line" />
-        <StepPill
-          active={step === 3}
-          done={step > 3}
-          label={t.begin.stepHadiya}
-        />
-        <span className="h-px flex-1 bg-line" />
-        <StepPill active={step === 4} done={false} label={t.begin.stepSend} />
+      <div className="mb-8 space-y-4">
+        <div className="step-rail" aria-hidden="true">
+          <span className="step-rail__seg" data-on={step >= 1} />
+          <span className="step-rail__seg" data-on={step >= 2} />
+          <span className="step-rail__seg" data-on={step >= 3} />
+          <span className="step-rail__seg" data-on={step >= 4} />
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] tracking-[0.14em] uppercase text-fog sm:text-xs sm:tracking-[0.16em]">
+          <StepPill active={step === 1} done={step > 1} label={t.begin.stepConcern} />
+          <StepPill active={step === 2} done={step > 2} label={t.begin.stepDetails} />
+          <StepPill active={step === 3} done={step > 3} label={t.begin.stepHadiya} />
+          <StepPill active={step === 4} done={false} label={t.begin.stepSend} />
+        </div>
       </div>
 
-      <HealingDisclaimer className="mb-10 border border-line bg-ink-soft/60 px-4 py-3" />
+      <HealingDisclaimer className="surface-panel mb-10 px-4 py-3.5" />
 
       {step === 1 && (
         <section className="space-y-8">
@@ -440,11 +430,8 @@ export function BeginFlow() {
                     setConcernId(item.id as ConcernId);
                     setFieldErrors((prev) => ({ ...prev, concern: undefined }));
                   }}
-                  className={`border px-5 py-5 text-start transition-colors duration-300 ${
-                    selected
-                      ? "border-gold bg-gold/10"
-                      : "border-line bg-ink/40 hover:border-fog/40"
-                  }`}
+                  className="choice-tile"
+                  data-selected={selected}
                 >
                   <span className="font-display text-2xl text-cream">
                     {item.title}
@@ -463,11 +450,7 @@ export function BeginFlow() {
             </p>
           ) : null}
 
-          <button
-            type="button"
-            onClick={tryStep2}
-            className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
-          >
+          <button type="button" onClick={tryStep2} className="btn-primary">
             {t.begin.continue}
           </button>
         </section>
@@ -606,15 +589,11 @@ export function BeginFlow() {
                 setFieldErrors({});
                 setStep(1);
               }}
-              className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
+              className="btn-ghost"
             >
               {t.begin.back}
             </button>
-            <button
-              type="button"
-              onClick={tryStep3}
-              className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
-            >
+            <button type="button" onClick={tryStep3} className="btn-primary">
               {t.begin.toHadiya}
             </button>
           </div>
@@ -639,11 +618,8 @@ export function BeginFlow() {
             <button
               type="button"
               onClick={() => setHadiyaRegion("pakistan")}
-              className={`border px-5 py-5 text-start transition-colors duration-300 ${
-                hadiyaRegion === "pakistan"
-                  ? "border-gold bg-gold/10"
-                  : "border-line bg-ink/40 hover:border-fog/40"
-              }`}
+              className="choice-tile"
+              data-selected={hadiyaRegion === "pakistan"}
             >
               <span className="font-display text-2xl text-cream">
                 {t.begin.hadiyaPakistan}
@@ -655,11 +631,8 @@ export function BeginFlow() {
             <button
               type="button"
               onClick={() => setHadiyaRegion("international")}
-              className={`border px-5 py-5 text-start transition-colors duration-300 ${
-                hadiyaRegion === "international"
-                  ? "border-gold bg-gold/10"
-                  : "border-line bg-ink/40 hover:border-fog/40"
-              }`}
+              className="choice-tile"
+              data-selected={hadiyaRegion === "international"}
             >
               <span className="font-display text-2xl text-cream">
                 {t.begin.hadiyaInternational}
@@ -670,7 +643,7 @@ export function BeginFlow() {
             </button>
           </div>
 
-          <div className="space-y-4 border border-line bg-ink-soft/40 px-5 py-5">
+          <div className="surface-panel space-y-4 px-5 py-5">
             <div>
               <p className="text-xs tracking-[0.16em] uppercase text-fog">
                 {hadiyaRegion === "pakistan"
@@ -799,7 +772,7 @@ export function BeginFlow() {
                 setFieldErrors({});
                 setStep(2);
               }}
-              className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
+              className="btn-ghost"
             >
               {t.begin.back}
             </button>
@@ -807,7 +780,7 @@ export function BeginFlow() {
               type="button"
               disabled={submitting}
               onClick={() => void submitRequest()}
-              className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn-primary"
             >
               {submitting ? t.begin.submitting : t.begin.submit}
             </button>
@@ -829,7 +802,7 @@ export function BeginFlow() {
             </p>
           </div>
 
-          <div className="border border-gold/40 bg-gold/10 px-5 py-5">
+          <div className="surface-panel border-gold/40 px-5 py-5">
             <p className="text-xs tracking-[0.16em] uppercase text-gold">
               {t.begin.reference}
             </p>
@@ -842,7 +815,7 @@ export function BeginFlow() {
           <div className="flex flex-wrap gap-3">
             <Link
               href={`/track?id=${encodeURIComponent(duplicate.trackingNumber)}`}
-              className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
+              className="btn-primary"
             >
               {t.begin.checkStatus}
             </Link>
@@ -852,7 +825,7 @@ export function BeginFlow() {
                 setStep(3);
                 setDuplicate(null);
               }}
-              className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist"
+              className="btn-ghost"
             >
               {t.begin.back}
             </button>
@@ -877,11 +850,11 @@ export function BeginFlow() {
             </p>
           </div>
 
-          <div className="border border-gold/40 bg-gold/10 px-5 py-5">
+          <div className="surface-panel border-gold/35 px-5 py-6">
             <p className="text-xs tracking-[0.16em] uppercase text-gold">
               {t.begin.reference}
             </p>
-            <p className="mt-2 font-display text-3xl text-cream">
+            <p className="mt-2 font-display text-3xl text-cream md:text-4xl">
               {created.trackingNumber}
             </p>
             <p className="mt-4 text-sm text-fog">{created.statusNote}</p>
@@ -892,7 +865,7 @@ export function BeginFlow() {
           </div>
 
           {receiptPreview ? (
-            <div className="border border-line bg-ink/40 px-5 py-5">
+            <div className="surface-panel px-5 py-5">
               <p className="text-sm text-gold">{t.begin.receiptWaHint}</p>
               <div className="mt-4 flex items-center gap-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -906,7 +879,7 @@ export function BeginFlow() {
             </div>
           ) : null}
 
-          <pre className="overflow-x-auto whitespace-pre-wrap border border-line bg-ink/50 px-5 py-5 font-sans text-sm leading-relaxed text-mist">
+          <pre className="surface-panel overflow-x-auto whitespace-pre-wrap px-5 py-5 font-sans text-sm leading-relaxed text-mist">
             {message}
           </pre>
 
@@ -915,26 +888,19 @@ export function BeginFlow() {
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
+              className="btn-primary"
             >
               {t.begin.openWaNow}
             </a>
-            <button
-              type="button"
-              onClick={downloadPrep}
-              className="border border-gold/50 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-gold transition-colors duration-300 hover:border-gold-bright hover:text-gold-bright"
-            >
+            <button type="button" onClick={downloadPrep} className="btn-secondary">
               {t.begin.downloadPrepPdf}
             </button>
-            <a
-              href={emailHref(message)}
-              className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
-            >
+            <a href={emailHref(message)} className="btn-ghost">
               {t.begin.notifyEmail}
             </a>
             <Link
               href={`/track?id=${encodeURIComponent(created.trackingNumber)}`}
-              className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
+              className="btn-ghost"
             >
               {t.begin.track}
             </Link>

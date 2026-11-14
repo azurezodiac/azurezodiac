@@ -30,13 +30,10 @@ export function MobileStickyBegin() {
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-ink/95 px-4 py-3 backdrop-blur-md md:hidden"
+      className="sticky-begin-bar fixed inset-x-0 bottom-0 z-50 border-t border-line bg-ink/92 px-4 py-3 backdrop-blur-md md:hidden"
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
     >
-      <Link
-        href="/begin"
-        className="flex w-full items-center justify-center bg-gold px-5 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
-      >
+      <Link href="/begin" className="btn-primary w-full">
         {t.hero.ctaBegin}
       </Link>
     </div>

@@ -104,10 +104,7 @@ export function PricingContent() {
           {t.pricing.note}
         </p>
 
-        <Link
-          href="/begin"
-          className="mt-8 inline-flex bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
-        >
+        <Link href="/begin" className="btn-primary mt-8">
           {t.pricing.cta}
         </Link>
       </main>

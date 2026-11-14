@@ -21,17 +21,14 @@ export function Contact() {
         </p>
         <HealingDisclaimer className="mt-6 max-w-lg" />
         <div className="mt-10 flex flex-wrap gap-3">
-          <Link
-            href="/begin"
-            className="inline-flex bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
-          >
+          <Link href="/begin" className="btn-primary">
             {t.contact.ctaBegin}
           </Link>
           <a
             href="https://wa.me/923452845400"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
+            className="btn-ghost"
           >
             {t.contact.ctaWhatsapp}
           </a>

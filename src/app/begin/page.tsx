@@ -26,8 +26,8 @@ export const metadata: Metadata = {
 export default function BeginPage() {
   return (
     <div className="min-h-full bg-ink">
-      <header className="border-b border-line">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-6 py-6 md:px-10">
+      <header className="border-b border-line bg-ink/90 backdrop-blur-md">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-6 py-5 md:px-10 md:py-6">
           <Link
             href="/"
             className="font-display text-xl tracking-[0.08em] text-cream md:text-2xl"
@@ -45,8 +45,14 @@ export default function BeginPage() {
           </div>
         </div>
       </header>
-      <main className="px-6 py-14 md:px-10 md:py-20">
-        <BeginFlow />
+      <main className="relative px-6 py-14 md:px-10 md:py-20">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_at_top,rgba(201,166,90,0.08),transparent_65%)]"
+        />
+        <div className="relative">
+          <BeginFlow />
+        </div>
       </main>
     </div>
   );

@@ -96,16 +96,10 @@ export function TopicPageUr({ topic }: { topic: SeoTopicUr }) {
         ) : null}
 
         <div className="mt-12 flex flex-wrap gap-3">
-          <Link
-            href="/begin"
-            className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
-          >
+          <Link href="/begin" className="btn-primary">
             علاج شروع کریں
           </Link>
-          <Link
-            href={`/topics/${topic.slug}`}
-            className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
-          >
+          <Link href={`/topics/${topic.slug}`} className="btn-ghost">
             {topic.langSwitchLabel}
           </Link>
         </div>

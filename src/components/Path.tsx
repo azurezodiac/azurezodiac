@@ -20,12 +20,12 @@ export function Path() {
           </p>
         </div>
 
-        <ol className="mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
+        <ol className="mt-16 grid gap-10 md:grid-cols-3 md:gap-10">
           {t.path.steps.map((step, index) => (
             <li key={step.title} className="relative">
-              <div className="mb-6 h-px w-16 bg-gold" />
+              <div className="mb-6 h-px w-14 origin-left bg-gold transition-transform duration-500 hover:scale-x-125" />
               <p className="text-xs tracking-[0.2em] uppercase text-fog">
-                {index + 1}
+                {String(index + 1).padStart(2, "0")}
               </p>
               <h3 className="mt-3 font-display text-3xl text-cream">
                 {step.title}
