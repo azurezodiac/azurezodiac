@@ -268,11 +268,11 @@ const en: Dictionary = {
   },
   about: {
     eyebrow: "About the healer",
-    title: "A quiet practice rooted in adab.",
+    title: "Ejaz Noor Shazli",
     body: [
-      "Redeemysoul is led with a simple intention: to listen carefully, speak with manners, and guide through faith-centered remembrance — not spectacle.",
-      "The approach stays close to ruqyah, dua, and practical spiritual rhythm. Each matter is treated privately, without public display or exaggerated claims.",
-      "Where medical or professional care is needed, that path is respected. Spiritual guidance here is meant to support the heart, not replace doctors.",
+      "Ejaz Noor Shazli is a Karachi-based spiritual healer serving through Redeemysoul with a quiet, adab-first approach to Islamic healing.",
+      "His work focuses on private consultation for nazar, spiritual pressure, and concerns of sihr — guided by remembrance, dua, and ruqyah-centered care rather than fear or spectacle.",
+      "Seekers are received with dignity. Matters stay confidential. Where medical or professional care is needed, that path is respected; spiritual guidance here supports the heart and does not replace doctors.",
     ],
   },
   hours: {
@@ -537,11 +537,11 @@ const ur: Dictionary = {
   },
   about: {
     eyebrow: "معالج کا تعارف",
-    title: "ادب پر کھڑا ایک خاموش عمل۔",
+    title: "اجاز نور شاذلی",
     body: [
-      "ریڈیمی سول کی نیت سادہ ہے: غور سے سننا، ادب سے بولنا، اور ایمان والے ذکر کے ذریعے رہنمائی کرنا — نمائش کے بغیر۔",
-      "انداز رقیہ، دعا اور عملی روحانی نظم کے قریب رہتا ہے۔ ہر معاملہ نجی رکھا جاتا ہے، بغیر عوامی نمایش یا بڑے دعووں کے۔",
-      "جہاں طبی یا پیشہ ورانہ علاج درکار ہو، اس کا احترام کیا جاتا ہے۔ یہاں روحانی رہنمائی دل کی مدد کے لیے ہے، ڈاکٹروں کا متبادل نہیں۔",
+      "اجاز نور شاذلی کراچی میں مقیم روحانی معالج ہیں، جو ریڈیمی سول کے ذریعے ادب اور خاموشی کے ساتھ اسلامی شفا کی خدمت کرتے ہیں۔",
+      "ان کا کام نظر، روحانی دباؤ اور سحر کی پریشانیوں کے لیے نجی مشاورت پر مرکوز ہے — ذکر، دعا اور رقیہ پر مبنی نگہداشت کے ساتھ، خوف یا نمائش کے بغیر۔",
+      "طالبین کو وقار کے ساتھ سنا جاتا ہے۔ معاملات راز میں رہتے ہیں۔ جہاں طبی یا پیشہ ورانہ علاج درکار ہو اس کا احترام کیا جاتا ہے؛ یہاں روحانی رہنمائی دل کی مدد کے لیے ہے، ڈاکٹروں کا متبادل نہیں۔",
     ],
   },
   hours: {
