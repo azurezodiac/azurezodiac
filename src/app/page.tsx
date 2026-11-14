@@ -5,6 +5,7 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { Faq } from "@/components/Faq";
 import { Hero } from "@/components/Hero";
 import { Hours } from "@/components/Hours";
+import { Location } from "@/components/Location";
 import { Path } from "@/components/Path";
 import { Services } from "@/components/Services";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -25,6 +26,7 @@ export default function Home() {
         <Testimonials />
         <About />
         <Hours />
+        <Location />
         <Faq />
         <Disclaimer />
         <Contact />

@@ -17,6 +17,7 @@ type Dictionary = {
     services: string;
     path: string;
     about: string;
+    visit: string;
     privacy: string;
     faq: string;
     begin: string;
@@ -65,6 +66,14 @@ type Dictionary = {
     intro: string;
     items: { label: string; value: string }[];
     note: string;
+  };
+  location: {
+    eyebrow: string;
+    title: string;
+    business: string;
+    address: string;
+    intro: string;
+    openMaps: string;
   };
   disclaimer: {
     eyebrow: string;
@@ -145,6 +154,7 @@ const en: Dictionary = {
     services: "Services",
     path: "How it works",
     about: "About",
+    visit: "Visit",
     privacy: "Privacy",
     faq: "FAQ",
     begin: "Begin",
@@ -288,6 +298,16 @@ const en: Dictionary = {
     ],
     note: "If your matter feels urgent, mention it clearly in WhatsApp so it can be prioritized with care.",
   },
+  location: {
+    eyebrow: "Visit",
+    title: "Find Spiritual Healing Shazli",
+    business: "Spiritual Healing Shazli",
+    address:
+      "H#953, Street #22, Block D, Ittehad Town, Baldia Town, Karachi",
+    intro:
+      "Office consultations are by appointment after the first message. You can open the Google Business location below for directions.",
+    openMaps: "Open in Google Maps",
+  },
   disclaimer: {
     eyebrow: "Disclaimer",
     title: "Spiritual guidance, not medical treatment.",
@@ -416,6 +436,7 @@ const ur: Dictionary = {
     services: "خدمات",
     path: "طریقہ کار",
     about: "تعارف",
+    visit: "مقام",
     privacy: "رازداری",
     faq: "سوالات",
     begin: "شروع",
@@ -556,6 +577,16 @@ const ur: Dictionary = {
       { label: "دفتری مشاورت", value: "پہلے پیغام کے بعد بذریعہ اپائنٹمنٹ" },
     ],
     note: "اگر معاملہ فوری لگے تو واٹس ایپ میں واضح لکھیں تاکہ احتیاط کے ساتھ ترجیح دی جا سکے۔",
+  },
+  location: {
+    eyebrow: "مقام",
+    title: "سپریچوئل ہیلنگ شاذلی تلاش کریں",
+    business: "Spiritual Healing Shazli",
+    address:
+      "مکان نمبر ۹۵۳، گلی نمبر ۲۲، بلاک ڈی، اتحاد ٹاؤن، بلدیہ ٹاؤن، کراچی",
+    intro:
+      "دفتری مشاورت پہلے پیغام کے بعد بذریعہ اپائنٹمنٹ ہوتی ہے۔ نیچے گوگل بزنس مقام کھول کر راستہ دیکھ سکتے ہیں۔",
+    openMaps: "گوگل میپس میں کھولیں",
   },
   disclaimer: {
     eyebrow: "وضاحت نامہ",

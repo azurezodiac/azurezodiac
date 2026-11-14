@@ -10,6 +10,7 @@ export function SiteHeader({ variant = "home" }: { variant?: "home" | "page" }) 
     { href: "#services", label: t.nav.services },
     { href: "#path", label: t.nav.path },
     { href: "#about", label: t.nav.about },
+    { href: "#visit", label: t.nav.visit },
     { href: "#faq", label: t.nav.faq },
     { href: "/begin", label: t.nav.begin },
   ];
