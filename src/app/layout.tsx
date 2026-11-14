@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { Fraunces, Outfit } from "next/font/google";
+import { Fraunces, Noto_Nastaliq_Urdu, Outfit } from "next/font/google";
+import { Providers } from "@/components/Providers";
+import { WhatsAppFloat } from "@/components/WhatsAppFloat";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -11,6 +13,13 @@ const fraunces = Fraunces({
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const nastaliq = Noto_Nastaliq_Urdu({
+  variable: "--font-urdu",
+  subsets: ["arabic"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
@@ -33,9 +42,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${outfit.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${outfit.variable} ${nastaliq.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-ink text-mist">{children}</body>
+      <body className="min-h-full flex flex-col bg-ink text-mist">
+        <Providers>
+          {children}
+          <WhatsAppFloat />
+        </Providers>
+      </body>
     </html>
   );
 }

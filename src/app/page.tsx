@@ -1,5 +1,6 @@
 import { Atmosphere } from "@/components/Atmosphere";
 import { Contact } from "@/components/Contact";
+import { Faq } from "@/components/Faq";
 import { Hero } from "@/components/Hero";
 import { Path } from "@/components/Path";
 import { Services } from "@/components/Services";
@@ -17,6 +18,7 @@ export default function Home() {
         <Atmosphere />
         <Path />
         <Trust />
+        <Faq />
         <Contact />
       </main>
       <SiteFooter />

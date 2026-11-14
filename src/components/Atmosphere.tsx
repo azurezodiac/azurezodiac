@@ -1,6 +1,11 @@
+"use client";
+
 import Image from "next/image";
+import { useLang } from "@/lib/i18n";
 
 export function Atmosphere() {
+  const { t } = useLang();
+
   return (
     <section className="relative overflow-hidden bg-ink">
       <div className="absolute inset-0">
@@ -16,11 +21,10 @@ export function Atmosphere() {
       <div className="relative mx-auto flex min-h-[28rem] max-w-7xl items-center px-6 py-24 md:px-10 md:py-28">
         <blockquote className="max-w-2xl">
           <p className="font-display text-3xl leading-snug text-cream md:text-5xl">
-            “Healing begins where fear is met with remembrance — not with
-            noise.”
+            {t.atmosphere.quote}
           </p>
           <footer className="mt-8 text-sm tracking-[0.18em] uppercase text-gold">
-            The Redeemysoul way
+            {t.atmosphere.credit}
           </footer>
         </blockquote>
       </div>

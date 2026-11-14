@@ -1,7 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useLang } from "@/lib/i18n";
 
 export function Hero() {
+  const { t } = useLang();
+
   return (
     <section
       id="top"
@@ -27,24 +32,23 @@ export function Hero() {
         </p>
         <div className="gold-rule reveal reveal-delay-1 mt-6 h-px w-40 bg-gold md:w-56" />
         <h1 className="reveal reveal-delay-2 mt-8 max-w-2xl font-display text-2xl leading-tight text-cream sm:text-3xl md:text-4xl">
-          Islamic healing for a heart under pressure.
+          {t.hero.headline}
         </h1>
         <p className="reveal reveal-delay-3 mt-5 max-w-xl text-base leading-relaxed text-fog md:text-lg">
-          Ruqyah-centered guidance for nazar, sihr concerns, and spiritual
-          heaviness — private, respectful, and rooted in remembrance.
+          {t.hero.support}
         </p>
         <div className="reveal reveal-delay-4 mt-10 flex flex-wrap items-center gap-4">
           <Link
             href="/begin"
             className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
           >
-            Begin healing
+            {t.hero.ctaBegin}
           </Link>
           <a
             href="#services"
             className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
           >
-            Explore services
+            {t.hero.ctaServices}
           </a>
         </div>
       </div>

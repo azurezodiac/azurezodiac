@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
-  CONCERNS,
   type ConcernId,
   buildConsultationMessage,
   emailHref,
   whatsappHref,
 } from "@/lib/consultation";
+import { useLang } from "@/lib/i18n";
 
 type Step = 1 | 2 | 3;
 
@@ -28,6 +28,7 @@ const fieldClass =
   "w-full border border-line bg-ink/60 px-4 py-3 text-cream outline-none transition-colors duration-300 placeholder:text-fog/50 focus:border-gold";
 
 export function BeginFlow() {
+  const { t } = useLang();
   const [step, setStep] = useState<Step>(1);
   const [concernId, setConcernId] = useState<ConcernId | null>(null);
   const [name, setName] = useState("");
@@ -40,12 +41,13 @@ export function BeginFlow() {
   const [created, setCreated] = useState<CreatedRequest | null>(null);
   const [duplicate, setDuplicate] = useState<DuplicateInfo | null>(null);
 
-  const concern = CONCERNS.find((item) => item.id === concernId) ?? null;
+  const concern =
+    t.begin.concerns.find((item) => item.id === concernId) ?? null;
 
   const message = useMemo(() => {
     if (!concern || !created) return "";
     return buildConsultationMessage({
-      concernId: concern.id,
+      concernId: concern.id as ConcernId,
       concernTitle: concern.title,
       name: name.trim(),
       motherName: motherName.trim(),
@@ -70,8 +72,7 @@ export function BeginFlow() {
       setDuplicate({
         trackingNumber: existing,
         status: "pending",
-        statusNote:
-          "A request is already pending for this number on this device. Contact admin to clear, or notify again on WhatsApp/email.",
+        statusNote: t.begin.pendingIntro,
       });
       setStep(3);
       return;
@@ -83,8 +84,7 @@ export function BeginFlow() {
     setCreated({
       trackingNumber,
       status: "pending",
-      statusNote:
-        "Your reference is ready. Send it on WhatsApp or email so guidance can begin.",
+      statusNote: t.begin.readyIntro,
     });
     setStep(3);
   }
@@ -109,7 +109,6 @@ export function BeginFlow() {
         }),
       });
 
-      // cPanel static hosting has no API — fall back to WhatsApp/email flow.
       if (response.status === 404 || response.status === 405) {
         createStaticFallback();
         return;
@@ -152,37 +151,44 @@ export function BeginFlow() {
   return (
     <div className="mx-auto w-full max-w-3xl">
       <div className="mb-10 flex items-center gap-3 text-xs tracking-[0.18em] uppercase text-fog">
-        <StepPill active={step === 1} done={step > 1} label="01 Concern" />
+        <StepPill
+          active={step === 1}
+          done={step > 1}
+          label={t.begin.stepConcern}
+        />
         <span className="h-px flex-1 bg-line" />
-        <StepPill active={step === 2} done={step > 2} label="02 Details" />
+        <StepPill
+          active={step === 2}
+          done={step > 2}
+          label={t.begin.stepDetails}
+        />
         <span className="h-px flex-1 bg-line" />
-        <StepPill active={step === 3} done={false} label="03 Send" />
+        <StepPill active={step === 3} done={false} label={t.begin.stepSend} />
       </div>
 
       {step === 1 && (
         <section className="space-y-8">
           <div>
             <p className="text-xs tracking-[0.22em] uppercase text-gold">
-              Begin healing
+              {t.begin.eyebrow}
             </p>
             <h1 className="mt-4 font-display text-4xl leading-tight text-cream md:text-5xl">
-              What are you facing?
+              {t.begin.title}
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-fog">
-              Choose the concern closest to your heart. Next we ask only what is
-              needed for a private, respectful consultation.
+              {t.begin.intro}
             </p>
           </div>
 
           <div className="grid gap-3">
-            {CONCERNS.map((item) => {
+            {t.begin.concerns.map((item) => {
               const selected = concernId === item.id;
               return (
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => setConcernId(item.id)}
-                  className={`border px-5 py-5 text-left transition-colors duration-300 ${
+                  onClick={() => setConcernId(item.id as ConcernId)}
+                  className={`border px-5 py-5 text-start transition-colors duration-300 ${
                     selected
                       ? "border-gold bg-gold/10"
                       : "border-line bg-ink/40 hover:border-fog/40"
@@ -205,7 +211,7 @@ export function BeginFlow() {
             onClick={() => setStep(2)}
             className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Continue
+            {t.begin.continue}
           </button>
         </section>
       )}
@@ -214,79 +220,78 @@ export function BeginFlow() {
         <section className="space-y-8">
           <div>
             <p className="text-xs tracking-[0.22em] uppercase text-gold">
-              Your details
+              {t.begin.detailsEyebrow}
             </p>
             <h1 className="mt-4 font-display text-4xl leading-tight text-cream md:text-5xl">
-              So we may know you properly.
+              {t.begin.detailsTitle}
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-fog">
-              Concern selected:{" "}
+              {t.begin.concernSelected}{" "}
               <span className="text-cream">{concern?.title}</span>
             </p>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-fog/80">
-              Privacy: your name, mother&apos;s name, phone, and location are
-              used only to understand and respond to your request.
+              {t.begin.privacy}
             </p>
           </div>
 
           <div className="space-y-5">
             <label className="block">
               <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
-                Your name
+                {t.begin.name}
               </span>
               <input
                 className={fieldClass}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Full name"
+                placeholder={t.begin.namePh}
                 autoComplete="name"
               />
             </label>
             <label className="block">
               <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
-                Mother&apos;s name
+                {t.begin.mother}
               </span>
               <input
                 className={fieldClass}
                 value={motherName}
                 onChange={(event) => setMotherName(event.target.value)}
-                placeholder="Walida ka name"
+                placeholder={t.begin.motherPh}
               />
             </label>
             <label className="block">
               <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
-                Closest location
+                {t.begin.location}
               </span>
               <input
                 className={fieldClass}
                 value={location}
                 onChange={(event) => setLocation(event.target.value)}
-                placeholder="City / area"
+                placeholder={t.begin.locationPh}
               />
             </label>
             <label className="block">
               <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
-                Your WhatsApp / mobile
+                {t.begin.phone}
               </span>
               <input
                 className={fieldClass}
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
-                placeholder="+92 3xx xxx xxxx"
+                placeholder={t.begin.phonePh}
                 inputMode="tel"
                 autoComplete="tel"
               />
             </label>
             <label className="block">
               <span className="mb-2 block text-xs tracking-[0.16em] uppercase text-fog">
-                Optional note
+                {t.begin.note}
               </span>
               <textarea
                 className={fieldClass}
                 rows={4}
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
-                placeholder="A few honest lines, if you wish."
+                placeholder={t.begin.notePh}
               />
             </label>
           </div>
@@ -299,7 +304,7 @@ export function BeginFlow() {
               onClick={() => setStep(1)}
               className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
             >
-              Back
+              {t.begin.back}
             </button>
             <button
               type="button"
@@ -307,7 +312,7 @@ export function BeginFlow() {
               onClick={submitRequest}
               className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {submitting ? "Saving..." : "Create tracking request"}
+              {submitting ? t.begin.submitting : t.begin.submit}
             </button>
           </div>
         </section>
@@ -317,20 +322,19 @@ export function BeginFlow() {
         <section className="space-y-8">
           <div>
             <p className="text-xs tracking-[0.22em] uppercase text-gold">
-              Already pending
+              {t.begin.stepSend}
             </p>
             <h1 className="mt-4 font-display text-4xl leading-tight text-cream md:text-5xl">
-              Request already pending
+              {t.begin.pendingTitle}
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-fog">
-              This WhatsApp / mobile already has an open request. A new one
-              cannot be created until the admin clears it.
+              {t.begin.pendingIntro}
             </p>
           </div>
 
           <div className="border border-gold/40 bg-gold/10 px-5 py-5">
             <p className="text-xs tracking-[0.16em] uppercase text-gold">
-              Your tracking number
+              {t.begin.reference}
             </p>
             <p className="mt-2 font-display text-3xl text-cream">
               {duplicate.trackingNumber}
@@ -343,7 +347,7 @@ export function BeginFlow() {
               href={`/track?id=${encodeURIComponent(duplicate.trackingNumber)}`}
               className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
             >
-              Check status
+              {t.begin.checkStatus}
             </Link>
             <button
               type="button"
@@ -353,7 +357,7 @@ export function BeginFlow() {
               }}
               className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist"
             >
-              Back
+              {t.begin.back}
             </button>
           </div>
         </section>
@@ -363,20 +367,19 @@ export function BeginFlow() {
         <section className="space-y-8">
           <div>
             <p className="text-xs tracking-[0.22em] uppercase text-gold">
-              Request created
+              {t.begin.stepSend}
             </p>
             <h1 className="mt-4 font-display text-4xl leading-tight text-cream md:text-5xl">
-              Your message is ready
+              {t.begin.readyTitle}
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-fog">
-              Keep this reference. Send the prepared message on WhatsApp or
-              email — then wait for a calm, private reply.
+              {t.begin.readyIntro}
             </p>
           </div>
 
           <div className="border border-gold/40 bg-gold/10 px-5 py-5">
             <p className="text-xs tracking-[0.16em] uppercase text-gold">
-              Tracking number
+              {t.begin.reference}
             </p>
             <p className="mt-2 font-display text-3xl text-cream">
               {created.trackingNumber}
@@ -393,7 +396,7 @@ export function BeginFlow() {
               href={`/track?id=${encodeURIComponent(created.trackingNumber)}`}
               className="border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
             >
-              Track status
+              {t.begin.track}
             </Link>
             <a
               href={whatsappHref(message)}
@@ -401,13 +404,13 @@ export function BeginFlow() {
               rel="noopener noreferrer"
               className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
             >
-              Notify on WhatsApp
+              {t.begin.notifyWa}
             </a>
             <a
               href={emailHref(message)}
               className="border border-gold/50 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-gold transition-colors duration-300 hover:border-gold-bright hover:text-gold-bright"
             >
-              Notify by email
+              {t.begin.notifyEmail}
             </a>
           </div>
         </section>

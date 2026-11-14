@@ -42,6 +42,19 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+body.font-urdu {
+  font-family: var(--font-urdu), var(--font-outfit), system-ui, sans-serif;
+}
+
+body.font-urdu .font-display {
+  font-family: var(--font-urdu), var(--font-fraunces), Georgia, serif;
+}
+
+body.font-urdu .uppercase {
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
 ::selection {
   background: color-mix(in srgb, var(--gold) 45%, transparent);
   color: var(--cream);
