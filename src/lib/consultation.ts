@@ -2,6 +2,26 @@
 export const CONTACT_EMAIL = "Roohaniilajkarachi@gmail.com";
 export const CONTACT_WHATSAPP = "923452845400";
 
+/** Hadiya for initial spiritual diagnosis (manual verification). */
+export const HADIYA = {
+  pakistan: {
+    amountLabel: "PKR 5,000",
+    amountValue: 5000,
+    currency: "PKR",
+    method: "EasyPaisa",
+    account: "03452845400",
+  },
+  international: {
+    amountLabel: "USD 50",
+    amountValue: 50,
+    currency: "USD",
+    method: "Bank IBAN",
+    account: "PK50TMFB0000000014429642",
+  },
+} as const;
+
+export type HadiyaRegion = keyof typeof HADIYA;
+
 export const CONCERNS = [
   {
     id: "evil-eye",
@@ -61,6 +81,8 @@ export type ConsultationPayload = {
   phone: string;
   note?: string;
   trackingNumber?: string;
+  hadiyaRegion?: HadiyaRegion;
+  hadiyaTxnLast5?: string;
 };
 
 export function buildConsultationMessage(data: ConsultationPayload): string {
@@ -85,6 +107,18 @@ export function buildConsultationMessage(data: ConsultationPayload): string {
 
   if (data.note?.trim()) {
     lines.push(`Details: ${data.note.trim()}`);
+  }
+
+  if (data.hadiyaRegion && data.hadiyaTxnLast5) {
+    const hadiya = HADIYA[data.hadiyaRegion];
+    lines.push(
+      "",
+      "Hadiya for spiritual diagnosis:",
+      `Region: ${data.hadiyaRegion === "pakistan" ? "Pakistan" : "International"}`,
+      `Amount: ${hadiya.amountLabel}`,
+      `Method: ${hadiya.method} (${hadiya.account})`,
+      `Transaction last 5 digits: ${data.hadiyaTxnLast5}`,
+    );
   }
 
   lines.push(

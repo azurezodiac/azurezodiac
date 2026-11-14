@@ -11,6 +11,8 @@ export async function POST(request: Request) {
       location?: string;
       phone?: string;
       note?: string;
+      hadiyaRegion?: string;
+      hadiyaTxnLast5?: string;
     };
 
     const concern = CONCERNS.find((item) => item.id === body.concernId);
@@ -25,7 +27,8 @@ export async function POST(request: Request) {
     const motherName = body.motherName?.trim() ?? "";
     const location = body.location?.trim() ?? "";
     const phone = normalizePhone(body.phone ?? "");
-    const note = body.note?.trim() ?? "";
+    let note = body.note?.trim() ?? "";
+    const hadiyaTxnLast5 = (body.hadiyaTxnLast5 ?? "").replace(/\D/g, "");
 
     if (name.length < 2 || motherName.length < 2 || location.length < 2) {
       return NextResponse.json(
@@ -39,6 +42,24 @@ export async function POST(request: Request) {
         { error: "Please enter a valid WhatsApp / mobile number." },
         { status: 400 },
       );
+    }
+
+    if (hadiyaTxnLast5.length !== 5) {
+      return NextResponse.json(
+        {
+          error:
+            "Please enter the last 5 digits of your Hadiya transaction for spiritual diagnosis.",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (!note.includes(hadiyaTxnLast5)) {
+      const region =
+        body.hadiyaRegion === "international" ? "International" : "Pakistan";
+      note = note
+        ? `${note}\n\nHadiya (${region}) txn last 5: ${hadiyaTxnLast5}`
+        : `Hadiya (${region}) txn last 5: ${hadiyaTxnLast5}`;
     }
 
     const result = await createRequest({

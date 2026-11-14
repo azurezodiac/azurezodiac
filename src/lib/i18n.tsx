@@ -126,6 +126,7 @@ type Dictionary = {
   begin: {
     stepConcern: string;
     stepDetails: string;
+    stepHadiya: string;
     stepSend: string;
     eyebrow: string;
     title: string;
@@ -146,8 +147,25 @@ type Dictionary = {
     phonePh: string;
     notePh: string;
     back: string;
+    toHadiya: string;
     submit: string;
     submitting: string;
+    hadiyaEyebrow: string;
+    hadiyaTitle: string;
+    hadiyaIntro: string;
+    hadiyaPakistan: string;
+    hadiyaInternational: string;
+    hadiyaPkAmount: string;
+    hadiyaIntlAmount: string;
+    hadiyaEasyPaisa: string;
+    hadiyaIban: string;
+    hadiyaCopy: string;
+    hadiyaCopied: string;
+    hadiyaTxnLabel: string;
+    hadiyaTxnPh: string;
+    hadiyaTxnHint: string;
+    hadiyaTxnError: string;
+    hadiyaNote: string;
     readyTitle: string;
     readyIntro: string;
     reference: string;
@@ -483,7 +501,8 @@ const en: Dictionary = {
   begin: {
     stepConcern: "01 Concern",
     stepDetails: "02 Details",
-    stepSend: "03 Send",
+    stepHadiya: "03 Hadiya",
+    stepSend: "04 Send",
     eyebrow: "Begin healing",
     title: "What are you facing?",
     intro:
@@ -505,11 +524,31 @@ const en: Dictionary = {
     phonePh: "+92 3xx xxx xxxx",
     notePh: "A few honest lines, if you wish.",
     back: "Back",
+    toHadiya: "Continue to Hadiya",
     submit: "Create request",
     submitting: "Saving...",
+    hadiyaEyebrow: "Spiritual diagnosis",
+    hadiyaTitle: "Send Hadiya for initial diagnosis",
+    hadiyaIntro:
+      "Before your request is created, send a Hadiya for spiritual diagnosis. Then enter the last 5 digits of your transaction so it can be verified.",
+    hadiyaPakistan: "Pakistan",
+    hadiyaInternational: "International",
+    hadiyaPkAmount: "PKR 5,000 — initial diagnosis only",
+    hadiyaIntlAmount: "USD 50 — initial diagnosis only",
+    hadiyaEasyPaisa: "EasyPaisa account",
+    hadiyaIban: "IBAN (international)",
+    hadiyaCopy: "Copy",
+    hadiyaCopied: "Copied",
+    hadiyaTxnLabel: "Last 5 digits of transaction",
+    hadiyaTxnPh: "e.g. 48291",
+    hadiyaTxnHint:
+      "After sending Hadiya, type only the last 5 digits from your transfer / transaction ID.",
+    hadiyaTxnError: "Enter exactly 5 digits from your transaction.",
+    hadiyaNote:
+      "This Hadiya is for initial spiritual diagnosis only. It is not a medical fee. Shifa is from Allah alone; no guarantee of healing is offered.",
     readyTitle: "Your message is ready",
     readyIntro:
-      "Keep this reference. Send the prepared message on WhatsApp or email — then wait for a calm, private reply.",
+      "Keep this reference. Send the prepared message on WhatsApp or email — your Hadiya transaction digits are included so diagnosis can be verified.",
     reference: "Reference",
     track: "Track status",
     notifyWa: "Notify on WhatsApp",
@@ -887,7 +926,8 @@ const ur: Dictionary = {
   begin: {
     stepConcern: "۰۱ مسئلہ",
     stepDetails: "۰۲ تفصیل",
-    stepSend: "۰۳ ارسال",
+    stepHadiya: "۰۳ ہدیہ",
+    stepSend: "۰۴ ارسال",
     eyebrow: "شفا شروع کریں",
     title: "آپ کس چیز کا سامنا کر رہے ہیں؟",
     intro:
@@ -909,11 +949,31 @@ const ur: Dictionary = {
     phonePh: "+۹۲ ۳xx xxx xxxx",
     notePh: "چند سچی سطریں، اگر چاہیں۔",
     back: "واپس",
+    toHadiya: "ہدیہ کی طرف جائیں",
     submit: "درخواست بنائیں",
     submitting: "محفوظ ہو رہا ہے...",
+    hadiyaEyebrow: "روحانی تشخیص",
+    hadiyaTitle: "ابتدائی تشخیص کے لیے ہدیہ بھیجیں",
+    hadiyaIntro:
+      "درخواست بنانے سے پہلے روحانی تشخیص کے لیے ہدیہ بھیجیں۔ پھر لین دین کے آخری ۵ ہندسے درج کریں تاکہ تصدیق ہو سکے۔",
+    hadiyaPakistan: "پاکستان",
+    hadiyaInternational: "بین الاقوامی",
+    hadiyaPkAmount: "۵،۰۰۰ روپے — صرف ابتدائی تشخیص",
+    hadiyaIntlAmount: "۵۰ ڈالر — صرف ابتدائی تشخیص",
+    hadiyaEasyPaisa: "ایزی پیسہ اکاؤنٹ",
+    hadiyaIban: "آئی بی اے این (بین الاقوامی)",
+    hadiyaCopy: "کاپی",
+    hadiyaCopied: "کاپی ہو گیا",
+    hadiyaTxnLabel: "لین دین کے آخری ۵ ہندسے",
+    hadiyaTxnPh: "مثلاً ۴۸۲۹۱",
+    hadiyaTxnHint:
+      "ہدیہ بھیجنے کے بعد صرف ٹرانزیکشن آئی ڈی / رسید کے آخری ۵ ہندسے لکھیں۔",
+    hadiyaTxnError: "بالکل ۵ ہندسے درج کریں۔",
+    hadiyaNote:
+      "یہ ہدیہ صرف ابتدائی روحانی تشخیص کے لیے ہے۔ یہ طبی فیس نہیں۔ شفا اللہ کی طرف سے ہے؛ شفا کی کوئی ضمانت نہیں۔",
     readyTitle: "آپ کا پیغام تیار ہے",
     readyIntro:
-      "یہ حوالہ محفوظ رکھیں۔ تیار پیغام واٹس ایپ یا ای میل پر بھیجیں — پھر پرسکون، نجی جواب کا انتظار کریں۔",
+      "یہ حوالہ محفوظ رکھیں۔ تیار پیغام واٹس ایپ یا ای میل پر بھیجیں — ہدیہ کے لین دین کے ہندسے شامل ہیں تاکہ تشخیص کی تصدیق ہو سکے۔",
     reference: "حوالہ نمبر",
     track: "حالت دیکھیں",
     notifyWa: "واٹس ایپ پر بھیجیں",
