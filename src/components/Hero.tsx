@@ -15,7 +15,7 @@ export function Hero() {
       <div className="absolute inset-0">
         <Image
           src="/images/hero.jpg"
-          alt="Sacred light at the Kaaba"
+          alt="Islamic spiritual atmosphere — Redeemysoul Spiritual Healing Shazli Karachi"
           fill
           priority
           sizes="100vw"
@@ -29,6 +29,9 @@ export function Hero() {
       <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-end px-6 pb-16 pt-32 md:px-10 md:pb-24">
         <p className="reveal font-display text-5xl leading-none tracking-[0.04em] text-cream sm:text-6xl md:text-8xl lg:text-9xl">
           Redeemysoul
+        </p>
+        <p className="reveal reveal-delay-1 mt-3 text-xs tracking-[0.18em] uppercase text-gold md:text-sm">
+          {t.hero.brandLine}
         </p>
         <div className="gold-rule reveal reveal-delay-1 mt-6 h-px w-40 bg-gold md:w-56" />
         <h1 className="reveal reveal-delay-2 mt-8 max-w-2xl font-display text-2xl leading-tight text-cream sm:text-3xl md:text-4xl">

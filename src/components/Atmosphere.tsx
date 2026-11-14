@@ -11,7 +11,7 @@ export function Atmosphere() {
       <div className="absolute inset-0">
         <Image
           src="/images/stillness.jpg"
-          alt="Mosque under soft evening light"
+          alt="Peaceful mosque light — Islamic spiritual healing atmosphere in Karachi"
           fill
           sizes="100vw"
           className="object-cover opacity-45"

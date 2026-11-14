@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { About } from "@/components/About";
 import { Atmosphere } from "@/components/Atmosphere";
 import { Contact } from "@/components/Contact";
@@ -13,6 +14,26 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Testimonials } from "@/components/Testimonials";
 import { Trust } from "@/components/Trust";
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_TITLE,
+  absoluteUrl,
+} from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: DEFAULT_TITLE,
+  },
+  description: DEFAULT_DESCRIPTION,
+  alternates: {
+    canonical: absoluteUrl("/"),
+  },
+  openGraph: {
+    url: absoluteUrl("/"),
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+  },
+};
 
 export default function Home() {
   return (

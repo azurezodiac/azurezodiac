@@ -1,0 +1,24 @@
+{
+  "name": "Redeemysoul — Spiritual Healing Shazli",
+  "short_name": "Redeemysoul",
+  "description": "Private Islamic healing and ruqyah-centered guidance in Karachi by Spiritual Healing Shazli.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#061410",
+  "theme_color": "#061410",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/images/og.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

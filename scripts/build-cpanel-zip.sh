@@ -43,22 +43,29 @@ rm -f "$ZIP_PATH"
 (
   cd out
   zip -r "$ZIP_PATH" . \
-    -x "*.txt" \
+    -x "CPANEL-UPLOAD.txt" \
     -x "__next*" \
     -x "*/__next*"
 )
 
-# Helpful upload note inside the zip root
+# Helpful upload + SEO note inside the zip root
 printf '%s\n' \
   "Redeemysoul — cPanel upload" \
   "" \
   "1) cPanel -> File Manager -> public_html" \
   "2) Upload this zip" \
   "3) Extract / Unzip here" \
-  "4) Make sure index.html is directly inside public_html" \
+  "4) Make sure index.html, robots.txt, and sitemap.xml are inside public_html" \
   "" \
-  "Works: homepage, begin form, WhatsApp/email notify" \
+  "Works: homepage, begin form, WhatsApp/email notify, SEO files" \
   "Needs Node hosting later: full tracking API + admin portal" \
+  "" \
+  "SEO — do these in Google (important for search suggestions):" \
+  "A) Google Search Console -> Add property redeemysoul.com -> verify -> Submit sitemap: https://redeemysoul.com/sitemap.xml" \
+  "B) Google Business Profile (Spiritual Healing Shazli) -> Website = https://redeemysoul.com" \
+  "C) Keep name/address/phone identical on GBP and the website footer" \
+  "D) Ask happy clients for Google reviews on Spiritual Healing Shazli" \
+  "E) Share the site from WhatsApp/Facebook with the homepage link regularly" \
   > /tmp/CPANEL-UPLOAD.txt
 (
   cd out

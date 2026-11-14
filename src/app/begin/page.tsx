@@ -2,11 +2,25 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BeginFlow } from "@/components/begin/BeginFlow";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Begin healing — Redeemysoul",
+  title: "Begin Islamic Healing Consultation",
   description:
-    "Start a private Redeemysoul consultation. Spiritual healing is not a substitute for medical treatment. Shifa is from Allah alone. No guarantee of healing.",
+    "Start a private Redeemysoul consultation with Spiritual Healing Shazli in Karachi. Share your concern for nazar, sihr, bandish, or spiritual strain. Not a medical substitute. Shifa is from Allah alone. No guarantee of healing.",
+  alternates: {
+    canonical: absoluteUrl("/begin"),
+  },
+  openGraph: {
+    url: absoluteUrl("/begin"),
+    title: "Begin Islamic Healing Consultation | Redeemysoul",
+    description:
+      "Private consultation request for Islamic healing and ruqyah-centered guidance in Karachi.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function BeginPage() {

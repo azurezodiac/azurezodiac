@@ -26,6 +26,7 @@ type Dictionary = {
     backHome: string;
   };
   hero: {
+    brandLine: string;
     headline: string;
     support: string;
     ctaBegin: string;
@@ -184,6 +185,7 @@ const en: Dictionary = {
     backHome: "Back home",
   },
   hero: {
+    brandLine: "Spiritual Healing Shazli · Karachi",
     headline: "Islamic healing for a heart under pressure.",
     support:
       "Ruqyah-centered guidance for nazar, sihr concerns, and spiritual heaviness — private, respectful, and rooted in remembrance.",
@@ -589,6 +591,7 @@ const ur: Dictionary = {
     backHome: "واپس صفحہ اول",
   },
   hero: {
+    brandLine: "سپریچوئل ہیلنگ شاذلی · کراچی",
     headline: "دباؤ میں دل کے لیے اسلامی شفا۔",
     support:
       "نظر، سحر کی پریشانی اور روحانی بوجھ کے لیے رقیہ پر مبنی رہنمائی — نجی، ادب کے ساتھ، اور ذکر پر قائم۔",

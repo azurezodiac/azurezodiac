@@ -2,10 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { TrackLookup } from "@/components/track/TrackLookup";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Track request — Redeemysoul",
-  description: "Check the status of your Redeemysoul consultation request.",
+  title: "Track Consultation Request",
+  description:
+    "Check the status of your Redeemysoul consultation request using your reference number.",
+  alternates: {
+    canonical: absoluteUrl("/track"),
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default function TrackPage() {
@@ -30,7 +39,7 @@ export default function TrackPage() {
       <main className="px-6 py-14 md:px-10 md:py-20">
         <Suspense
           fallback={
-            <p className="text-center text-fog">Loading tracker...</p>
+            <p className="text-center text-fog">Loading tracker…</p>
           }
         >
           <TrackLookup />
