@@ -183,6 +183,26 @@ const en: Dictionary = {
         copy: "When dreams, pressure, or household strain feel beyond ordinary hardship, we begin with discernment, dignity, and faith — never fear spectacle.",
       },
       {
+        title: "Islamic healing",
+        copy: "Private ruqyah-centered healing for spiritual heaviness, inner unrest, and matters that need quiet Islamic care — guided with adab, not haste.",
+      },
+      {
+        title: "Spiritual cleansing",
+        copy: "When the heart, thoughts, or daily life feel clouded or spiritually unclean. Cleansing rooted in remembrance, dua, and patient guidance.",
+      },
+      {
+        title: "Home cleansing",
+        copy: "For a house that feels heavy, restless, or unsettled — so barakah and calm can return to the rooms where your family lives.",
+      },
+      {
+        title: "Business & rizq blockage",
+        copy: "When work stalls, doors stay shut, or provision feels spiritually blocked. Guidance for clarity, effort, and trust in Allah’s rizq.",
+      },
+      {
+        title: "Family & children care",
+        copy: "Protective spiritual care when children, marriage, or the household carry fear, disturbed sleep, or unexplained strain.",
+      },
+      {
         title: "Spiritual renewal",
         copy: "For a heart that feels distant from salah, dua, and inner quiet. A paced return to remembrance and daily rhythm that fits real life.",
       },
@@ -407,6 +427,31 @@ const en: Dictionary = {
         hint: "Unusual fear, dreams, or strain that feels beyond ordinary hardship.",
       },
       {
+        id: "healing",
+        title: "Islamic healing",
+        hint: "Spiritual heaviness or unrest that needs private ruqyah-centered care.",
+      },
+      {
+        id: "cleansing",
+        title: "Spiritual cleansing",
+        hint: "A heart or daily life that feels clouded and needs purification.",
+      },
+      {
+        id: "home-cleansing",
+        title: "Home cleansing",
+        hint: "A house that feels heavy, restless, or spiritually unsettled.",
+      },
+      {
+        id: "rizq",
+        title: "Business & rizq blockage",
+        hint: "Work, doors, or provision that feel spiritually blocked.",
+      },
+      {
+        id: "family",
+        title: "Family & children care",
+        hint: "Fear, disturbed sleep, or strain affecting children or the household.",
+      },
+      {
         id: "renewal",
         title: "Spiritual renewal",
         hint: "Distance from salah, dua, clarity, or inner peace.",
@@ -463,6 +508,26 @@ const ur: Dictionary = {
       {
         title: "سحر و پریشانی",
         copy: "جب خواب، دباؤ یا گھر کا تناؤ عام مشکلات سے زیادہ لگے، ہم پہچان، وقار اور ایمان کے ساتھ شروع کرتے ہیں — خوف کی نمائش کے بغیر۔",
+      },
+      {
+        title: "اسلامی شفا",
+        copy: "روحانی بوجھ، اندرونی بے چینی، اور ان معاملات کے لیے نجی رقیہ پر مبنی شفا جنہیں ادب اور خاموشی چاہیے — جلدی نہیں، ادب کے ساتھ۔",
+      },
+      {
+        title: "روحانی صفائی",
+        copy: "جب دل، خیالات یا روزمرہ زندگی آلودہ یا ابر آلود محسوس ہو۔ ذکر، دعا اور صبر بھری رہنمائی پر مبنی صفائی۔",
+      },
+      {
+        title: "گھر کی صفائی",
+        copy: "جب گھر بھاری، بے چین یا غیر مطمئن لگے — تاکہ برکت اور سکون ان کمروں میں لوٹ آئے جہاں آپ کا خاندان رہتا ہے۔",
+      },
+      {
+        title: "کاروبار و رزق کی رکاوٹ",
+        copy: "جب کام رکے، دروازے بند رہیں، یا رزق روحانی طور پر بند محسوس ہو۔ وضاحت، محنت اور اللہ کے رزق پر بھروسے کی رہنمائی۔",
+      },
+      {
+        title: "خاندان و بچوں کی نگہداشت",
+        copy: "حفاظتی روحانی نگہداشت جب بچے، ازدواجی زندگی یا گھر خوف، خراب نیند یا بے وجہ دباؤ کا شکار ہوں۔",
       },
       {
         title: "روحانی تجدید",
@@ -685,6 +750,31 @@ const ur: Dictionary = {
         id: "black-magic",
         title: "سحر و پریشانی",
         hint: "غیر معمولی خوف، خواب، یا تناؤ جو عام مشکل سے زیادہ لگے۔",
+      },
+      {
+        id: "healing",
+        title: "اسلامی شفا",
+        hint: "روحانی بوجھ یا بے چینی جس کے لیے نجی رقیہ پر مبنی نگہداشت درکار ہو۔",
+      },
+      {
+        id: "cleansing",
+        title: "روحانی صفائی",
+        hint: "دل یا روزمرہ زندگی جو ابر آلود محسوس ہو اور صفائی چاہتی ہو۔",
+      },
+      {
+        id: "home-cleansing",
+        title: "گھر کی صفائی",
+        hint: "گھر جو بھاری، بے چین یا روحانی طور پر غیر مطمئن لگے۔",
+      },
+      {
+        id: "rizq",
+        title: "کاروبار و رزق کی رکاوٹ",
+        hint: "کام، مواقع یا رزق جو روحانی طور پر بند محسوس ہو۔",
+      },
+      {
+        id: "family",
+        title: "خاندان و بچوں کی نگہداشت",
+        hint: "خوف، خراب نیند یا دباؤ جو بچوں یا گھر پر اثر انداز ہو۔",
       },
       {
         id: "renewal",

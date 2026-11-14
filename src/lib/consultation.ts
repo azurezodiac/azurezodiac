@@ -14,6 +14,31 @@ export const CONCERNS = [
     hint: "Unusual fear, dreams, or strain that feels beyond ordinary hardship.",
   },
   {
+    id: "healing",
+    title: "Islamic healing",
+    hint: "Spiritual heaviness or unrest that needs private ruqyah-centered care.",
+  },
+  {
+    id: "cleansing",
+    title: "Spiritual cleansing",
+    hint: "A heart or daily life that feels clouded and needs purification.",
+  },
+  {
+    id: "home-cleansing",
+    title: "Home cleansing",
+    hint: "A house that feels heavy, restless, or spiritually unsettled.",
+  },
+  {
+    id: "rizq",
+    title: "Business & rizq blockage",
+    hint: "Work, doors, or provision that feel spiritually blocked.",
+  },
+  {
+    id: "family",
+    title: "Family & children care",
+    hint: "Fear, disturbed sleep, or strain affecting children or the household.",
+  },
+  {
     id: "renewal",
     title: "Spiritual renewal",
     hint: "Distance from salah, dua, clarity, or inner peace.",

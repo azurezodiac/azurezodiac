@@ -27,7 +27,7 @@ export function Services() {
               className="group grid gap-3 py-8 transition-colors duration-300 md:grid-cols-[4rem_1fr] md:gap-8"
             >
               <span className="font-display text-2xl text-gold/70 transition-colors duration-300 group-hover:text-gold-bright">
-                0{index + 1}
+                {String(index + 1).padStart(2, "0")}
               </span>
               <div>
                 <h3 className="font-display text-2xl text-cream md:text-3xl">
