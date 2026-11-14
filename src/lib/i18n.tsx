@@ -79,6 +79,8 @@ type Dictionary = {
     eyebrow: string;
     title: string;
     body: string;
+    short: string;
+    points: string[];
   };
   faq: {
     eyebrow: string;
@@ -302,7 +304,7 @@ const en: Dictionary = {
     body: [
       "Ejaz Noor Shazli is a Karachi-based spiritual healer serving through Redeemysoul with a quiet, adab-first approach to Islamic healing.",
       "His work focuses on private consultation for nazar, spiritual pressure, and concerns of sihr — guided by remembrance, dua, and ruqyah-centered care rather than fear or spectacle.",
-      "Seekers are received with dignity. Matters stay confidential. Where medical or professional care is needed, that path is respected; spiritual guidance here supports the heart and does not replace doctors.",
+      "Seekers are received with dignity. Matters stay confidential. Spiritual healing is not a substitute for medical treatment; shifa is from Allah alone, and no guarantee of healing is offered. Where medical care is needed, that path is respected.",
     ],
   },
   hours: {
@@ -330,8 +332,15 @@ const en: Dictionary = {
   },
   disclaimer: {
     eyebrow: "Disclaimer",
-    title: "Spiritual guidance, not medical treatment.",
-    body: "Redeemysoul provides Islamic spiritual guidance and ruqyah-centered support. It is not a substitute for medical, psychological, or emergency care. If you have health concerns, please consult a qualified doctor or relevant professional alongside any spiritual path you choose.",
+    title: "Spiritual healing is not medical treatment.",
+    body: "Redeemysoul offers Islamic spiritual guidance and ruqyah-centered support only. Please read this carefully before you begin.",
+    short:
+      "Spiritual healing is not a substitute for medical treatment. Shifa is from Allah alone. No guarantee of healing is offered.",
+    points: [
+      "This is not a substitute for medical, psychological, or emergency care. Continue seeing qualified doctors for any health concern.",
+      "Shifa (healing) is from Allah alone. We only offer spiritual means, dua, and guidance with humility.",
+      "There is no guarantee of shifa, results, or timelines. Outcomes rest with Allah.",
+    ],
   },
   faq: {
     eyebrow: "FAQ",
@@ -352,7 +361,7 @@ const en: Dictionary = {
       },
       {
         q: "Is this a replacement for medical care?",
-        a: "No. Redeemysoul offers faith-centered spiritual guidance. Please continue any medical or professional care you need.",
+        a: "No. Spiritual healing is not a substitute for medical treatment. Shifa is from Allah alone, and no guarantee of healing is offered. Please continue any medical or professional care you need.",
       },
       {
         q: "How fast will I get a reply?",
@@ -377,6 +386,7 @@ const en: Dictionary = {
     email: "Email",
     whatsapp: "WhatsApp",
   },
+
   begin: {
     stepConcern: "01 Concern",
     stepDetails: "02 Details",
@@ -627,7 +637,7 @@ const ur: Dictionary = {
     body: [
       "اجاز نور شاذلی کراچی میں مقیم روحانی معالج ہیں، جو ریڈیمی سول کے ذریعے ادب اور خاموشی کے ساتھ اسلامی شفا کی خدمت کرتے ہیں۔",
       "ان کا کام نظر، روحانی دباؤ اور سحر کی پریشانیوں کے لیے نجی مشاورت پر مرکوز ہے — ذکر، دعا اور رقیہ پر مبنی نگہداشت کے ساتھ، خوف یا نمائش کے بغیر۔",
-      "طالبین کو وقار کے ساتھ سنا جاتا ہے۔ معاملات راز میں رہتے ہیں۔ جہاں طبی یا پیشہ ورانہ علاج درکار ہو اس کا احترام کیا جاتا ہے؛ یہاں روحانی رہنمائی دل کی مدد کے لیے ہے، ڈاکٹروں کا متبادل نہیں۔",
+      "طالبین کو وقار کے ساتھ سنا جاتا ہے۔ معاملات راز میں رہتے ہیں۔ روحانی شفا طبی علاج کا متبادل نہیں؛ شفا صرف اللہ کی طرف سے ہے، اور شفا کی کوئی ضمانت نہیں۔ جہاں طبی علاج درکار ہو اس کا احترام کیا جاتا ہے۔",
     ],
   },
   hours: {
@@ -655,8 +665,15 @@ const ur: Dictionary = {
   },
   disclaimer: {
     eyebrow: "وضاحت نامہ",
-    title: "روحانی رہنمائی، طبی علاج نہیں۔",
-    body: "ریڈیمی سول اسلامی روحانی رہنمائی اور رقیہ پر مبنی معاونت دیتا ہے۔ یہ طبی، نفسیاتی یا ایمرجنسی علاج کا متبادل نہیں۔ اگر صحت کی پریشانی ہو تو کسی اہل ڈاکٹر یا متعلقہ پیشہ ور سے ضرور رجوع کریں، چاہے آپ روحانی راستہ بھی اختیار کریں۔",
+    title: "روحانی شفا طبی علاج نہیں ہے۔",
+    body: "ریڈیمی سول صرف اسلامی روحانی رہنمائی اور رقیہ پر مبنی معاونت دیتا ہے۔ شروع سے پہلے یہ بات غور سے پڑھیں۔",
+    short:
+      "روحانی شفا طبی علاج کا متبادل نہیں۔ شفا صرف اللہ کی طرف سے ہے۔ شفا کی کوئی ضمانت نہیں دی جاتی۔",
+    points: [
+      "یہ طبی، نفسیاتی یا ایمرجنسی علاج کا متبادل نہیں۔ صحت کی کسی بھی پریشانی کے لیے اہل ڈاکٹروں سے رجوع جاری رکھیں۔",
+      "شفا صرف اللہ کی طرف سے ہے۔ ہم صرف روحانی وسائل، دعا اور عاجزی کے ساتھ رہنمائی پیش کرتے ہیں۔",
+      "شفا، نتیجے یا وقت کی کوئی ضمانت نہیں۔ انجام اللہ کے ہاتھ میں ہے۔",
+    ],
   },
   faq: {
     eyebrow: "عمومی سوالات",
@@ -677,7 +694,7 @@ const ur: Dictionary = {
       },
       {
         q: "کیا یہ طبی علاج کا متبادل ہے؟",
-        a: "نہیں۔ ریڈیمی سول ایمانی روحانی رہنمائی دیتا ہے۔ جو طبی یا پیشہ ورانہ علاج درکار ہو وہ جاری رکھیں۔",
+        a: "نہیں۔ روحانی شفا طبی علاج کا متبادل نہیں۔ شفا صرف اللہ کی طرف سے ہے، اور شفا کی کوئی ضمانت نہیں دی جاتی۔ جو طبی یا پیشہ ورانہ علاج درکار ہو وہ جاری رکھیں۔",
       },
       {
         q: "جواب کتنی جلدی آتا ہے؟",

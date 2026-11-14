@@ -6,7 +6,7 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 export const metadata: Metadata = {
   title: "Begin healing — Redeemysoul",
   description:
-    "Start a private Redeemysoul consultation: share your concern, name, and location.",
+    "Start a private Redeemysoul consultation. Spiritual healing is not a substitute for medical treatment. Shifa is from Allah alone. No guarantee of healing.",
 };
 
 export default function BeginPage() {

@@ -1,5 +1,6 @@
 "use client";
 
+import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import { useLang } from "@/lib/i18n";
 
 export function About() {
@@ -20,6 +21,7 @@ export function About() {
           {t.about.body.map((paragraph) => (
             <p key={paragraph.slice(0, 24)}>{paragraph}</p>
           ))}
+          <HealingDisclaimer className="border-t border-line pt-6" />
         </div>
       </div>
     </section>

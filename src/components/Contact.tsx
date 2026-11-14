@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import { useLang } from "@/lib/i18n";
 
 export function Contact() {
@@ -18,6 +19,7 @@ export function Contact() {
         <p className="mt-6 max-w-lg text-base leading-relaxed text-fog">
           {t.contact.intro}
         </p>
+        <HealingDisclaimer className="mt-6 max-w-lg" />
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
             href="/begin"

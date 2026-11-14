@@ -26,12 +26,12 @@ const nastaliq = Noto_Nastaliq_Urdu({
 export const metadata: Metadata = {
   title: "Redeemysoul — Islamic Healing | Nazar, Sihr & Spiritual Care",
   description:
-    "Private Islamic healing for nazar, sihr concerns, and spiritual renewal — rooted in remembrance, dignity, and care.",
+    "Private Islamic healing for nazar, sihr concerns, and spiritual renewal. Not a substitute for medical treatment. Shifa is from Allah alone. No guarantee of healing.",
   metadataBase: new URL("https://redeemysoul.com"),
   openGraph: {
     title: "Redeemysoul — Islamic Healing",
     description:
-      "Private Islamic healing for nazar, sihr concerns, and spiritual renewal.",
+      "Private Islamic healing — not a medical substitute. Shifa is from Allah alone. No guarantee of healing.",
     url: "https://redeemysoul.com",
     siteName: "Redeemysoul",
     type: "website",

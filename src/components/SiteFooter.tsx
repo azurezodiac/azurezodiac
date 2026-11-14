@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import { useLang } from "@/lib/i18n";
 
 export function SiteFooter() {
@@ -16,6 +17,7 @@ export function SiteFooter() {
           <p className="mt-3 max-w-md text-sm leading-relaxed text-fog">
             {t.footer.blurb}
           </p>
+          <HealingDisclaimer className="mt-4 max-w-md" />
           <p className="mt-4 max-w-md text-xs leading-relaxed text-fog/80">
             {t.footer.privacy}
           </p>

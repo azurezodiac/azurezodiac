@@ -17,6 +17,22 @@ export function Disclaimer() {
         <p className="mt-5 max-w-3xl text-sm leading-relaxed text-fog md:text-base">
           {t.disclaimer.body}
         </p>
+        <ul className="mt-8 max-w-3xl space-y-4 border-t border-line pt-8">
+          {t.disclaimer.points.map((point) => (
+            <li
+              key={point.slice(0, 32)}
+              className="text-sm leading-relaxed text-fog md:text-base"
+            >
+              <span className="me-3 text-gold" aria-hidden="true">
+                —
+              </span>
+              {point}
+            </li>
+          ))}
+        </ul>
+        <p className="mt-8 max-w-3xl border-t border-line pt-6 text-sm font-medium leading-relaxed text-cream/90">
+          {t.disclaimer.short}
+        </p>
       </div>
     </section>
   );

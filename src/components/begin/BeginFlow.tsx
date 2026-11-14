@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import {
   type ConcernId,
   buildConsultationMessage,
@@ -165,6 +166,8 @@ export function BeginFlow() {
         <span className="h-px flex-1 bg-line" />
         <StepPill active={step === 3} done={false} label={t.begin.stepSend} />
       </div>
+
+      <HealingDisclaimer className="mb-10 border border-line bg-ink-soft/60 px-4 py-3" />
 
       {step === 1 && (
         <section className="space-y-8">

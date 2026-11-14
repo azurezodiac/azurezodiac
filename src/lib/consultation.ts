@@ -90,6 +90,8 @@ export function buildConsultationMessage(data: ConsultationPayload): string {
   lines.push(
     "",
     "Please guide me on the next step. JazakAllahu khairan.",
+    "",
+    "Note: Spiritual healing is not a substitute for medical treatment. Shifa is from Allah alone. No guarantee of healing is offered.",
   );
   return lines.join("\n");
 }

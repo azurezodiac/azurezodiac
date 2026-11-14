@@ -1,5 +1,6 @@
 "use client";
 
+import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import { useLang } from "@/lib/i18n";
 
 export function Services() {
@@ -18,6 +19,7 @@ export function Services() {
           <p className="mt-6 max-w-md text-base leading-relaxed text-fog">
             {t.services.intro}
           </p>
+          <HealingDisclaimer className="mt-8 max-w-md border-t border-line pt-6" />
         </div>
 
         <div className="divide-y divide-line border-y border-line">

@@ -1,5 +1,6 @@
 "use client";
 
+import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import { useLang } from "@/lib/i18n";
 
 const MAPS_QUERY = "Spiritual Healing Shazli Karachi";
@@ -22,6 +23,7 @@ export function Location() {
           <p className="mt-6 text-base leading-relaxed text-fog">
             {t.location.intro}
           </p>
+          <HealingDisclaimer className="mt-6" />
         </div>
 
         <div className="mt-12 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
