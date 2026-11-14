@@ -16,6 +16,7 @@ type Dictionary = {
   nav: {
     services: string;
     path: string;
+    about: string;
     privacy: string;
     faq: string;
     begin: string;
@@ -46,6 +47,29 @@ type Dictionary = {
   };
   trust: {
     items: { eyebrow: string; title: string; copy: string }[];
+  };
+  testimonials: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    items: { name: string; place: string; quote: string }[];
+  };
+  about: {
+    eyebrow: string;
+    title: string;
+    body: string[];
+  };
+  hours: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    items: { label: string; value: string }[];
+    note: string;
+  };
+  disclaimer: {
+    eyebrow: string;
+    title: string;
+    body: string;
   };
   faq: {
     eyebrow: string;
@@ -120,6 +144,7 @@ const en: Dictionary = {
   nav: {
     services: "Services",
     path: "How it works",
+    about: "About",
     privacy: "Privacy",
     faq: "FAQ",
     begin: "Begin",
@@ -196,6 +221,77 @@ const en: Dictionary = {
         copy: "After you share your concern, you receive a practical reply — what to do now, and how to continue if needed.",
       },
     ],
+  },
+  testimonials: {
+    eyebrow: "Experiences",
+    title: "Quiet words from those who reached out.",
+    intro:
+      "First names only. Shared with permission. No dramatic claims — only honest notes of relief and clarity.",
+    items: [
+      {
+        name: "Ayesha",
+        place: "Karachi",
+        quote:
+          "I was carrying heavy fear at night. The guidance was calm, private, and helped me return to dua with a steadier heart.",
+      },
+      {
+        name: "Bilal",
+        place: "Lahore",
+        quote:
+          "I felt stuck between worry and confusion. The reply was clear, respectful, and gave me a practical next step.",
+      },
+      {
+        name: "Fatima",
+        place: "Islamabad",
+        quote:
+          "No shouting, no pressure. Just careful listening and a path I could follow with my family.",
+      },
+      {
+        name: "Usman",
+        place: "Hyderabad",
+        quote:
+          "I came with suspicion of nazar on my work. The consultation stayed dignified and focused on remembrance.",
+      },
+      {
+        name: "Sana",
+        place: "Multan",
+        quote:
+          "I appreciated the adab. My matter felt safe, and the guidance did not make my fear louder.",
+      },
+      {
+        name: "Hamza",
+        place: "Faisalabad",
+        quote:
+          "Short, honest answers helped more than long promises. I knew what to do after the first reply.",
+      },
+    ],
+  },
+  about: {
+    eyebrow: "About the healer",
+    title: "A quiet practice rooted in adab.",
+    body: [
+      "Redeemysoul is led with a simple intention: to listen carefully, speak with manners, and guide through faith-centered remembrance — not spectacle.",
+      "The approach stays close to ruqyah, dua, and practical spiritual rhythm. Each matter is treated privately, without public display or exaggerated claims.",
+      "Where medical or professional care is needed, that path is respected. Spiritual guidance here is meant to support the heart, not replace doctors.",
+    ],
+  },
+  hours: {
+    eyebrow: "Hours",
+    title: "When you can expect a reply.",
+    intro:
+      "Messages are read with care. We reply as soon as a calm, proper response can be given.",
+    items: [
+      { label: "Online messages", value: "Saturday – Thursday" },
+      { label: "Usual reply window", value: "Within 24–48 hours" },
+      { label: "Friday", value: "Limited replies / urgent notes only" },
+      { label: "Office consultation", value: "By appointment after first message" },
+    ],
+    note: "If your matter feels urgent, mention it clearly in WhatsApp so it can be prioritized with care.",
+  },
+  disclaimer: {
+    eyebrow: "Disclaimer",
+    title: "Spiritual guidance, not medical treatment.",
+    body: "Redeemysoul provides Islamic spiritual guidance and ruqyah-centered support. It is not a substitute for medical, psychological, or emergency care. If you have health concerns, please consult a qualified doctor or relevant professional alongside any spiritual path you choose.",
   },
   faq: {
     eyebrow: "FAQ",
@@ -319,6 +415,7 @@ const ur: Dictionary = {
   nav: {
     services: "خدمات",
     path: "طریقہ کار",
+    about: "تعارف",
     privacy: "رازداری",
     faq: "سوالات",
     begin: "شروع",
@@ -393,6 +490,77 @@ const ur: Dictionary = {
         copy: "اپنی پریشانی بتانے کے بعد آپ کو عملی جواب ملتا ہے — اب کیا کریں، اور اگر ضرورت ہو تو آگے کیسے بڑھیں۔",
       },
     ],
+  },
+  testimonials: {
+    eyebrow: "تجربات",
+    title: "جنہوں نے رابطہ کیا، ان کی مختصر باتیں۔",
+    intro:
+      "صرف پہلا نام۔ اجازت کے ساتھ۔ کوئی بڑے دعوے نہیں — صرف اطمینان اور وضاحت کے سچے نوٹس۔",
+    items: [
+      {
+        name: "عائشہ",
+        place: "کراچی",
+        quote:
+          "راتوں کو شدید خوف تھا۔ رہنمائی پرسکون اور نجی تھی، اور دعا کی طرف دل زیادہ مطمئن ہو کر لوٹا۔",
+      },
+      {
+        name: "بلال",
+        place: "لاہور",
+        quote:
+          "پریشانی اور الجھن کے درمیان پھنسا محسوس ہوتا تھا۔ جواب واضح، باادب اور عملی اگلے قدم والا تھا۔",
+      },
+      {
+        name: "فاطمہ",
+        place: "اسلام آباد",
+        quote:
+          "نہ شور، نہ دباؤ۔ صرف غور سے سننا اور ایک ایسا راستہ جو خاندان کے ساتھ چل سکے۔",
+      },
+      {
+        name: "عثمان",
+        place: "حیدرآباد",
+        quote:
+          "کام پر نظر کا شبہ تھا۔ مشاورت وقار کے ساتھ رہی اور ذکر پر مرکوز رہی۔",
+      },
+      {
+        name: "ثنا",
+        place: "ملتان",
+        quote:
+          "ادب پسند آیا۔ میرا معاملہ محفوظ لگا، اور رہنمائی نے خوف کو بڑا نہیں بنایا۔",
+      },
+      {
+        name: "حمزہ",
+        place: "فیصل آباد",
+        quote:
+          "لمبے وعدوں سے زیادہ مختصر سچے جوابات نے فائدہ دیا۔ پہلے جواب کے بعد مجھے معلوم تھا آگے کیا کرنا ہے۔",
+      },
+    ],
+  },
+  about: {
+    eyebrow: "معالج کا تعارف",
+    title: "ادب پر کھڑا ایک خاموش عمل۔",
+    body: [
+      "ریڈیمی سول کی نیت سادہ ہے: غور سے سننا، ادب سے بولنا، اور ایمان والے ذکر کے ذریعے رہنمائی کرنا — نمائش کے بغیر۔",
+      "انداز رقیہ، دعا اور عملی روحانی نظم کے قریب رہتا ہے۔ ہر معاملہ نجی رکھا جاتا ہے، بغیر عوامی نمایش یا بڑے دعووں کے۔",
+      "جہاں طبی یا پیشہ ورانہ علاج درکار ہو، اس کا احترام کیا جاتا ہے۔ یہاں روحانی رہنمائی دل کی مدد کے لیے ہے، ڈاکٹروں کا متبادل نہیں۔",
+    ],
+  },
+  hours: {
+    eyebrow: "اوقات",
+    title: "جواب کب کی توقع رکھیں؟",
+    intro:
+      "پیغامات احتیاط سے پڑھے جاتے ہیں۔ جب پرسکون اور درست جواب ممکن ہو، تب جواب دیا جاتا ہے۔",
+    items: [
+      { label: "آن لائن پیغامات", value: "ہفتہ تا جمعرات" },
+      { label: "عمومی جواب کا وقت", value: "۲۴ تا ۴۸ گھنٹوں میں" },
+      { label: "جمعہ", value: "محدود جواب / صرف فوری نوٹس" },
+      { label: "دفتری مشاورت", value: "پہلے پیغام کے بعد بذریعہ اپائنٹمنٹ" },
+    ],
+    note: "اگر معاملہ فوری لگے تو واٹس ایپ میں واضح لکھیں تاکہ احتیاط کے ساتھ ترجیح دی جا سکے۔",
+  },
+  disclaimer: {
+    eyebrow: "وضاحت نامہ",
+    title: "روحانی رہنمائی، طبی علاج نہیں۔",
+    body: "ریڈیمی سول اسلامی روحانی رہنمائی اور رقیہ پر مبنی معاونت دیتا ہے۔ یہ طبی، نفسیاتی یا ایمرجنسی علاج کا متبادل نہیں۔ اگر صحت کی پریشانی ہو تو کسی اہل ڈاکٹر یا متعلقہ پیشہ ور سے ضرور رجوع کریں، چاہے آپ روحانی راستہ بھی اختیار کریں۔",
   },
   faq: {
     eyebrow: "عمومی سوالات",

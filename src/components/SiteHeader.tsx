@@ -9,6 +9,7 @@ export function SiteHeader({ variant = "home" }: { variant?: "home" | "page" }) 
   const links = [
     { href: "#services", label: t.nav.services },
     { href: "#path", label: t.nav.path },
+    { href: "#about", label: t.nav.about },
     { href: "#faq", label: t.nav.faq },
     { href: "/begin", label: t.nav.begin },
   ];
