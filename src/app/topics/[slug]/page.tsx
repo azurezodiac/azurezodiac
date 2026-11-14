@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { TopicPage } from "@/components/topics/TopicPage";
 import { absoluteUrl } from "@/lib/seo";
+import { getTopicIntelligence } from "@/lib/seo-intelligence";
 import { allTopicSlugs, getTopic } from "@/lib/seo-topics";
 
 type Props = {
@@ -19,6 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Topic not found" };
   }
 
+  const intel = getTopicIntelligence(topic);
   const url = absoluteUrl(`/topics/${topic.slug}`);
 
   return {
@@ -26,14 +28,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       absolute: topic.metaTitle,
     },
     description: topic.metaDescription,
-    keywords: topic.keywords,
+    keywords: intel.phoneticLattice,
     alternates: {
       canonical: url,
     },
     openGraph: {
       url,
       title: topic.metaTitle,
-      description: topic.metaDescription,
+      description: intel.snippetAnswer.slice(0, 200),
       type: "article",
     },
     twitter: {
@@ -44,6 +46,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     robots: {
       index: true,
       follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+    },
+    other: {
+      "ai:intent_cascade": intel.intentCascade.map((s) => s.stage).join(","),
+      "ai:phonetic_count": String(intel.phoneticLattice.length),
     },
   };
 }

@@ -3,31 +3,14 @@ import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import type { SeoTopic } from "@/lib/seo-topics";
 import { SEO_TOPICS, getTopic } from "@/lib/seo-topics";
-import { SITE, absoluteUrl } from "@/lib/seo";
+import {
+  buildTopicRichJsonLd,
+  getTopicIntelligence,
+} from "@/lib/seo-intelligence";
+import { SITE } from "@/lib/seo";
 
 function TopicJsonLd({ topic }: { topic: SeoTopic }) {
-  const data = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: topic.h1,
-    description: topic.metaDescription,
-    author: {
-      "@type": "Person",
-      name: SITE.healer,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: SITE.businessName,
-      url: absoluteUrl("/"),
-    },
-    mainEntityOfPage: absoluteUrl(`/topics/${topic.slug}`),
-    keywords: topic.keywords.join(", "),
-    about: topic.keywords.map((name) => ({
-      "@type": "Thing",
-      name,
-    })),
-  };
-
+  const data = buildTopicRichJsonLd(topic);
   return (
     <script
       type="application/ld+json"
@@ -37,7 +20,11 @@ function TopicJsonLd({ topic }: { topic: SeoTopic }) {
 }
 
 export function TopicPage({ topic }: { topic: SeoTopic }) {
+  const intel = getTopicIntelligence(topic);
   const related = topic.related
+    .map((slug) => getTopic(slug))
+    .filter((item): item is SeoTopic => Boolean(item));
+  const mesh = intel.coOccurWith
     .map((slug) => getTopic(slug))
     .filter((item): item is SeoTopic => Boolean(item));
 
@@ -72,15 +59,34 @@ export function TopicPage({ topic }: { topic: SeoTopic }) {
 
       <main className="mx-auto w-full max-w-3xl px-6 py-14 md:px-10 md:py-20">
         <p className="text-xs tracking-[0.22em] uppercase text-gold">
-          Spiritual Healing Shazli · Karachi
+          {SITE.businessName} · Karachi
         </p>
         <h1 className="mt-5 font-display text-4xl leading-tight text-cream md:text-5xl">
           {topic.h1}
         </h1>
-        <p className="mt-6 text-base leading-relaxed text-fog">{topic.intro}</p>
-        <HealingDisclaimer className="mt-6 border border-line bg-ink-soft/60 px-4 py-3" />
 
-        <div className="mt-12 space-y-10">
+        {/* AI Overview / featured-snippet capsule */}
+        <p className="seo-snippet seo-speakable mt-6 border border-line bg-ink-soft/50 px-5 py-4 text-base leading-relaxed text-cream/95">
+          {intel.snippetAnswer}
+        </p>
+
+        <HealingDisclaimer className="mt-6" />
+
+        {/* Intent cascade — mirrors how AI search ranks passages */}
+        <div className="mt-14 space-y-10">
+          {intel.intentCascade.map((block) => (
+            <section key={block.stage} data-intent={block.stage}>
+              <h2 className="font-display text-2xl text-cream md:text-3xl">
+                {block.heading}
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-fog">
+                {block.body}
+              </p>
+            </section>
+          ))}
+        </div>
+
+        <div className="mt-14 space-y-10 border-t border-line pt-12">
           {topic.sections.map((section) => (
             <section key={section.heading}>
               <h2 className="font-display text-2xl text-cream md:text-3xl">
@@ -92,6 +98,62 @@ export function TopicPage({ topic }: { topic: SeoTopic }) {
             </section>
           ))}
         </div>
+
+        {/* People Also Ask — crawlable, schema-backed */}
+        <section className="mt-14 border-t border-line pt-12" id="paa">
+          <h2 className="font-display text-2xl text-cream md:text-3xl">
+            People also ask
+          </h2>
+          <div className="mt-8 divide-y divide-line border-y border-line">
+            {intel.paa.map((item) => (
+              <div key={item.q} className="py-5">
+                <h3 className="font-display text-xl text-cream">{item.q}</h3>
+                <p className="mt-3 text-base leading-relaxed text-fog">
+                  {item.a}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Topical co-occurrence mesh */}
+        {mesh.length > 0 ? (
+          <section className="mt-14 border-t border-line pt-12">
+            <h2 className="font-display text-2xl text-cream">
+              Often searched together
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-fog">
+              Google and AI assistants frequently connect these concerns. Exploring
+              them together strengthens clear understanding — and helps the right
+              seekers find {SITE.businessName}.
+            </p>
+            <ul className="mt-6 flex flex-wrap gap-3">
+              {mesh.map((item) => (
+                <li key={item.slug}>
+                  <Link
+                    href={`/topics/${item.slug}`}
+                    className="border border-line px-4 py-2 text-sm text-fog transition-colors duration-300 hover:border-gold hover:text-gold-bright"
+                  >
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {/* Phonetic lattice — natural sentence, not stuffing */}
+        <section className="mt-14 border-t border-line pt-10">
+          <h2 className="font-display text-2xl text-cream">
+            Related search spellings
+          </h2>
+          <p className="seo-speakable mt-4 text-sm leading-relaxed text-fog">
+            This guidance also helps people who searched close spellings such as{" "}
+            {intel.phoneticLattice.slice(0, 14).join(", ")}. Whatever spelling
+            brought you here, {SITE.name} / {SITE.businessName} in Karachi can
+            receive your matter privately with {SITE.healer}.
+          </p>
+        </section>
 
         <section className="mt-14 border-t border-line pt-10">
           <h2 className="font-display text-2xl text-cream">
@@ -109,9 +171,6 @@ export function TopicPage({ topic }: { topic: SeoTopic }) {
               </li>
             ))}
           </ul>
-          <p className="mt-8 text-sm leading-relaxed text-fog/80">
-            Also indexed for: {topic.keywords.join(" · ")}
-          </p>
         </section>
 
         <div className="mt-12 flex flex-wrap gap-3">
