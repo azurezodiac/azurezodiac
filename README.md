@@ -42,4 +42,11 @@ pnpm build && pnpm start
 
 Open `http://localhost:3000/admin` — password from `ADMIN_PASSWORD`.
 
-Static cPanel zip does **not** run admin APIs. For live CMS + leads, host with Node (Vercel / Railway / VPS) or keep editing code for topics and rebuild the zip.
+Set **`DATABASE_URL`** to your Postgres (same DB for leads + CMS). Apply:
+
+```bash
+psql "$DATABASE_URL" -f migrations/001_requests.sql
+psql "$DATABASE_URL" -f migrations/002_cms.sql
+```
+
+Without `DATABASE_URL`, a local JSON fallback is used. Static cPanel zip does **not** run admin APIs — Node host required for `/admin`.

@@ -243,7 +243,9 @@ export function AdminPortal() {
           <p className="eyebrow">Admin</p>
           <h1 className="mt-3 font-display text-4xl text-cream">Control portal</h1>
           <p className="mt-3 max-w-xl text-sm text-fog">
-            Posts, features, promotions, pricing, leads, and track — more modules can be added later.
+            Posts, features, promotions, pricing, leads, and track — saved to your
+            website database when <code className="text-gold">DATABASE_URL</code>{" "}
+            is set (Postgres). File store is only a fallback.
           </p>
         </div>
         <button type="button" onClick={() => void logout()} className="btn-ghost !py-2.5 !text-xs">

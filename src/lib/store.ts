@@ -1,7 +1,8 @@
 import { randomBytes } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
-import { Pool, type QueryResultRow } from "pg";
+import type { QueryResultRow } from "pg";
+import { getDb } from "@/lib/db";
 import {
   OPEN_STATUSES,
   STATUS_NOTES_DEFAULT,
@@ -21,13 +22,8 @@ type StoreShape = {
   requests: ConsultationRequest[];
 };
 
-let pool: Pool | null = null;
-
-function db(): Pool | null {
-  const url = process.env.DATABASE_URL?.trim();
-  if (!url) return null;
-  if (!pool) pool = new Pool({ connectionString: url });
-  return pool;
+function db() {
+  return getDb();
 }
 
 function rowToRequest(row: QueryResultRow): ConsultationRequest {
