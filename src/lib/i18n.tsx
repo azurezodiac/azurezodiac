@@ -1281,9 +1281,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = lang === "ur" ? "ur" : "en";
-    document.documentElement.dir = lang === "ur" ? "rtl" : "ltr";
-    document.body.classList.toggle("font-urdu", lang === "ur");
+    const root = document.documentElement;
+    const isUr = lang === "ur";
+    root.lang = isUr ? "ur" : "en";
+    root.dir = isUr ? "rtl" : "ltr";
+    root.classList.toggle("lang-ur", isUr);
+    root.classList.toggle("lang-en", !isUr);
+    document.body.classList.toggle("font-urdu", isUr);
+    document.body.dir = isUr ? "rtl" : "ltr";
   }, [lang]);
 
   const value = useMemo(

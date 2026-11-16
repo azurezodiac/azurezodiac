@@ -37,11 +37,25 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+html[dir="ltr"],
+body[dir="ltr"] {
+  direction: ltr;
+  text-align: start;
+}
+
+html[dir="rtl"],
+body[dir="rtl"] {
+  direction: rtl;
+  text-align: start;
 }
 
 body {
   margin: 0;
   min-height: 100%;
+  overflow-x: clip;
   background-color: var(--ink);
   background-image:
     radial-gradient(
@@ -57,17 +71,57 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ——— Urdu (RTL): standard Nastaliq body + Arabic sans UI ——— */
+
 body.font-urdu {
-  font-family: var(--font-urdu), var(--font-outfit), system-ui, sans-serif;
+  font-family:
+    var(--font-urdu),
+    "Noto Nastaliq Urdu",
+    var(--font-urdu-sans),
+    "Noto Sans Arabic",
+    serif;
+  letter-spacing: 0;
+  word-spacing: 0.01em;
+  line-height: 2;
+  font-size: 1.05rem;
 }
 
 body.font-urdu .font-display {
-  font-family: var(--font-urdu), var(--font-fraunces), Georgia, serif;
+  font-family:
+    var(--font-urdu),
+    "Noto Nastaliq Urdu",
+    serif;
+  letter-spacing: 0;
+  line-height: 1.7;
+  font-weight: 700;
 }
 
-body.font-urdu .uppercase {
-  letter-spacing: 0.04em;
+body.font-urdu .uppercase,
+body.font-urdu .eyebrow,
+body.font-urdu .btn-primary,
+body.font-urdu .btn-secondary,
+body.font-urdu .btn-ghost,
+body.font-urdu .trust-marquee__track span,
+body.font-urdu nav a,
+body.font-urdu .wa-float {
+  font-family:
+    var(--font-urdu-sans),
+    "Noto Sans Arabic",
+    var(--font-urdu),
+    sans-serif;
+  letter-spacing: 0;
   text-transform: none;
+  line-height: 1.65;
+}
+
+body.font-urdu .field-input,
+body.font-urdu label,
+body.font-urdu p,
+body.font-urdu li,
+body.font-urdu h1,
+body.font-urdu h2,
+body.font-urdu h3 {
+  letter-spacing: 0;
 }
 
 ::selection {
@@ -285,6 +339,15 @@ img {
   box-shadow: inset 3px 0 0 var(--gold);
 }
 
+html[dir="rtl"] .choice-tile[data-selected="true"] {
+  background: linear-gradient(
+    -105deg,
+    color-mix(in srgb, var(--gold) 12%, transparent),
+    color-mix(in srgb, var(--ink) 40%, transparent)
+  );
+  box-shadow: inset -3px 0 0 var(--gold);
+}
+
 .step-rail {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -409,7 +472,7 @@ img {
 }
 
 .gold-rule {
-  transform-origin: left center;
+  transform-origin: inline-start center;
   animation: pulse-line 4.5s ease-in-out infinite;
 }
 
@@ -444,6 +507,14 @@ img {
 
 [data-reveal="right"] {
   transform: translate3d(2rem, 0, 0);
+}
+
+html[dir="rtl"] [data-reveal="left"] {
+  transform: translate3d(2rem, 0, 0);
+}
+
+html[dir="rtl"] [data-reveal="right"] {
+  transform: translate3d(-2rem, 0, 0);
 }
 
 [data-reveal="zoom"] {
@@ -592,6 +663,19 @@ img {
   animation: marquee 28s linear infinite;
 }
 
+html[dir="rtl"] .trust-marquee__track {
+  animation-name: marquee-rtl;
+}
+
+@keyframes marquee-rtl {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+
 .trust-marquee__track span {
   white-space: nowrap;
   font-size: 0.7rem;
@@ -603,6 +687,55 @@ img {
 .trust-marquee__track span strong {
   color: var(--gold);
   font-weight: 500;
+}
+
+/* ——— Mobile: stop horizontal offset / cramped chrome ——— */
+
+@media (max-width: 767px) {
+  :root {
+    --header-h: 4.25rem;
+  }
+
+  body {
+    background-attachment: scroll;
+  }
+
+  [data-reveal="left"],
+  [data-reveal="right"],
+  html[dir="rtl"] [data-reveal="left"],
+  html[dir="rtl"] [data-reveal="right"] {
+    transform: translate3d(0, 1.25rem, 0);
+  }
+
+  .hover-lift:hover,
+  .choice-tile:hover,
+  .btn-primary:hover,
+  .wa-float:hover {
+    transform: none;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost {
+    padding-inline: 1.1rem;
+    letter-spacing: 0.1em;
+  }
+
+  body.font-urdu .btn-primary,
+  body.font-urdu .btn-secondary,
+  body.font-urdu .btn-ghost {
+    letter-spacing: 0;
+    padding-block: 0.85rem;
+  }
+
+  .step-rail {
+    gap: 0.25rem;
+  }
+
+  .trust-marquee__track {
+    gap: 1.75rem;
+    animation-duration: 36s;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

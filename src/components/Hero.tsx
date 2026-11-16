@@ -22,12 +22,16 @@ export function Hero() {
           className="hero-media object-cover object-[center_30%]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,20,16,0.5)_0%,rgba(6,20,16,0.68)_42%,rgba(6,20,16,0.96)_100%)]" />
-        <div className="hero-glow float-orb absolute -left-24 top-24 h-72 w-72 rounded-full bg-gold/15 blur-3xl" />
-        <div className="hero-glow float-orb float-orb-delay absolute bottom-16 right-0 h-80 w-80 rounded-full bg-fog/8 blur-3xl" />
+        <div className="hero-glow float-orb absolute -start-24 top-24 h-72 w-72 rounded-full bg-gold/15 blur-3xl" />
+        <div className="hero-glow float-orb float-orb-delay absolute bottom-16 end-0 h-80 w-80 rounded-full bg-fog/8 blur-3xl" />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-end px-6 pb-20 pt-32 md:px-10 md:pb-28">
-        <p className="reveal font-display text-5xl leading-none tracking-[0.04em] text-cream sm:text-6xl md:text-8xl lg:text-9xl">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-end px-4 pb-24 pt-28 sm:px-6 md:px-10 md:pb-28 md:pt-32">
+        <p
+          className="reveal font-display text-[2.65rem] leading-none tracking-[0.04em] text-cream sm:text-6xl md:text-8xl lg:text-9xl"
+          dir="ltr"
+          lang="en"
+        >
           Redeemysoul
         </p>
         <p className="reveal reveal-delay-1 mt-4 text-xs tracking-[0.18em] uppercase text-gold md:text-sm">

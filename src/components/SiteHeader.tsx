@@ -35,10 +35,12 @@ export function SiteHeader({ variant = "home" }: { variant?: "home" | "page" }) 
       }
       data-scrolled={variant === "home" ? scrolled : undefined}
     >
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-6 py-5 md:px-10 md:py-6">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-2 px-4 py-4 sm:gap-3 sm:px-6 sm:py-5 md:px-10 md:py-6">
         <a
           href={variant === "home" ? "#top" : "/"}
-          className="font-display text-xl tracking-[0.08em] text-cream transition-opacity duration-300 hover:opacity-90 md:text-2xl"
+          className="min-w-0 shrink font-display text-lg tracking-[0.08em] text-cream transition-opacity duration-300 hover:opacity-90 sm:text-xl md:text-2xl"
+          dir="ltr"
+          lang="en"
         >
           Redeemysoul
         </a>
@@ -66,9 +68,12 @@ export function SiteHeader({ variant = "home" }: { variant?: "home" | "page" }) 
             ),
           )}
         </nav>
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-3">
           <LanguageToggle />
-          <Link href="/begin" className="btn-secondary !px-3 !py-2 text-[11px] md:!px-5 md:text-xs">
+          <Link
+            href="/begin"
+            className="btn-secondary !px-2.5 !py-2 text-[10px] whitespace-nowrap sm:!px-3 sm:text-[11px] md:!px-5 md:text-xs"
+          >
             {t.nav.consultation}
           </Link>
         </div>

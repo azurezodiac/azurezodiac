@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Noto_Nastaliq_Urdu, Outfit } from "next/font/google";
+import {
+  Fraunces,
+  Noto_Nastaliq_Urdu,
+  Noto_Sans_Arabic,
+  Outfit,
+} from "next/font/google";
 import { JsonLd } from "@/components/JsonLd";
 import { Providers } from "@/components/Providers";
 import { WhatsAppFloat } from "@/components/WhatsAppFloat";
@@ -25,10 +30,19 @@ const outfit = Outfit({
   display: "swap",
 });
 
+/** Body / headlines — standard Urdu Nastaliq */
 const nastaliq = Noto_Nastaliq_Urdu({
   variable: "--font-urdu",
   subsets: ["arabic"],
   weight: ["400", "700"],
+  display: "swap",
+});
+
+/** Nav / buttons — cleaner Arabic UI face */
+const notoSansArabic = Noto_Sans_Arabic({
+  variable: "--font-urdu-sans",
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -124,9 +138,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${outfit.variable} ${nastaliq.variable} h-full antialiased`}
+      dir="ltr"
+      className={`${fraunces.variable} ${outfit.variable} ${nastaliq.variable} ${notoSansArabic.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-ink text-mist">
+      <body className="min-h-full flex flex-col overflow-x-clip bg-ink text-mist">
         <JsonLd />
         <Providers>
           {children}

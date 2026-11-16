@@ -24,7 +24,7 @@ export function Path() {
         >
           {t.path.steps.map((step, index) => (
             <li key={step.title} className="hover-lift relative">
-              <div className="mb-6 h-px w-14 origin-left bg-gold transition-transform duration-500 hover:scale-x-125" />
+              <div className="mb-6 h-px w-14 origin-start bg-gold transition-transform duration-500 hover:scale-x-125" />
               <p className="text-xs tracking-[0.2em] uppercase text-fog">
                 {String(index + 1).padStart(2, "0")}
               </p>
