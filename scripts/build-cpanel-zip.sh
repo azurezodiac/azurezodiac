@@ -81,22 +81,31 @@ rm -f "$ZIP_PATH"
     -x "*/__next*"
 )
 
-# Helpful upload + SEO note inside the zip root
+# Helpful upload + DNS cutover note inside the zip root
 printf '%s\n' \
-  "Redeemysoul — cPanel upload (MySQL)" \
+  "Redeemysoul — cPanel + MySQL (Option B)" \
   "" \
+  "FILES" \
   "1) cPanel -> File Manager -> public_html" \
-  "2) Upload this zip and Extract" \
-  "3) Confirm index.html + api/ folder are inside public_html" \
+  "2) Upload redeemysoul-public_html.zip and Extract" \
+  "3) Confirm public_html has: index.html, .htaccess, api/" \
+  "4) Copy api/config.sample.php -> api/config.php and fill MySQL + admin_password" \
+  "5) MySQL user must be Added to Database with ALL PRIVILEGES" \
   "" \
-  "MySQL (required for Begin / Track / Admin):" \
-  "A) cPanel -> MySQL Databases -> create DB + user + add user to DB (ALL PRIVILEGES)" \
-  "B) Copy public_html/api/config.sample.php to public_html/api/config.php" \
-  "C) Edit config.php: db_host=localhost, db_name, db_user, db_pass, admin_password" \
-  "D) Optional: phpMyAdmin -> Import api/schema.sql (also auto-creates on first API call)" \
-  "E) Open https://redeemysoul.com/admin and log in with admin_password" \
+  "DNS (required — domain is currently on Vercel NS)" \
+  "Right now redeemysoul.com uses ns1.vercel-dns.com / ns2.vercel-dns.com" \
+  "Until DNS points to THIS cPanel server, config.php will not control the live site." \
   "" \
-  "SEO — Google Search Console sitemap: https://redeemysoul.com/sitemap.xml" \
+  "Pick ONE:" \
+  "A) Registrar nameservers -> change to your hosting cPanel nameservers" \
+  "   (from hosting welcome email, e.g. ns1.yourhost.com / ns2.yourhost.com)" \
+  "B) Or in DNS panel set A record @ to your cPanel Shared IP" \
+  "   (cPanel -> Server Information) and point www there too; remove Vercel A/ALIAS." \
+  "" \
+  "Wait for DNS (often 5-60 minutes). Live site headers must NOT say server: Vercel." \
+  "Then open /admin and log in with config.php admin_password." \
+  "" \
+  "SEO sitemap: https://redeemysoul.com/sitemap.xml" \
   > /tmp/CPANEL-UPLOAD.txt
 (
   cd out
