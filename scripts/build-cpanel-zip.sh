@@ -84,7 +84,7 @@ printf '%s\n' \
   "4) Make sure index.html, robots.txt, and sitemap.xml are inside public_html" \
   "" \
   "Works: homepage, begin form, WhatsApp/email notify, SEO files" \
-  "Needs Node hosting later: full tracking API + admin portal" \
+  "Needs Node hosting: /admin portal (posts, pricing, promos, leads, track)" \
   "" \
   "SEO — do these in Google (important for search suggestions):" \
   "A) Google Search Console -> Add property redeemysoul.com -> verify -> Submit sitemap: https://redeemysoul.com/sitemap.xml" \

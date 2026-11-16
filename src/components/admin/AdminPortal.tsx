@@ -1,12 +1,30 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  EMPTY_CMS,
+  type CmsCollection,
+  type CmsFeature,
+  type CmsPost,
+  type CmsPricingItem,
+  type CmsPromotion,
+  type CmsState,
+} from "@/lib/cms-types";
 import {
   STATUS_LABELS,
   STATUS_NOTES_DEFAULT,
   type ConsultationRequest,
   type RequestStatus,
 } from "@/lib/types";
+
+type Tab =
+  | "overview"
+  | "leads"
+  | "track"
+  | "posts"
+  | "features"
+  | "promotions"
+  | "pricing";
 
 const statuses: RequestStatus[] = [
   "pending",
@@ -17,37 +35,79 @@ const statuses: RequestStatus[] = [
   "cleared",
 ];
 
+const TABS: { id: Tab; label: string }[] = [
+  { id: "overview", label: "Overview" },
+  { id: "leads", label: "Leads" },
+  { id: "track", label: "Track" },
+  { id: "posts", label: "Posts" },
+  { id: "features", label: "Features" },
+  { id: "promotions", label: "Promotions" },
+  { id: "pricing", label: "Pricing" },
+];
+
 export function AdminPortal() {
   const [authed, setAuthed] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [apiMode, setApiMode] = useState<"live" | "offline" | "loading">(
+    "loading",
+  );
+  const [tab, setTab] = useState<Tab>("overview");
   const [requests, setRequests] = useState<ConsultationRequest[]>([]);
+  const [cms, setCms] = useState<CmsState>(EMPTY_CMS);
   const [loading, setLoading] = useState(true);
+  const [trackQuery, setTrackQuery] = useState("");
 
-  const loadRequests = useCallback(async () => {
+  const loadAll = useCallback(async () => {
     setLoading(true);
+    setError("");
     try {
-      const response = await fetch("/api/admin/requests");
-      if (response.status === 401) {
+      const [reqRes, cmsRes] = await Promise.all([
+        fetch("/api/admin/requests"),
+        fetch("/api/admin/cms"),
+      ]);
+
+      if (reqRes.status === 404 || cmsRes.status === 404) {
+        setApiMode("offline");
         setAuthed(false);
-        setRequests([]);
         return;
       }
-      const data = (await response.json()) as { requests?: ConsultationRequest[] };
+
+      if (reqRes.status === 401 || cmsRes.status === 401) {
+        setApiMode("live");
+        setAuthed(false);
+        setRequests([]);
+        setCms(EMPTY_CMS);
+        return;
+      }
+
+      if (!reqRes.ok || !cmsRes.ok) {
+        setError("Could not load admin data.");
+        setApiMode("live");
+        return;
+      }
+
+      const reqData = (await reqRes.json()) as {
+        requests?: ConsultationRequest[];
+      };
+      const cmsData = (await cmsRes.json()) as { cms?: CmsState };
+      setRequests(reqData.requests ?? []);
+      setCms(cmsData.cms ?? EMPTY_CMS);
       setAuthed(true);
-      setRequests(data.requests ?? []);
+      setApiMode("live");
     } catch {
-      setError("Could not load requests.");
+      setApiMode("offline");
+      setAuthed(false);
+      setError("Admin API unreachable. Node hosting required for full portal.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    // Initial session + queue fetch for the admin portal.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount fetch
-    void loadRequests();
-  }, [loadRequests]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount bootstrap
+    void loadAll();
+  }, [loadAll]);
 
   async function login() {
     setError("");
@@ -56,18 +116,24 @@ export function AdminPortal() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password }),
     });
+    if (response.status === 404) {
+      setApiMode("offline");
+      setError("APIs not available on static cPanel. Deploy with Node (pnpm start / Vercel).");
+      return;
+    }
     if (!response.ok) {
       setError("Invalid password.");
       return;
     }
     setPassword("");
-    await loadRequests();
+    await loadAll();
   }
 
   async function logout() {
     await fetch("/api/admin/logout", { method: "POST" });
     setAuthed(false);
     setRequests([]);
+    setCms(EMPTY_CMS);
   }
 
   async function patchRequest(
@@ -80,20 +146,76 @@ export function AdminPortal() {
       body: JSON.stringify({ trackingNumber, ...patch }),
     });
     if (!response.ok) {
-      setError("Update failed.");
+      setError("Lead update failed.");
       return;
     }
-    await loadRequests();
+    await loadAll();
+  }
+
+  async function cmsAction(
+    action: "create" | "update" | "delete" | "reset",
+    collection?: CmsCollection,
+    id?: string,
+    item?: Record<string, unknown>,
+  ) {
+    const response = await fetch("/api/admin/cms", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, collection, id, item }),
+    });
+    if (!response.ok) {
+      setError("CMS update failed.");
+      return;
+    }
+    const data = (await response.json()) as { cms?: CmsState };
+    if (data.cms) setCms(data.cms);
+  }
+
+  const filteredTrack = useMemo(() => {
+    const q = trackQuery.trim().toUpperCase();
+    if (!q) return requests;
+    return requests.filter(
+      (r) =>
+        r.trackingNumber.toUpperCase().includes(q) ||
+        r.phone.includes(q) ||
+        r.name.toUpperCase().includes(q),
+    );
+  }, [requests, trackQuery]);
+
+  const openLeads = requests.filter((r) =>
+    ["pending", "in_review", "active", "diagnosis_completed"].includes(r.status),
+  ).length;
+
+  if (apiMode === "offline") {
+    return (
+      <div className="mx-auto w-full max-w-2xl space-y-6">
+        <p className="eyebrow">Admin</p>
+        <h1 className="font-display text-4xl text-cream">Portal needs Node</h1>
+        <p className="text-base leading-relaxed text-fog">
+          Static cPanel zip shows the public site only. The admin portal
+          (posts, pricing, promotions, leads, track) needs Node hosting so APIs
+          can save data.
+        </p>
+        <ul className="space-y-2 text-sm text-fog">
+          <li>· Local: <code className="text-gold">pnpm build && pnpm start</code></li>
+          <li>· Cloud: Vercel / Railway / any Node host with <code className="text-gold">ADMIN_PASSWORD</code></li>
+          <li>· Optional Postgres: set <code className="text-gold">DATABASE_URL</code> for leads</li>
+        </ul>
+        <p className="text-sm text-fog">
+          Then open <span className="text-cream">/admin</span> and sign in.
+        </p>
+      </div>
+    );
   }
 
   if (!authed) {
     return (
       <div className="mx-auto w-full max-w-md space-y-6">
         <div>
-          <p className="text-xs tracking-[0.22em] uppercase text-gold">Admin</p>
+          <p className="eyebrow">Admin</p>
           <h1 className="mt-4 font-display text-4xl text-cream">Sign in</h1>
           <p className="mt-3 text-sm text-fog">
-            Manage consultation requests, status updates, and clears.
+            Manage leads, track records, posts, features, promotions, and pricing.
           </p>
         </div>
         <input
@@ -101,17 +223,13 @@ export function AdminPortal() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           placeholder="Admin password"
-          className="w-full border border-line bg-ink/60 px-4 py-3 text-cream outline-none focus:border-gold"
+          className="field-input"
           onKeyDown={(event) => {
             if (event.key === "Enter") void login();
           }}
         />
         {error ? <p className="text-sm text-red-300">{error}</p> : null}
-        <button
-          type="button"
-          onClick={() => void login()}
-          className="bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink hover:bg-gold-bright"
-        >
+        <button type="button" onClick={() => void login()} className="btn-primary">
           Enter portal
         </button>
       </div>
@@ -122,116 +240,336 @@ export function AdminPortal() {
     <div className="mx-auto w-full max-w-6xl space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs tracking-[0.22em] uppercase text-gold">Admin</p>
-          <h1 className="mt-3 font-display text-4xl text-cream">
-            Request portal
-          </h1>
-          <p className="mt-3 text-sm text-fog">
-            Open requests stay locked for that phone until you clear them.
+          <p className="eyebrow">Admin</p>
+          <h1 className="mt-3 font-display text-4xl text-cream">Control portal</h1>
+          <p className="mt-3 max-w-xl text-sm text-fog">
+            Posts, features, promotions, pricing, leads, and track — more modules can be added later.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => void logout()}
-          className="border border-mist/25 px-5 py-2.5 text-xs tracking-[0.14em] uppercase text-mist"
-        >
+        <button type="button" onClick={() => void logout()} className="btn-ghost !py-2.5 !text-xs">
           Log out
         </button>
       </div>
 
+      <nav className="flex flex-wrap gap-2 border-b border-line pb-3">
+        {TABS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setTab(item.id)}
+            className={`px-3 py-2 text-xs tracking-[0.14em] uppercase transition-colors ${
+              tab === item.id
+                ? "bg-gold text-ink"
+                : "border border-line text-fog hover:border-gold hover:text-gold-bright"
+            }`}
+          >
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
       {error ? <p className="text-sm text-red-300">{error}</p> : null}
       {loading ? <p className="text-fog">Loading...</p> : null}
 
-      <div className="space-y-4">
-        {requests.length === 0 && !loading ? (
-          <p className="text-fog">No requests yet.</p>
-        ) : null}
-        {requests.map((request) => (
-          <article
-            key={request.id}
-            className="border border-line bg-ink/40 px-5 py-5"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="font-display text-2xl text-cream">
-                  {request.trackingNumber}
-                </p>
-                <p className="mt-1 text-sm text-gold">
-                  {STATUS_LABELS[request.status]}
-                </p>
-              </div>
-              <p className="text-xs text-fog">
-                {new Date(request.createdAt).toLocaleString()}
+      {tab === "overview" && !loading ? (
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-stagger>
+          <Stat label="Open leads" value={String(openLeads)} />
+          <Stat label="All leads" value={String(requests.length)} />
+          <Stat label="Posts" value={String(cms.posts.length)} />
+          <Stat label="Active promos" value={String(cms.promotions.filter((p) => p.active).length)} />
+          <div className="surface-panel sm:col-span-2 lg:col-span-4 px-5 py-5">
+            <p className="text-sm text-fog">
+              Tip: publish posts for the blog API, activate one promotion for the homepage banner, and keep pricing items in sync with Hadiya amounts.
+            </p>
+            <button
+              type="button"
+              className="btn-secondary mt-4 !py-2 !text-xs"
+              onClick={() => void cmsAction("reset")}
+            >
+              Reset CMS to seed content
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {tab === "leads" && !loading ? (
+        <LeadsPanel requests={requests} onPatch={patchRequest} />
+      ) : null}
+
+      {tab === "track" && !loading ? (
+        <section className="space-y-4">
+          <input
+            className="field-input max-w-md"
+            value={trackQuery}
+            onChange={(e) => setTrackQuery(e.target.value)}
+            placeholder="Search tracking #, phone, or name"
+          />
+          <LeadsPanel requests={filteredTrack} onPatch={patchRequest} compact />
+        </section>
+      ) : null}
+
+      {tab === "posts" && !loading ? (
+        <PostsPanel
+          posts={cms.posts}
+          onCreate={(item) => void cmsAction("create", "posts", undefined, item)}
+          onUpdate={(id, item) => void cmsAction("update", "posts", id, item)}
+          onDelete={(id) => void cmsAction("delete", "posts", id)}
+        />
+      ) : null}
+
+      {tab === "features" && !loading ? (
+        <FeaturesPanel
+          features={cms.features}
+          onCreate={(item) => void cmsAction("create", "features", undefined, item)}
+          onUpdate={(id, item) => void cmsAction("update", "features", id, item)}
+          onDelete={(id) => void cmsAction("delete", "features", id)}
+        />
+      ) : null}
+
+      {tab === "promotions" && !loading ? (
+        <PromosPanel
+          promotions={cms.promotions}
+          onCreate={(item) => void cmsAction("create", "promotions", undefined, item)}
+          onUpdate={(id, item) => void cmsAction("update", "promotions", id, item)}
+          onDelete={(id) => void cmsAction("delete", "promotions", id)}
+        />
+      ) : null}
+
+      {tab === "pricing" && !loading ? (
+        <PricingPanel
+          pricing={cms.pricing}
+          onCreate={(item) => void cmsAction("create", "pricing", undefined, item)}
+          onUpdate={(id, item) => void cmsAction("update", "pricing", id, item)}
+          onDelete={(id) => void cmsAction("delete", "pricing", id)}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="surface-panel px-5 py-5">
+      <p className="text-xs tracking-[0.16em] uppercase text-fog">{label}</p>
+      <p className="mt-3 font-display text-4xl text-cream">{value}</p>
+    </div>
+  );
+}
+
+function LeadsPanel({
+  requests,
+  onPatch,
+  compact,
+}: {
+  requests: ConsultationRequest[];
+  onPatch: (
+    trackingNumber: string,
+    patch: { status?: RequestStatus; statusNote?: string },
+  ) => void;
+  compact?: boolean;
+}) {
+  if (requests.length === 0) {
+    return <p className="text-fog">No leads found.</p>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {requests.map((request) => (
+        <article key={request.id} className="surface-panel px-5 py-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="font-display text-2xl text-cream">
+                {request.trackingNumber}
+              </p>
+              <p className="mt-1 text-sm text-gold">
+                {STATUS_LABELS[request.status]}
               </p>
             </div>
+            <p className="text-xs text-fog">
+              {new Date(request.createdAt).toLocaleString()}
+            </p>
+          </div>
 
-            <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
-              <Item label="Name" value={request.name} />
-              <Item label="Mother" value={request.motherName} />
-              <Item label="Phone" value={request.phone} />
-              <Item label="Location" value={request.location} />
-              <Item label="Concern" value={request.concernTitle} />
-              <Item label="Note" value={request.note || "—"} />
-            </dl>
+          <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+            <Item label="Name" value={request.name} />
+            <Item label="Mother" value={request.motherName} />
+            <Item label="Phone" value={request.phone} />
+            <Item label="Location" value={request.location} />
+            <Item label="Concern" value={request.concernTitle} />
+            {!compact ? <Item label="Note" value={request.note || "—"} /> : null}
+          </dl>
 
-            <div className="mt-5 grid gap-3 md:grid-cols-[14rem_1fr_auto]">
-              <select
-                value={request.status}
-                onChange={(event) =>
-                  void patchRequest(request.trackingNumber, {
-                    status: event.target.value as RequestStatus,
+          <div className="mt-5 grid gap-3 md:grid-cols-[14rem_1fr_auto]">
+            <select
+              value={request.status}
+              onChange={(event) =>
+                onPatch(request.trackingNumber, {
+                  status: event.target.value as RequestStatus,
+                })
+              }
+              className="field-input"
+            >
+              {statuses.map((status) => (
+                <option key={status} value={status}>
+                  {STATUS_LABELS[status]}
+                </option>
+              ))}
+            </select>
+            <input
+              defaultValue={request.statusNote}
+              key={`${request.trackingNumber}-${request.updatedAt}`}
+              onBlur={(event) => {
+                if (event.target.value !== request.statusNote) {
+                  onPatch(request.trackingNumber, {
+                    statusNote: event.target.value,
+                  });
+                }
+              }}
+              className="field-input"
+              placeholder="Status note shown to user"
+            />
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  onPatch(request.trackingNumber, {
+                    status: "diagnosis_completed",
+                    statusNote:
+                      STATUS_NOTES_DEFAULT.diagnosis_completed ??
+                      "Diagnosis completed.",
                   })
                 }
-                className="border border-line bg-ink px-3 py-2 text-cream outline-none"
+                className="btn-ghost !px-4 !py-2 !text-xs"
               >
-                {statuses.map((status) => (
-                  <option key={status} value={status}>
-                    {STATUS_LABELS[status]}
-                  </option>
-                ))}
-              </select>
-              <input
-                defaultValue={request.statusNote}
-                key={`${request.trackingNumber}-${request.updatedAt}`}
-                onBlur={(event) => {
-                  if (event.target.value !== request.statusNote) {
-                    void patchRequest(request.trackingNumber, {
-                      statusNote: event.target.value,
-                    });
-                  }
-                }}
-                className="border border-line bg-ink px-3 py-2 text-cream outline-none"
-                placeholder="Status note shown to user"
-              />
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    void patchRequest(request.trackingNumber, {
-                      status: "diagnosis_completed",
-                      statusNote:
-                        STATUS_NOTES_DEFAULT.diagnosis_completed ??
-                        "Diagnosis completed.",
-                    })
-                  }
-                  className="border border-mist/30 px-4 py-2 text-xs tracking-[0.14em] uppercase text-mist hover:border-gold hover:text-gold-bright"
-                >
-                  Diagnosis done
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    void patchRequest(request.trackingNumber, {
-                      status: "cleared",
-                      statusNote:
-                        "This request was cleared by admin. You may submit a new request.",
-                    })
-                  }
-                  className="border border-gold/50 px-4 py-2 text-xs tracking-[0.14em] uppercase text-gold hover:border-gold-bright hover:text-gold-bright"
-                >
-                  Clear lock
-                </button>
-              </div>
+                Diagnosis done
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  onPatch(request.trackingNumber, {
+                    status: "cleared",
+                    statusNote:
+                      "This request was cleared by admin. You may submit a new request.",
+                  })
+                }
+                className="btn-secondary !px-4 !py-2 !text-xs"
+              >
+                Clear lock
+              </button>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function PostsPanel({
+  posts,
+  onCreate,
+  onUpdate,
+  onDelete,
+}: {
+  posts: CmsPost[];
+  onCreate: (item: Record<string, unknown>) => void;
+  onUpdate: (id: string, item: Record<string, unknown>) => void;
+  onDelete: (id: string) => void;
+}) {
+  const [draft, setDraft] = useState({
+    title: "",
+    slug: "",
+    excerpt: "",
+    body: "",
+    published: true,
+  });
+
+  return (
+    <div className="space-y-8">
+      <form
+        className="surface-panel space-y-4 px-5 py-5"
+        onSubmit={(event) => {
+          event.preventDefault();
+          onCreate(draft);
+          setDraft({ title: "", slug: "", excerpt: "", body: "", published: true });
+        }}
+      >
+        <h2 className="font-display text-2xl text-cream">New post</h2>
+        <input
+          className="field-input"
+          placeholder="Title"
+          value={draft.title}
+          onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+          required
+        />
+        <input
+          className="field-input"
+          placeholder="slug-like-this"
+          value={draft.slug}
+          onChange={(e) => setDraft({ ...draft, slug: e.target.value })}
+        />
+        <input
+          className="field-input"
+          placeholder="Short excerpt"
+          value={draft.excerpt}
+          onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })}
+        />
+        <textarea
+          className="field-input"
+          rows={6}
+          placeholder="Body (markdown-ish headings ok)"
+          value={draft.body}
+          onChange={(e) => setDraft({ ...draft, body: e.target.value })}
+        />
+        <label className="flex items-center gap-2 text-sm text-fog">
+          <input
+            type="checkbox"
+            checked={draft.published}
+            onChange={(e) => setDraft({ ...draft, published: e.target.checked })}
+          />
+          Published
+        </label>
+        <button type="submit" className="btn-primary">
+          Add post
+        </button>
+      </form>
+
+      <div className="space-y-4">
+        {posts.map((post) => (
+          <article key={post.id} className="surface-panel space-y-3 px-5 py-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="font-display text-xl text-cream">{post.title}</h3>
+              <span className="text-xs text-gold">
+                {post.published ? "Published" : "Draft"} · /blog/{post.slug}
+              </span>
+            </div>
+            <textarea
+              className="field-input"
+              rows={4}
+              defaultValue={post.body}
+              key={`${post.id}-body-${post.updatedAt}`}
+              onBlur={(e) => {
+                if (e.target.value !== post.body) {
+                  onUpdate(post.id, { body: e.target.value });
+                }
+              }}
+            />
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="btn-ghost !py-2 !text-xs"
+                onClick={() =>
+                  onUpdate(post.id, { published: !post.published })
+                }
+              >
+                {post.published ? "Unpublish" : "Publish"}
+              </button>
+              <button
+                type="button"
+                className="btn-ghost !py-2 !text-xs"
+                onClick={() => onDelete(post.id)}
+              >
+                Delete
+              </button>
             </div>
           </article>
         ))}
@@ -240,10 +578,306 @@ export function AdminPortal() {
   );
 }
 
+function FeaturesPanel({
+  features,
+  onCreate,
+  onUpdate,
+  onDelete,
+}: {
+  features: CmsFeature[];
+  onCreate: (item: Record<string, unknown>) => void;
+  onUpdate: (id: string, item: Record<string, unknown>) => void;
+  onDelete: (id: string) => void;
+}) {
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+
+  return (
+    <div className="space-y-6">
+      <form
+        className="surface-panel space-y-3 px-5 py-5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onCreate({ title, body, published: true });
+          setTitle("");
+          setBody("");
+        }}
+      >
+        <h2 className="font-display text-2xl text-cream">Add feature</h2>
+        <input
+          className="field-input"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Feature title"
+          required
+        />
+        <textarea
+          className="field-input"
+          rows={3}
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Short description"
+        />
+        <button type="submit" className="btn-primary">
+          Save feature
+        </button>
+      </form>
+      {features
+        .slice()
+        .sort((a, b) => a.order - b.order)
+        .map((feature) => (
+          <article key={feature.id} className="surface-panel space-y-3 px-5 py-5">
+            <input
+              className="field-input"
+              defaultValue={feature.title}
+              key={`${feature.id}-t-${feature.updatedAt}`}
+              onBlur={(e) => {
+                if (e.target.value !== feature.title) {
+                  onUpdate(feature.id, { title: e.target.value });
+                }
+              }}
+            />
+            <textarea
+              className="field-input"
+              rows={3}
+              defaultValue={feature.body}
+              key={`${feature.id}-b-${feature.updatedAt}`}
+              onBlur={(e) => {
+                if (e.target.value !== feature.body) {
+                  onUpdate(feature.id, { body: e.target.value });
+                }
+              }}
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="btn-ghost !py-2 !text-xs"
+                onClick={() =>
+                  onUpdate(feature.id, { published: !feature.published })
+                }
+              >
+                {feature.published ? "Hide" : "Show"}
+              </button>
+              <button
+                type="button"
+                className="btn-ghost !py-2 !text-xs"
+                onClick={() => onDelete(feature.id)}
+              >
+                Delete
+              </button>
+            </div>
+          </article>
+        ))}
+    </div>
+  );
+}
+
+function PromosPanel({
+  promotions,
+  onCreate,
+  onUpdate,
+  onDelete,
+}: {
+  promotions: CmsPromotion[];
+  onCreate: (item: Record<string, unknown>) => void;
+  onUpdate: (id: string, item: Record<string, unknown>) => void;
+  onDelete: (id: string) => void;
+}) {
+  const [draft, setDraft] = useState({
+    title: "",
+    body: "",
+    ctaLabel: "Begin healing",
+    ctaHref: "/begin",
+    active: true,
+  });
+
+  return (
+    <div className="space-y-6">
+      <form
+        className="surface-panel space-y-3 px-5 py-5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onCreate(draft);
+          setDraft({
+            title: "",
+            body: "",
+            ctaLabel: "Begin healing",
+            ctaHref: "/begin",
+            active: true,
+          });
+        }}
+      >
+        <h2 className="font-display text-2xl text-cream">New promotion</h2>
+        <input
+          className="field-input"
+          placeholder="Title"
+          value={draft.title}
+          onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+          required
+        />
+        <textarea
+          className="field-input"
+          rows={3}
+          placeholder="Promo text"
+          value={draft.body}
+          onChange={(e) => setDraft({ ...draft, body: e.target.value })}
+        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <input
+            className="field-input"
+            placeholder="CTA label"
+            value={draft.ctaLabel}
+            onChange={(e) => setDraft({ ...draft, ctaLabel: e.target.value })}
+          />
+          <input
+            className="field-input"
+            placeholder="/begin"
+            value={draft.ctaHref}
+            onChange={(e) => setDraft({ ...draft, ctaHref: e.target.value })}
+          />
+        </div>
+        <button type="submit" className="btn-primary">
+          Add promotion
+        </button>
+      </form>
+
+      {promotions.map((promo) => (
+        <article key={promo.id} className="surface-panel space-y-3 px-5 py-5">
+          <p className="font-display text-xl text-cream">{promo.title}</p>
+          <p className="text-sm text-fog">{promo.body}</p>
+          <p className="text-xs text-gold">
+            {promo.active ? "Active on site" : "Inactive"} · {promo.ctaLabel} →{" "}
+            {promo.ctaHref}
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              className="btn-ghost !py-2 !text-xs"
+              onClick={() => onUpdate(promo.id, { active: !promo.active })}
+            >
+              {promo.active ? "Deactivate" : "Activate"}
+            </button>
+            <button
+              type="button"
+              className="btn-ghost !py-2 !text-xs"
+              onClick={() => onDelete(promo.id)}
+            >
+              Delete
+            </button>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function PricingPanel({
+  pricing,
+  onCreate,
+  onUpdate,
+  onDelete,
+}: {
+  pricing: CmsPricingItem[];
+  onCreate: (item: Record<string, unknown>) => void;
+  onUpdate: (id: string, item: Record<string, unknown>) => void;
+  onDelete: (id: string) => void;
+}) {
+  const [draft, setDraft] = useState({
+    label: "",
+    amount: "",
+    method: "",
+    note: "",
+    published: true,
+  });
+
+  return (
+    <div className="space-y-6">
+      <form
+        className="surface-panel space-y-3 px-5 py-5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onCreate(draft);
+          setDraft({
+            label: "",
+            amount: "",
+            method: "",
+            note: "",
+            published: true,
+          });
+        }}
+      >
+        <h2 className="font-display text-2xl text-cream">Add pricing row</h2>
+        <input
+          className="field-input"
+          placeholder="Label"
+          value={draft.label}
+          onChange={(e) => setDraft({ ...draft, label: e.target.value })}
+          required
+        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <input
+            className="field-input"
+            placeholder="Amount"
+            value={draft.amount}
+            onChange={(e) => setDraft({ ...draft, amount: e.target.value })}
+          />
+          <input
+            className="field-input"
+            placeholder="Method / account"
+            value={draft.method}
+            onChange={(e) => setDraft({ ...draft, method: e.target.value })}
+          />
+        </div>
+        <input
+          className="field-input"
+          placeholder="Note"
+          value={draft.note}
+          onChange={(e) => setDraft({ ...draft, note: e.target.value })}
+        />
+        <button type="submit" className="btn-primary">
+          Save pricing
+        </button>
+      </form>
+
+      {pricing
+        .slice()
+        .sort((a, b) => a.order - b.order)
+        .map((row) => (
+          <article key={row.id} className="surface-panel space-y-3 px-5 py-5">
+            <p className="font-display text-xl text-cream">{row.label}</p>
+            <p className="text-gold">{row.amount}</p>
+            <p className="break-all text-sm text-fog">{row.method}</p>
+            <p className="text-sm text-fog/80">{row.note}</p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="btn-ghost !py-2 !text-xs"
+                onClick={() =>
+                  onUpdate(row.id, { published: !row.published })
+                }
+              >
+                {row.published ? "Unpublish" : "Publish"}
+              </button>
+              <button
+                type="button"
+                className="btn-ghost !py-2 !text-xs"
+                onClick={() => onDelete(row.id)}
+              >
+                Delete
+              </button>
+            </div>
+          </article>
+        ))}
+    </div>
+  );
+}
+
 function Item({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="uppercase tracking-[0.14em] text-fog/70">{label}</dt>
+      <dt className="text-[10px] uppercase tracking-[0.14em] text-fog/70">
+        {label}
+      </dt>
       <dd className="mt-1 text-cream">{value}</dd>
     </div>
   );

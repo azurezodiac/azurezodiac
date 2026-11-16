@@ -1,13 +1,35 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import type { CmsPricingItem } from "@/lib/cms-types";
 import { HADIYA } from "@/lib/consultation";
 import { useLang } from "@/lib/i18n";
 
 export function PricingContent() {
   const { t } = useLang();
+  const [cmsPricing, setCmsPricing] = useState<CmsPricingItem[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/cms/public");
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          cms?: { pricing?: CmsPricingItem[] };
+        };
+        if (!cancelled) setCmsPricing(data.cms?.pricing ?? []);
+      } catch {
+        // static fallback
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="min-h-full bg-ink">
@@ -52,32 +74,51 @@ export function PricingContent() {
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="border border-line px-5 py-6">
-              <p className="text-xs tracking-[0.16em] uppercase text-gold">
-                {t.pricing.pkLabel}
-              </p>
-              <p className="mt-3 font-display text-3xl text-cream">
-                {t.pricing.pkAmount}
-              </p>
-              <p className="mt-3 text-sm text-fog">{t.pricing.pkMethod}</p>
-              <p className="mt-2 text-xs text-fog/70">
-                {HADIYA.pakistan.method}
-              </p>
-            </div>
-            <div className="border border-line px-5 py-6">
-              <p className="text-xs tracking-[0.16em] uppercase text-gold">
-                {t.pricing.intlLabel}
-              </p>
-              <p className="mt-3 font-display text-3xl text-cream">
-                {t.pricing.intlAmount}
-              </p>
-              <p className="mt-3 break-all text-sm text-fog">
-                {t.pricing.intlMethod}
-              </p>
-              <p className="mt-2 text-xs text-fog/70">
-                {HADIYA.international.method}
-              </p>
-            </div>
+            {cmsPricing.length > 0
+              ? cmsPricing.map((row) => (
+                  <div key={row.id} className="border border-line px-5 py-6">
+                    <p className="text-xs tracking-[0.16em] uppercase text-gold">
+                      {row.label}
+                    </p>
+                    <p className="mt-3 font-display text-3xl text-cream">
+                      {row.amount}
+                    </p>
+                    <p className="mt-3 break-all text-sm text-fog">
+                      {row.method}
+                    </p>
+                    <p className="mt-2 text-xs text-fog/70">{row.note}</p>
+                  </div>
+                ))
+              : (
+                  <>
+                    <div className="border border-line px-5 py-6">
+                      <p className="text-xs tracking-[0.16em] uppercase text-gold">
+                        {t.pricing.pkLabel}
+                      </p>
+                      <p className="mt-3 font-display text-3xl text-cream">
+                        {t.pricing.pkAmount}
+                      </p>
+                      <p className="mt-3 text-sm text-fog">{t.pricing.pkMethod}</p>
+                      <p className="mt-2 text-xs text-fog/70">
+                        {HADIYA.pakistan.method}
+                      </p>
+                    </div>
+                    <div className="border border-line px-5 py-6">
+                      <p className="text-xs tracking-[0.16em] uppercase text-gold">
+                        {t.pricing.intlLabel}
+                      </p>
+                      <p className="mt-3 font-display text-3xl text-cream">
+                        {t.pricing.intlAmount}
+                      </p>
+                      <p className="mt-3 break-all text-sm text-fog">
+                        {t.pricing.intlMethod}
+                      </p>
+                      <p className="mt-2 text-xs text-fog/70">
+                        {HADIYA.international.method}
+                      </p>
+                    </div>
+                  </>
+                )}
           </div>
         </section>
 

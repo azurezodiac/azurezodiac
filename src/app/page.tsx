@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { About } from "@/components/About";
 import { Atmosphere } from "@/components/Atmosphere";
+import { CmsFeatures } from "@/components/CmsFeatures";
 import { Contact } from "@/components/Contact";
 import { Disclaimer } from "@/components/Disclaimer";
 import { Faq } from "@/components/Faq";
@@ -10,6 +11,7 @@ import { Learn } from "@/components/Learn";
 import { Location } from "@/components/Location";
 import { MobileStickyBegin } from "@/components/MobileStickyBegin";
 import { Path } from "@/components/Path";
+import { PromoBanner } from "@/components/PromoBanner";
 import { Services } from "@/components/Services";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -44,6 +46,8 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <TrustMarquee />
+        <PromoBanner />
+        <CmsFeatures />
         <Services />
         <Atmosphere />
         <Path />

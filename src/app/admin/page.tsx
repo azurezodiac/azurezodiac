@@ -19,7 +19,7 @@ export default function AdminPage() {
             Redeemysoul
           </Link>
           <span className="text-xs tracking-[0.16em] uppercase text-fog">
-            Admin portal
+            Leads · Posts · Pricing · Promos
           </span>
         </div>
       </header>
