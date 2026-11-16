@@ -8,12 +8,14 @@ Modern Islamic healing website for [redeemysoul.com](https://redeemysoul.com).
 - React 19
 - TypeScript
 - Tailwind CSS 4
-- Turbopack
+- **MySQL** (cPanel) via PHP API — primary for production
+- Optional Postgres / JSON fallback for local Node
 
 ## Develop
 
 ```bash
 pnpm install
+cp .env.example .env.local   # MYSQL_* + ADMIN_PASSWORD
 pnpm dev
 ```
 
@@ -23,30 +25,33 @@ pnpm dev
 pnpm build
 ```
 
-### Static cPanel (public site only)
+### Static cPanel + MySQL (recommended)
 
 ```bash
 bash scripts/build-cpanel-zip.sh
 ```
 
-Upload **`redeemysoul-public_html.zip`** (not the `.sh` script) to `public_html` and extract.
+Upload **`redeemysoul-public_html.zip`** to `public_html` and extract.
 
-### Admin portal (Node required)
+1. cPanel → **MySQL Databases** → create DB + user, add user to DB (ALL PRIVILEGES)
+2. Copy `public_html/api/config.sample.php` → `public_html/api/config.php`
+3. Fill `db_host` (`localhost`), `db_name`, `db_user`, `db_pass`, `admin_password`
+4. Optional: phpMyAdmin → Import `api/schema.sql` (also auto-creates on first API hit)
+5. Open `/admin` and log in
 
-`/admin` manages **leads, track, posts, features, promotions, pricing**.
+This powers **Begin**, **Track**, and the full **Admin** portal (leads, posts, features, promos, pricing) on your own MySQL.
+
+### Node host (optional)
 
 ```bash
-cp .env.example .env.local   # set ADMIN_PASSWORD
+# .env.local
+MYSQL_HOST=localhost
+MYSQL_DATABASE=...
+MYSQL_USER=...
+MYSQL_PASSWORD=...
+ADMIN_PASSWORD=...
+
 pnpm build && pnpm start
 ```
 
-Open `http://localhost:3000/admin` — password from `ADMIN_PASSWORD`.
-
-Set **`DATABASE_URL`** to your Postgres (same DB for leads + CMS). Apply:
-
-```bash
-psql "$DATABASE_URL" -f migrations/001_requests.sql
-psql "$DATABASE_URL" -f migrations/002_cms.sql
-```
-
-Without `DATABASE_URL`, a local JSON fallback is used. Static cPanel zip does **not** run admin APIs — Node host required for `/admin`.
+Schema: `migrations/mysql/001_schema.sql`

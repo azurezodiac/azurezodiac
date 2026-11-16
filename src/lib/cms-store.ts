@@ -1,7 +1,6 @@
 import { randomBytes } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
-import type { QueryResultRow } from "pg";
 import { BLOG_POSTS } from "@/lib/blog";
 import {
   EMPTY_CMS,
@@ -13,7 +12,7 @@ import {
   type CmsState,
 } from "@/lib/cms-types";
 import { HADIYA } from "@/lib/consultation";
-import { getDb } from "@/lib/db";
+import { dbQuery, getDb, type DbRow } from "@/lib/db";
 
 const DATA_DIR = path.join(
   process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
@@ -22,6 +21,8 @@ const DATA_DIR = path.join(
   "redeemysoul-data",
 );
 const CMS_FILE = path.join(DATA_DIR, "cms.json");
+
+let schemaReady = false;
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -106,75 +107,81 @@ function seedState(): CmsState {
   };
 }
 
-function rowPost(row: QueryResultRow): CmsPost {
+function rowPost(row: DbRow): CmsPost {
   return {
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
-    excerpt: row.excerpt ?? "",
-    body: row.body ?? "",
+    id: String(row.id),
+    slug: String(row.slug),
+    title: String(row.title),
+    excerpt: String(row.excerpt ?? ""),
+    body: String(row.body ?? ""),
     published: Boolean(row.published),
-    publishedAt: row.published_at,
-    updatedAt: new Date(row.updated_at).toISOString(),
+    publishedAt: String(row.published_at),
+    updatedAt: new Date(String(row.updated_at)).toISOString(),
   };
 }
 
-function rowFeature(row: QueryResultRow): CmsFeature {
+function rowFeature(row: DbRow): CmsFeature {
   return {
-    id: row.id,
-    title: row.title,
-    body: row.body ?? "",
+    id: String(row.id),
+    title: String(row.title),
+    body: String(row.body ?? ""),
     order: Number(row.sort_order) || 0,
     published: Boolean(row.published),
-    updatedAt: new Date(row.updated_at).toISOString(),
+    updatedAt: new Date(String(row.updated_at)).toISOString(),
   };
 }
 
-function rowPromo(row: QueryResultRow): CmsPromotion {
+function rowPromo(row: DbRow): CmsPromotion {
   return {
-    id: row.id,
-    title: row.title,
-    body: row.body ?? "",
-    ctaLabel: row.cta_label ?? "Begin",
-    ctaHref: row.cta_href ?? "/begin",
+    id: String(row.id),
+    title: String(row.title),
+    body: String(row.body ?? ""),
+    ctaLabel: String(row.cta_label ?? "Begin"),
+    ctaHref: String(row.cta_href ?? "/begin"),
     active: Boolean(row.active),
-    updatedAt: new Date(row.updated_at).toISOString(),
+    updatedAt: new Date(String(row.updated_at)).toISOString(),
   };
 }
 
-function rowPricing(row: QueryResultRow): CmsPricingItem {
+function rowPricing(row: DbRow): CmsPricingItem {
   return {
-    id: row.id,
-    label: row.label,
-    amount: row.amount ?? "",
-    method: row.method ?? "",
-    note: row.note ?? "",
+    id: String(row.id),
+    label: String(row.label),
+    amount: String(row.amount ?? ""),
+    method: String(row.method ?? ""),
+    note: String(row.note ?? ""),
     order: Number(row.sort_order) || 0,
     published: Boolean(row.published),
-    updatedAt: new Date(row.updated_at).toISOString(),
+    updatedAt: new Date(String(row.updated_at)).toISOString(),
   };
 }
 
 async function ensureCmsTables(): Promise<void> {
-  const database = getDb();
-  if (!database) return;
-  const sql = await fs.readFile(
-    path.join(process.cwd(), "migrations", "002_cms.sql"),
-    "utf8",
-  );
-  await database.query(sql);
+  if (schemaReady || !getDb()) return;
+  const dialect = getDb()!.dialect;
+  const file =
+    dialect === "mysql"
+      ? path.join(process.cwd(), "migrations", "mysql", "001_schema.sql")
+      : path.join(process.cwd(), "migrations", "002_cms.sql");
+  const raw = await fs.readFile(file, "utf8");
+  const statements = raw
+    .split(/;\s*\n/)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0 && !part.startsWith("--"));
+  for (const statement of statements) {
+    await dbQuery(statement);
+  }
+  schemaReady = true;
 }
 
 async function readCmsFromDb(): Promise<CmsState> {
-  const database = getDb();
-  if (!database) throw new Error("No database");
   await ensureCmsTables();
 
   const [posts, features, promotions, pricing] = await Promise.all([
-    database.query(`SELECT * FROM cms_posts ORDER BY published_at DESC`),
-    database.query(`SELECT * FROM cms_features ORDER BY sort_order ASC`),
-    database.query(`SELECT * FROM cms_promotions ORDER BY updated_at DESC`),
-    database.query(`SELECT * FROM cms_pricing ORDER BY sort_order ASC`),
+    dbQuery(`SELECT * FROM cms_posts ORDER BY published_at DESC`),
+    dbQuery(`SELECT * FROM cms_features ORDER BY sort_order ASC`),
+    dbQuery(`SELECT * FROM cms_promotions ORDER BY updated_at DESC`),
+    dbQuery(`SELECT * FROM cms_pricing ORDER BY sort_order ASC`),
   ]);
 
   const state: CmsState = {
@@ -197,87 +204,78 @@ async function readCmsFromDb(): Promise<CmsState> {
 }
 
 async function writeSeedToDb(): Promise<CmsState> {
-  const database = getDb();
-  if (!database) throw new Error("No database");
   await ensureCmsTables();
   const seeded = seedState();
 
-  await database.query("BEGIN");
-  try {
-    await database.query("DELETE FROM cms_posts");
-    await database.query("DELETE FROM cms_features");
-    await database.query("DELETE FROM cms_promotions");
-    await database.query("DELETE FROM cms_pricing");
+  await dbQuery("DELETE FROM cms_posts");
+  await dbQuery("DELETE FROM cms_features");
+  await dbQuery("DELETE FROM cms_promotions");
+  await dbQuery("DELETE FROM cms_pricing");
 
-    for (const post of seeded.posts) {
-      await database.query(
-        `INSERT INTO cms_posts
-         (id, slug, title, excerpt, body, published, published_at, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
-        [
-          post.id,
-          post.slug,
-          post.title,
-          post.excerpt,
-          post.body,
-          post.published,
-          post.publishedAt,
-          post.updatedAt,
-        ],
-      );
-    }
-    for (const feature of seeded.features) {
-      await database.query(
-        `INSERT INTO cms_features
-         (id, title, body, sort_order, published, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6)`,
-        [
-          feature.id,
-          feature.title,
-          feature.body,
-          feature.order,
-          feature.published,
-          feature.updatedAt,
-        ],
-      );
-    }
-    for (const promo of seeded.promotions) {
-      await database.query(
-        `INSERT INTO cms_promotions
-         (id, title, body, cta_label, cta_href, active, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-        [
-          promo.id,
-          promo.title,
-          promo.body,
-          promo.ctaLabel,
-          promo.ctaHref,
-          promo.active,
-          promo.updatedAt,
-        ],
-      );
-    }
-    for (const row of seeded.pricing) {
-      await database.query(
-        `INSERT INTO cms_pricing
-         (id, label, amount, method, note, sort_order, published, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
-        [
-          row.id,
-          row.label,
-          row.amount,
-          row.method,
-          row.note,
-          row.order,
-          row.published,
-          row.updatedAt,
-        ],
-      );
-    }
-    await database.query("COMMIT");
-  } catch (error) {
-    await database.query("ROLLBACK");
-    throw error;
+  for (const post of seeded.posts) {
+    await dbQuery(
+      `INSERT INTO cms_posts
+       (id, slug, title, excerpt, body, published, published_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        post.id,
+        post.slug,
+        post.title,
+        post.excerpt,
+        post.body,
+        post.published ? 1 : 0,
+        post.publishedAt,
+        post.updatedAt,
+      ],
+    );
+  }
+  for (const feature of seeded.features) {
+    await dbQuery(
+      `INSERT INTO cms_features
+       (id, title, body, sort_order, published, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        feature.id,
+        feature.title,
+        feature.body,
+        feature.order,
+        feature.published ? 1 : 0,
+        feature.updatedAt,
+      ],
+    );
+  }
+  for (const promo of seeded.promotions) {
+    await dbQuery(
+      `INSERT INTO cms_promotions
+       (id, title, body, cta_label, cta_href, active, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        promo.id,
+        promo.title,
+        promo.body,
+        promo.ctaLabel,
+        promo.ctaHref,
+        promo.active ? 1 : 0,
+        promo.updatedAt,
+      ],
+    );
+  }
+  for (const row of seeded.pricing) {
+    await dbQuery(
+      `INSERT INTO cms_pricing
+       (id, label, amount, method, note, sort_order, published, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        row.id,
+        row.label,
+        row.amount,
+        row.method,
+        row.note,
+        row.order,
+        row.published ? 1 : 0,
+        row.updatedAt,
+      ],
+    );
   }
 
   return seeded;
@@ -340,10 +338,9 @@ export async function createCmsItem(
   collection: CmsCollection,
   input: Record<string, unknown>,
 ): Promise<CmsState> {
-  const database = getDb();
   const stamped = nowIso();
 
-  if (database) {
+  if (getDb()) {
     await ensureCmsTables();
     if (collection === "posts") {
       const slug =
@@ -352,55 +349,55 @@ export async function createCmsItem(
           .toLowerCase()
           .replace(/[^a-z0-9-]+/g, "-")
           .replace(/^-|-$/g, "") || `post-${newId()}`;
-      await database.query(
+      await dbQuery(
         `INSERT INTO cms_posts
          (id, slug, title, excerpt, body, published, published_at, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           newId(),
           slug,
           String(input.title || "Untitled").trim(),
           String(input.excerpt || "").trim(),
           String(input.body || "").trim(),
-          Boolean(input.published),
+          input.published ? 1 : 0,
           String(input.publishedAt || stamped.slice(0, 10)),
           stamped,
         ],
       );
     } else if (collection === "features") {
-      await database.query(
+      await dbQuery(
         `INSERT INTO cms_features
          (id, title, body, sort_order, published, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6)`,
+         VALUES (?, ?, ?, ?, ?, ?)`,
         [
           newId(),
           String(input.title || "Feature").trim(),
           String(input.body || "").trim(),
           Number(input.order) || 0,
-          input.published !== false,
+          input.published !== false ? 1 : 0,
           stamped,
         ],
       );
     } else if (collection === "promotions") {
-      await database.query(
+      await dbQuery(
         `INSERT INTO cms_promotions
          (id, title, body, cta_label, cta_href, active, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           newId(),
           String(input.title || "Promotion").trim(),
           String(input.body || "").trim(),
           String(input.ctaLabel || "Begin").trim(),
           String(input.ctaHref || "/begin").trim(),
-          input.active !== false,
+          input.active !== false ? 1 : 0,
           stamped,
         ],
       );
     } else {
-      await database.query(
+      await dbQuery(
         `INSERT INTO cms_pricing
          (id, label, amount, method, note, sort_order, published, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           newId(),
           String(input.label || "Plan").trim(),
@@ -408,7 +405,7 @@ export async function createCmsItem(
           String(input.method || "").trim(),
           String(input.note || "").trim(),
           Number(input.order) || 0,
-          input.published !== false,
+          input.published !== false ? 1 : 0,
           stamped,
         ],
       );
@@ -473,23 +470,21 @@ export async function updateCmsItem(
   id: string,
   patch: Record<string, unknown>,
 ): Promise<CmsState | null> {
-  const database = getDb();
   const stamped = nowIso();
 
-  if (database) {
+  if (getDb()) {
     await ensureCmsTables();
     if (collection === "posts") {
-      const current = await database.query(
-        `SELECT * FROM cms_posts WHERE id = $1`,
-        [id],
-      );
+      const current = await dbQuery(`SELECT * FROM cms_posts WHERE id = ?`, [
+        id,
+      ]);
       if (!current.rows[0]) return null;
       const row = rowPost(current.rows[0]);
-      await database.query(
+      await dbQuery(
         `UPDATE cms_posts SET
-          slug = $1, title = $2, excerpt = $3, body = $4,
-          published = $5, published_at = $6, updated_at = $7
-         WHERE id = $8`,
+          slug = ?, title = ?, excerpt = ?, body = ?,
+          published = ?, published_at = ?, updated_at = ?
+         WHERE id = ?`,
         [
           patch.slug !== undefined
             ? String(patch.slug)
@@ -502,9 +497,11 @@ export async function updateCmsItem(
             ? String(patch.excerpt).trim()
             : row.excerpt,
           patch.body !== undefined ? String(patch.body) : row.body,
-          patch.published !== undefined
+          (patch.published !== undefined
             ? Boolean(patch.published)
-            : row.published,
+            : row.published)
+            ? 1
+            : 0,
           patch.publishedAt !== undefined
             ? String(patch.publishedAt)
             : row.publishedAt,
@@ -513,38 +510,39 @@ export async function updateCmsItem(
         ],
       );
     } else if (collection === "features") {
-      const current = await database.query(
-        `SELECT * FROM cms_features WHERE id = $1`,
-        [id],
-      );
+      const current = await dbQuery(`SELECT * FROM cms_features WHERE id = ?`, [
+        id,
+      ]);
       if (!current.rows[0]) return null;
       const row = rowFeature(current.rows[0]);
-      await database.query(
+      await dbQuery(
         `UPDATE cms_features SET
-          title = $1, body = $2, sort_order = $3, published = $4, updated_at = $5
-         WHERE id = $6`,
+          title = ?, body = ?, sort_order = ?, published = ?, updated_at = ?
+         WHERE id = ?`,
         [
           patch.title !== undefined ? String(patch.title).trim() : row.title,
           patch.body !== undefined ? String(patch.body).trim() : row.body,
           patch.order !== undefined ? Number(patch.order) : row.order,
-          patch.published !== undefined
+          (patch.published !== undefined
             ? Boolean(patch.published)
-            : row.published,
+            : row.published)
+            ? 1
+            : 0,
           stamped,
           id,
         ],
       );
     } else if (collection === "promotions") {
-      const current = await database.query(
-        `SELECT * FROM cms_promotions WHERE id = $1`,
+      const current = await dbQuery(
+        `SELECT * FROM cms_promotions WHERE id = ?`,
         [id],
       );
       if (!current.rows[0]) return null;
       const row = rowPromo(current.rows[0]);
-      await database.query(
+      await dbQuery(
         `UPDATE cms_promotions SET
-          title = $1, body = $2, cta_label = $3, cta_href = $4, active = $5, updated_at = $6
-         WHERE id = $7`,
+          title = ?, body = ?, cta_label = ?, cta_href = ?, active = ?, updated_at = ?
+         WHERE id = ?`,
         [
           patch.title !== undefined ? String(patch.title).trim() : row.title,
           patch.body !== undefined ? String(patch.body).trim() : row.body,
@@ -554,32 +552,35 @@ export async function updateCmsItem(
           patch.ctaHref !== undefined
             ? String(patch.ctaHref).trim()
             : row.ctaHref,
-          patch.active !== undefined ? Boolean(patch.active) : row.active,
+          (patch.active !== undefined ? Boolean(patch.active) : row.active)
+            ? 1
+            : 0,
           stamped,
           id,
         ],
       );
     } else {
-      const current = await database.query(
-        `SELECT * FROM cms_pricing WHERE id = $1`,
-        [id],
-      );
+      const current = await dbQuery(`SELECT * FROM cms_pricing WHERE id = ?`, [
+        id,
+      ]);
       if (!current.rows[0]) return null;
       const row = rowPricing(current.rows[0]);
-      await database.query(
+      await dbQuery(
         `UPDATE cms_pricing SET
-          label = $1, amount = $2, method = $3, note = $4,
-          sort_order = $5, published = $6, updated_at = $7
-         WHERE id = $8`,
+          label = ?, amount = ?, method = ?, note = ?,
+          sort_order = ?, published = ?, updated_at = ?
+         WHERE id = ?`,
         [
           patch.label !== undefined ? String(patch.label).trim() : row.label,
           patch.amount !== undefined ? String(patch.amount).trim() : row.amount,
           patch.method !== undefined ? String(patch.method).trim() : row.method,
           patch.note !== undefined ? String(patch.note).trim() : row.note,
           patch.order !== undefined ? Number(patch.order) : row.order,
-          patch.published !== undefined
+          (patch.published !== undefined
             ? Boolean(patch.published)
-            : row.published,
+            : row.published)
+            ? 1
+            : 0,
           stamped,
           id,
         ],
@@ -589,8 +590,6 @@ export async function updateCmsItem(
   }
 
   const state = await readCmsFromFile();
-  const before = JSON.stringify(state[collection]);
-  // Reuse prior file-path update logic via create/update pattern
   if (collection === "posts") {
     const index = state.posts.findIndex((item) => item.id === id);
     if (index < 0) return null;
@@ -683,7 +682,6 @@ export async function updateCmsItem(
       updatedAt: stamped,
     };
   }
-  if (JSON.stringify(state[collection]) === before) return null;
   await writeCmsFile(state);
   return state;
 }
@@ -692,8 +690,7 @@ export async function deleteCmsItem(
   collection: CmsCollection,
   id: string,
 ): Promise<CmsState | null> {
-  const database = getDb();
-  if (database) {
+  if (getDb()) {
     await ensureCmsTables();
     const table =
       collection === "posts"
@@ -703,10 +700,7 @@ export async function deleteCmsItem(
           : collection === "promotions"
             ? "cms_promotions"
             : "cms_pricing";
-    const result = await database.query(
-      `DELETE FROM ${table} WHERE id = $1 RETURNING id`,
-      [id],
-    );
+    const result = await dbQuery(`DELETE FROM ${table} WHERE id = ?`, [id]);
     if (result.rowCount === 0) return null;
     return readCmsFromDb();
   }

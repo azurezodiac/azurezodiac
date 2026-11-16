@@ -308,6 +308,7 @@ export function BeginFlow() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           concernId: concern.id,
+          concernTitle: concern.title,
           name,
           motherName,
           location,

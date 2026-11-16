@@ -141,7 +141,7 @@ export function AdminPortal() {
     patch: { status?: RequestStatus; statusNote?: string },
   ) {
     const response = await fetch("/api/admin/requests", {
-      method: "PATCH",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ trackingNumber, ...patch }),
     });
@@ -198,7 +198,8 @@ export function AdminPortal() {
         </p>
         <ul className="space-y-2 text-sm text-fog">
           <li>· Local: <code className="text-gold">pnpm build && pnpm start</code></li>
-          <li>· Cloud: Vercel / Railway / any Node host with <code className="text-gold">ADMIN_PASSWORD</code></li>
+          <li>· cPanel: copy <code className="text-gold">api/config.sample.php</code> → <code className="text-gold">api/config.php</code> with MySQL + admin password</li>
+          <li>· Node: set <code className="text-gold">MYSQL_*</code> (or <code className="text-gold">DATABASE_URL=mysql://…</code>) + <code className="text-gold">ADMIN_PASSWORD</code></li>
           <li>· Optional Postgres: set <code className="text-gold">DATABASE_URL</code> for leads</li>
         </ul>
         <p className="text-sm text-fog">
@@ -244,8 +245,9 @@ export function AdminPortal() {
           <h1 className="mt-3 font-display text-4xl text-cream">Control portal</h1>
           <p className="mt-3 max-w-xl text-sm text-fog">
             Posts, features, promotions, pricing, leads, and track — saved to your
-            website database when <code className="text-gold">DATABASE_URL</code>{" "}
-            is set (Postgres). File store is only a fallback.
+            cPanel <strong className="font-medium text-parchment">MySQL</strong>{" "}
+            database via <code className="text-gold">/api</code> (PHP on static
+            host, or Node with <code className="text-gold">MYSQL_*</code>).
           </p>
         </div>
         <button type="button" onClick={() => void logout()} className="btn-ghost !py-2.5 !text-xs">

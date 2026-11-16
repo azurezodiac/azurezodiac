@@ -1,8 +1,7 @@
 import { randomBytes } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
-import type { QueryResultRow } from "pg";
-import { getDb } from "@/lib/db";
+import { dbQuery, getDb, type DbRow } from "@/lib/db";
 import {
   OPEN_STATUSES,
   STATUS_NOTES_DEFAULT,
@@ -22,27 +21,45 @@ type StoreShape = {
   requests: ConsultationRequest[];
 };
 
-function db() {
-  return getDb();
+let schemaReady = false;
+
+function rowToRequest(row: DbRow): ConsultationRequest {
+  return {
+    id: String(row.id),
+    trackingNumber: String(row.tracking_number),
+    concernId: String(row.concern_id),
+    concernTitle: String(row.concern_title),
+    name: String(row.name),
+    motherName: String(row.mother_name),
+    location: String(row.location),
+    phone: String(row.phone),
+    note: String(row.note ?? ""),
+    status: row.status as RequestStatus,
+    statusNote: String(row.status_note ?? ""),
+    createdAt: new Date(String(row.created_at)).toISOString(),
+    updatedAt: new Date(String(row.updated_at)).toISOString(),
+    clearedAt: row.cleared_at
+      ? new Date(String(row.cleared_at)).toISOString()
+      : null,
+  };
 }
 
-function rowToRequest(row: QueryResultRow): ConsultationRequest {
-  return {
-    id: row.id,
-    trackingNumber: row.tracking_number,
-    concernId: row.concern_id,
-    concernTitle: row.concern_title,
-    name: row.name,
-    motherName: row.mother_name,
-    location: row.location,
-    phone: row.phone,
-    note: row.note ?? "",
-    status: row.status,
-    statusNote: row.status_note ?? "",
-    createdAt: new Date(row.created_at).toISOString(),
-    updatedAt: new Date(row.updated_at).toISOString(),
-    clearedAt: row.cleared_at ? new Date(row.cleared_at).toISOString() : null,
-  };
+async function ensureSchema(): Promise<void> {
+  if (schemaReady || !getDb()) return;
+  const dialect = getDb()!.dialect;
+  const file =
+    dialect === "mysql"
+      ? path.join(process.cwd(), "migrations", "mysql", "001_schema.sql")
+      : path.join(process.cwd(), "migrations", "001_requests.sql");
+  const raw = await fs.readFile(file, "utf8");
+  const statements = raw
+    .split(/;\s*\n/)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0 && !part.startsWith("--"));
+  for (const statement of statements) {
+    await dbQuery(statement);
+  }
+  schemaReady = true;
 }
 
 async function ensureFileStore(): Promise<StoreShape> {
@@ -78,14 +95,15 @@ export async function findOpenByPhone(
   phone: string,
 ): Promise<ConsultationRequest | null> {
   const normalized = normalizePhone(phone);
-  const database = db();
-  if (database) {
-    const result = await database.query(
+  if (getDb()) {
+    await ensureSchema();
+    const placeholders = OPEN_STATUSES.map(() => "?").join(",");
+    const result = await dbQuery(
       `SELECT * FROM consultation_requests
-       WHERE phone = $1 AND status = ANY($2::text[])
+       WHERE phone = ? AND status IN (${placeholders})
        ORDER BY created_at DESC
        LIMIT 1`,
-      [normalized, OPEN_STATUSES],
+      [normalized, ...OPEN_STATUSES],
     );
     return result.rows[0] ? rowToRequest(result.rows[0]) : null;
   }
@@ -136,15 +154,13 @@ export async function createRequest(input: {
     clearedAt: null,
   };
 
-  const database = db();
-  if (database) {
-    await database.query(
+  if (getDb()) {
+    await ensureSchema();
+    await dbQuery(
       `INSERT INTO consultation_requests (
         id, tracking_number, concern_id, concern_title, name, mother_name,
         location, phone, note, status, status_note, created_at, updated_at, cleared_at
-      ) VALUES (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14
-      )`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         request.id,
         request.trackingNumber,
@@ -175,10 +191,10 @@ export async function getByTrackingNumber(
   trackingNumber: string,
 ): Promise<ConsultationRequest | null> {
   const needle = trackingNumber.trim().toUpperCase();
-  const database = db();
-  if (database) {
-    const result = await database.query(
-      `SELECT * FROM consultation_requests WHERE upper(tracking_number) = $1 LIMIT 1`,
+  if (getDb()) {
+    await ensureSchema();
+    const result = await dbQuery(
+      `SELECT * FROM consultation_requests WHERE UPPER(tracking_number) = ? LIMIT 1`,
       [needle],
     );
     return result.rows[0] ? rowToRequest(result.rows[0]) : null;
@@ -193,9 +209,9 @@ export async function getByTrackingNumber(
 }
 
 export async function listRequests(): Promise<ConsultationRequest[]> {
-  const database = db();
-  if (database) {
-    const result = await database.query(
+  if (getDb()) {
+    await ensureSchema();
+    const result = await dbQuery(
       `SELECT * FROM consultation_requests ORDER BY created_at DESC`,
     );
     return result.rows.map(rowToRequest);
@@ -226,12 +242,12 @@ export async function updateRequest(
       nextStatus === "cleared" ? new Date().toISOString() : current.clearedAt,
   };
 
-  const database = db();
-  if (database) {
-    await database.query(
+  if (getDb()) {
+    await ensureSchema();
+    await dbQuery(
       `UPDATE consultation_requests
-       SET status = $1, status_note = $2, updated_at = $3, cleared_at = $4
-       WHERE upper(tracking_number) = $5`,
+       SET status = ?, status_note = ?, updated_at = ?, cleared_at = ?
+       WHERE UPPER(tracking_number) = ?`,
       [
         updated.status,
         updated.statusNote,

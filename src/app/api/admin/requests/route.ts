@@ -11,7 +11,7 @@ export async function GET() {
   return NextResponse.json({ requests });
 }
 
-export async function PATCH(request: Request) {
+async function updateLead(request: Request) {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -39,4 +39,13 @@ export async function PATCH(request: Request) {
   }
 
   return NextResponse.json({ request: updated });
+}
+
+/** POST preferred for cPanel PHP; PATCH kept for compatibility. */
+export async function POST(request: Request) {
+  return updateLead(request);
+}
+
+export async function PATCH(request: Request) {
+  return updateLead(request);
 }
