@@ -9,7 +9,7 @@ export function Services() {
   return (
     <section id="services" className="section-band relative bg-ink-soft">
       <div className="relative mx-auto grid max-w-7xl gap-14 px-6 py-24 md:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-32">
-        <div>
+        <div data-reveal="left">
           <p className="eyebrow">{t.services.eyebrow}</p>
           <h2 className="mt-5 font-display text-4xl leading-tight text-cream md:text-5xl">
             {t.services.title}
@@ -20,7 +20,10 @@ export function Services() {
           <HealingDisclaimer className="mt-8 max-w-md border-t border-line pt-6" />
         </div>
 
-        <div className="divide-y divide-line border-y border-line">
+        <div
+          className="divide-y divide-line border-y border-line"
+          data-stagger
+        >
           {t.services.items.map((service, index) => (
             <article
               key={service.title}
@@ -30,7 +33,7 @@ export function Services() {
                 {String(index + 1).padStart(2, "0")}
               </span>
               <div>
-                <h3 className="font-display text-2xl text-cream transition-colors duration-300 group-hover:text-cream md:text-3xl">
+                <h3 className="font-display text-2xl text-cream md:text-3xl">
                   {service.title}
                 </h3>
                 <p className="mt-3 max-w-xl text-base leading-relaxed text-fog">

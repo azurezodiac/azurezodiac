@@ -15,6 +15,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Testimonials } from "@/components/Testimonials";
 import { Trust } from "@/components/Trust";
+import { TrustMarquee } from "@/components/TrustMarquee";
 import {
   DEFAULT_DESCRIPTION,
   DEFAULT_TITLE,
@@ -42,6 +43,7 @@ export default function Home() {
       <SiteHeader />
       <main className="flex-1">
         <Hero />
+        <TrustMarquee />
         <Services />
         <Atmosphere />
         <Path />

@@ -8,19 +8,19 @@ export function Atmosphere() {
 
   return (
     <section className="relative overflow-hidden bg-ink">
-      <div className="absolute inset-0">
+      <div className="absolute inset-0" data-parallax="18">
         <Image
           src="/images/stillness.jpg"
           alt="Peaceful mosque light — Islamic spiritual healing atmosphere in Karachi"
           fill
           sizes="100vw"
-          className="object-cover opacity-45"
+          className="object-cover opacity-45 scale-110"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,20,16,0.92)_0%,rgba(6,20,16,0.55)_55%,rgba(6,20,16,0.88)_100%)]" />
       </div>
       <div className="relative mx-auto flex min-h-[28rem] max-w-7xl items-center px-6 py-24 md:px-10 md:py-28">
-        <blockquote className="max-w-2xl">
-          <div className="mb-8 h-px w-16 bg-gold" />
+        <blockquote className="max-w-2xl" data-reveal="zoom">
+          <div className="gold-rule mb-8 h-px w-16 bg-gold" />
           <p className="font-display text-3xl leading-snug text-cream md:text-5xl">
             {t.atmosphere.quote}
           </p>

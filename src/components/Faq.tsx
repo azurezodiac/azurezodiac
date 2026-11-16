@@ -10,10 +10,8 @@ export function Faq() {
   return (
     <section id="faq" className="bg-ink-soft" aria-labelledby="faq-heading">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 md:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-32">
-        <div>
-          <p className="text-xs tracking-[0.22em] uppercase text-gold">
-            {t.faq.eyebrow}
-          </p>
+        <div data-reveal="left">
+          <p className="eyebrow">{t.faq.eyebrow}</p>
           <h2
             id="faq-heading"
             className="mt-5 font-display text-4xl leading-tight text-cream md:text-5xl"
@@ -25,7 +23,7 @@ export function Faq() {
           </p>
         </div>
 
-        <div className="divide-y divide-line border-y border-line">
+        <div className="divide-y divide-line border-y border-line" data-reveal="right">
           {t.faq.items.map((item, index) => {
             const isOpen = open === index;
             const panelId = `faq-panel-${index}`;

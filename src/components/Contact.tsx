@@ -9,10 +9,8 @@ export function Contact() {
 
   return (
     <section id="contact" className="bg-ink-soft">
-      <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32">
-        <p className="text-xs tracking-[0.22em] uppercase text-gold">
-          {t.contact.eyebrow}
-        </p>
+      <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32" data-reveal>
+        <p className="eyebrow">{t.contact.eyebrow}</p>
         <h2 className="mt-5 max-w-2xl font-display text-4xl leading-tight text-cream md:text-5xl">
           {t.contact.title}
         </h2>

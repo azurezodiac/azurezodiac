@@ -22,8 +22,8 @@ export function Hero() {
           className="hero-media object-cover object-[center_30%]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,20,16,0.5)_0%,rgba(6,20,16,0.68)_42%,rgba(6,20,16,0.96)_100%)]" />
-        <div className="hero-glow absolute -left-24 top-24 h-72 w-72 rounded-full bg-gold/15 blur-3xl" />
-        <div className="hero-glow absolute bottom-16 right-0 h-80 w-80 rounded-full bg-fog/8 blur-3xl" />
+        <div className="hero-glow float-orb absolute -left-24 top-24 h-72 w-72 rounded-full bg-gold/15 blur-3xl" />
+        <div className="hero-glow float-orb float-orb-delay absolute bottom-16 right-0 h-80 w-80 rounded-full bg-fog/8 blur-3xl" />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-end px-6 pb-20 pt-32 md:px-10 md:pb-28">

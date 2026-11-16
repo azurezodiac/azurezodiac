@@ -11,10 +11,8 @@ export function Learn() {
   return (
     <section id="learn" className="bg-ink-soft">
       <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32">
-        <div className="max-w-3xl">
-          <p className="text-xs tracking-[0.22em] uppercase text-gold">
-            {t.learn.eyebrow}
-          </p>
+        <div className="max-w-3xl" data-reveal>
+          <p className="eyebrow">{t.learn.eyebrow}</p>
           <h2 className="mt-5 font-display text-4xl leading-tight text-cream md:text-5xl">
             {t.learn.title}
           </h2>
@@ -26,7 +24,10 @@ export function Learn() {
           </p>
         </div>
 
-        <div className="mt-16 divide-y divide-line border-y border-line">
+        <div
+          className="mt-16 divide-y divide-line border-y border-line"
+          data-stagger
+        >
           {t.learn.topics.map((topic, index) => (
             <article key={topic.title} className="grid gap-3 py-8 md:grid-cols-[4rem_1fr] md:gap-8">
               <span className="font-display text-2xl text-gold/70">
@@ -141,16 +142,10 @@ export function Learn() {
           <p className="text-base leading-relaxed text-fog">{t.learn.closing}</p>
           <HealingDisclaimer className="mt-6" />
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/begin"
-              className="inline-flex bg-gold px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-ink transition-colors duration-300 hover:bg-gold-bright"
-            >
+            <Link href="/begin" className="btn-primary">
               {t.nav.begin}
             </Link>
-            <Link
-              href="/topics"
-              className="inline-flex border border-mist/25 px-7 py-3.5 text-sm tracking-[0.14em] uppercase text-mist transition-colors duration-300 hover:border-gold hover:text-gold-bright"
-            >
+            <Link href="/topics" className="btn-ghost">
               {t.nav.topics}
             </Link>
           </div>

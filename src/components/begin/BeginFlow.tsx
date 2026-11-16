@@ -406,7 +406,7 @@ export function BeginFlow() {
       <HealingDisclaimer className="surface-panel mb-10 px-4 py-3.5" />
 
       {step === 1 && (
-        <section className="space-y-8">
+        <section key="step-1" className="begin-step-enter space-y-8">
           <div>
             <p className="text-xs tracking-[0.22em] uppercase text-gold">
               {t.begin.eyebrow}
@@ -457,7 +457,7 @@ export function BeginFlow() {
       )}
 
       {step === 2 && (
-        <section className="space-y-8">
+        <section key="step-2" className="begin-step-enter space-y-8">
           <div>
             <p className="text-xs tracking-[0.22em] uppercase text-gold">
               {t.begin.detailsEyebrow}
@@ -601,7 +601,7 @@ export function BeginFlow() {
       )}
 
       {step === 3 && (
-        <section className="space-y-8">
+        <section key="step-3" className="begin-step-enter space-y-8">
           <div>
             <p className="text-xs tracking-[0.22em] uppercase text-gold">
               {t.begin.hadiyaEyebrow}
@@ -789,7 +789,7 @@ export function BeginFlow() {
       )}
 
       {step === 4 && duplicate && (
-        <section className="space-y-8">
+        <section key="step-4-dup" className="begin-step-enter space-y-8">
           <div>
             <p className="text-xs tracking-[0.22em] uppercase text-gold">
               {t.begin.stepSend}
@@ -834,7 +834,7 @@ export function BeginFlow() {
       )}
 
       {step === 4 && created && concern && (
-        <section className="space-y-8">
+        <section key="step-4-ok" className="begin-step-enter space-y-8">
           <div>
             <p className="text-xs tracking-[0.22em] uppercase text-gold">
               {t.begin.stepSend}
