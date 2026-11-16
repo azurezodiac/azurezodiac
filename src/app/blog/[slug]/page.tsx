@@ -10,8 +10,6 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-const isStatic = process.env.CPANEL_STATIC === "1";
-
 function cmsToBlogPost(post: CmsPost): BlogPost {
   const sections = post.body
     .split(/\n(?=##\s)/)
@@ -65,21 +63,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  if (!isStatic) {
-    try {
-      const cms = await getPublicCms();
-      const cmsPost = cms.posts.find((item) => item.slug === slug);
-      if (cmsPost) {
-        const url = absoluteUrl(`/blog/${cmsPost.slug}`);
-        return {
-          title: { absolute: `${cmsPost.title} | Redeemysoul` },
-          description: cmsPost.excerpt,
-          alternates: { canonical: url },
-        };
-      }
-    } catch {
-      // ignore
+  try {
+    const cms = await getPublicCms();
+    const cmsPost = cms.posts.find((item) => item.slug === slug);
+    if (cmsPost) {
+      const url = absoluteUrl(`/blog/${cmsPost.slug}`);
+      return {
+        title: { absolute: `${cmsPost.title} | Redeemysoul` },
+        description: cmsPost.excerpt,
+        alternates: { canonical: url },
+      };
     }
+  } catch {
+    // ignore on static / missing store
   }
 
   return { title: "Article not found" };
@@ -90,17 +86,16 @@ export default async function BlogPostRoute({ params }: Props) {
   const staticPost = getPost(slug);
   if (staticPost) return <BlogArticle post={staticPost} />;
 
-  if (!isStatic) {
-    try {
-      const cms = await getPublicCms();
-      const cmsPost = cms.posts.find((item) => item.slug === slug);
-      if (cmsPost) return <BlogArticle post={cmsToBlogPost(cmsPost)} />;
-    } catch {
-      // ignore
-    }
+  try {
+    const cms = await getPublicCms();
+    const cmsPost = cms.posts.find((item) => item.slug === slug);
+    if (cmsPost) return <BlogArticle post={cmsToBlogPost(cmsPost)} />;
+  } catch {
+    // ignore on static / missing store
   }
 
   notFound();
 }
 
-export const dynamicParams = !isStatic;
+/** Static cPanel export only ships generateStaticParams slugs. */
+export const dynamicParams = false;
