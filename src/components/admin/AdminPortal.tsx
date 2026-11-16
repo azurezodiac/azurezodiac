@@ -212,13 +212,7 @@ export function AdminPortal() {
   if (!authed) {
     return (
       <div className="mx-auto w-full max-w-md space-y-6">
-        <div>
-          <p className="eyebrow">Admin</p>
-          <h1 className="mt-4 font-display text-4xl text-cream">Sign in</h1>
-          <p className="mt-3 text-sm text-fog">
-            Manage leads, track records, posts, features, promotions, and pricing.
-          </p>
-        </div>
+        <h1 className="font-display text-4xl text-cream">Admin portal</h1>
         <input
           type="password"
           value={password}
