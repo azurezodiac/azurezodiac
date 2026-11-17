@@ -111,18 +111,41 @@ export function AdminPortal() {
 
   async function login() {
     setError("");
-    const response = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-    if (response.status === 404) {
+    let response: Response;
+    try {
+      response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+    } catch {
       setApiMode("offline");
-      setError("APIs not available on static cPanel. Deploy with Node (pnpm start / Vercel).");
+      setError(
+        "API not reachable. Upload the latest zip so public_html/api/index.php exists, then create api/config.php.",
+      );
+      return;
+    }
+    if (response.status === 404 || response.status === 403) {
+      setApiMode("offline");
+      setError(
+        "API folder missing on cPanel. Extract the latest redeemysoul-public_html.zip into public_html (must include api/index.php + config.php).",
+      );
+      return;
+    }
+    if (response.status === 503) {
+      setError(
+        "api/config.php missing. Copy api/config.sample.php to api/config.php and set admin_password.",
+      );
+      return;
+    }
+    if (response.status === 500) {
+      setError(
+        "Database connection failed. Check db_name, db_user, db_pass in api/config.php and that the user has ALL PRIVILEGES on the DB.",
+      );
       return;
     }
     if (!response.ok) {
-      setError("Invalid password.");
+      setError("Invalid password. Use the admin_password value from api/config.php (not the MySQL password).");
       return;
     }
     setPassword("");
@@ -189,22 +212,18 @@ export function AdminPortal() {
   if (apiMode === "offline") {
     return (
       <div className="mx-auto w-full max-w-2xl space-y-6">
-        <p className="eyebrow">Admin</p>
-        <h1 className="font-display text-4xl text-cream">Portal needs Node</h1>
+        <h1 className="font-display text-4xl text-cream">Admin portal</h1>
         <p className="text-base leading-relaxed text-fog">
-          Static cPanel zip shows the public site only. The admin portal
-          (posts, pricing, promotions, leads, track) needs Node hosting so APIs
-          can save data.
+          Login API is missing on this host. On cPanel you need the PHP API
+          folder inside <code className="text-gold">public_html/api/</code>.
         </p>
         <ul className="space-y-2 text-sm text-fog">
-          <li>· Local: <code className="text-gold">pnpm build && pnpm start</code></li>
-          <li>· cPanel: copy <code className="text-gold">api/config.sample.php</code> → <code className="text-gold">api/config.php</code> with MySQL + admin password</li>
-          <li>· Node: set <code className="text-gold">MYSQL_*</code> (or <code className="text-gold">DATABASE_URL=mysql://…</code>) + <code className="text-gold">ADMIN_PASSWORD</code></li>
-          <li>· Optional Postgres: set <code className="text-gold">DATABASE_URL</code> for leads</li>
+          <li>1. Upload latest <code className="text-gold">redeemysoul-public_html.zip</code> into <code className="text-gold">public_html</code> and Extract</li>
+          <li>2. Confirm these files exist: <code className="text-gold">api/index.php</code>, <code className="text-gold">api/schema.sql</code>, <code className="text-gold">.htaccess</code></li>
+          <li>3. Copy <code className="text-gold">api/config.sample.php</code> → <code className="text-gold">api/config.php</code></li>
+          <li>4. Set <code className="text-gold">admin_password</code> in config.php — that is the login password</li>
+          <li>5. MySQL user must be Added to the database with ALL PRIVILEGES</li>
         </ul>
-        <p className="text-sm text-fog">
-          Then open <span className="text-cream">/admin</span> and sign in.
-        </p>
       </div>
     );
   }
