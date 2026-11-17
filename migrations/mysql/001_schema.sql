@@ -12,9 +12,9 @@ CREATE TABLE IF NOT EXISTS consultation_requests (
   note TEXT NOT NULL,
   status VARCHAR(64) NOT NULL,
   status_note TEXT NOT NULL,
-  created_at DATETIME(3) NOT NULL,
-  updated_at DATETIME(3) NOT NULL,
-  cleared_at DATETIME(3) NULL,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL,
+  cleared_at DATETIME NULL,
   UNIQUE KEY consultation_requests_tracking_unique (tracking_number),
   KEY consultation_requests_phone_status_idx (phone, status),
   KEY consultation_requests_created_at_idx (created_at)
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS cms_posts (
   body MEDIUMTEXT NOT NULL,
   published TINYINT(1) NOT NULL DEFAULT 1,
   published_at VARCHAR(32) NOT NULL,
-  updated_at DATETIME(3) NOT NULL,
+  updated_at DATETIME NOT NULL,
   UNIQUE KEY cms_posts_slug_unique (slug),
   KEY cms_posts_published_at_idx (published, published_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS cms_features (
   body TEXT NOT NULL,
   sort_order INT NOT NULL DEFAULT 0,
   published TINYINT(1) NOT NULL DEFAULT 1,
-  updated_at DATETIME(3) NOT NULL,
+  updated_at DATETIME NOT NULL,
   KEY cms_features_order_idx (published, sort_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS cms_promotions (
   cta_label VARCHAR(255) NOT NULL,
   cta_href VARCHAR(255) NOT NULL,
   active TINYINT(1) NOT NULL DEFAULT 1,
-  updated_at DATETIME(3) NOT NULL
+  updated_at DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS cms_pricing (
@@ -61,6 +61,6 @@ CREATE TABLE IF NOT EXISTS cms_pricing (
   note TEXT NOT NULL,
   sort_order INT NOT NULL DEFAULT 0,
   published TINYINT(1) NOT NULL DEFAULT 1,
-  updated_at DATETIME(3) NOT NULL,
+  updated_at DATETIME NOT NULL,
   KEY cms_pricing_order_idx (published, sort_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

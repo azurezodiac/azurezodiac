@@ -1,9 +1,46 @@
 <?php
 /**
- * Redeemysoul cPanel MySQL API — mirrors Next.js /api routes for static hosting.
- * Place this folder at public_html/api/ and copy config.sample.php → config.php
+ * Redeemysoul cPanel MySQL API (PHP 7.4+ compatible)
+ * Upload as public_html/rs-api.php with config.php beside it.
  */
 declare(strict_types=1);
+
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
+if (!function_exists('str_starts_with')) {
+  function str_starts_with($haystack, $needle) {
+    return $needle === '' || strpos((string)$haystack, (string)$needle) === 0;
+  }
+}
+if (!function_exists('str_contains')) {
+  function str_contains($haystack, $needle) {
+    return $needle === '' || strpos((string)$haystack, (string)$needle) !== false;
+  }
+}
+
+function json_out(array $payload, $status = 200)
+{
+  http_response_code((int)$status);
+  if (!headers_sent()) {
+    header('Content-Type: application/json; charset=utf-8');
+    header('X-Content-Type-Options: nosniff');
+  }
+  echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  exit;
+}
+
+set_exception_handler(function ($e) {
+  json_out([
+    'error' => 'Server error.',
+    'detail' => $e->getMessage(),
+  ], 500);
+});
+
+set_error_handler(function ($severity, $message, $file, $line) {
+  throw new ErrorException($message, 0, $severity, $file, $line);
+});
 
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
@@ -33,10 +70,22 @@ if (!is_file($configPath)) {
   ], 503);
 }
 
-/** @var array{db_host:string,db_name:string,db_user:string,db_pass:string,admin_password:string,admin_session_secret:string} $config */
+try {
+/** @var array $config */
 $config = require $configPath;
 
-try {
+if (!is_array($config)) {
+  json_out(['error' => 'config.php must return an array.'], 500);
+}
+foreach (array('db_host','db_name','db_user','db_pass','admin_password') as $key) {
+  if (!isset($config[$key]) || $config[$key] === '') {
+    json_out(array('error' => 'config.php missing ' . $key . '.'), 500);
+  }
+}
+if (empty($config['admin_session_secret'])) {
+  $config['admin_session_secret'] = $config['admin_password'];
+}
+
   $pdo = new PDO(
     sprintf(
       'mysql:host=%s;dbname=%s;charset=utf8mb4',
@@ -45,25 +94,21 @@ try {
     ),
     $config['db_user'],
     $config['db_pass'],
-    [
+    array(
       PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
       PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]
+    )
   );
-} catch (Throwable $e) {
-  json_out(['error' => 'Database connection failed. Check config.php MySQL settings.'], 500);
-}
-
-ensure_schema($pdo);
-maybe_seed_cms($pdo);
-
-$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-$path = api_path();
-
-try {
+  ensure_schema($pdo);
+  maybe_seed_cms($pdo);
+  $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+  $path = api_path();
   route($pdo, $config, $method, $path);
 } catch (Throwable $e) {
-  json_out(['error' => 'Server error.'], 500);
+  json_out(array(
+    'error' => 'Server error.',
+    'detail' => $e->getMessage(),
+  ), 500);
 }
 
 function api_path(): string
@@ -273,10 +318,10 @@ function handle_cms_public(PDO $pdo): void
   header('Cache-Control: public, s-maxage=60, stale-while-revalidate=300');
   json_out([
     'cms' => [
-      'posts' => array_values(array_filter($cms['posts'], fn($p) => !empty($p['published']))),
-      'features' => array_values(array_filter($cms['features'], fn($f) => !empty($f['published']))),
-      'promotions' => array_values(array_filter($cms['promotions'], fn($p) => !empty($p['active']))),
-      'pricing' => array_values(array_filter($cms['pricing'], fn($p) => !empty($p['published']))),
+      'posts' => array_values(array_filter($cms['posts'], function ($p) { return !empty($p['published']); })),
+      'features' => array_values(array_filter($cms['features'], function ($f) { return !empty($f['published']); })),
+      'promotions' => array_values(array_filter($cms['promotions'], function ($p) { return !empty($p['active']); })),
+      'pricing' => array_values(array_filter($cms['pricing'], function ($p) { return !empty($p['published']); })),
     ],
   ]);
 }
@@ -292,13 +337,18 @@ function handle_admin_login(array $config): void
     json_out(['error' => 'Invalid password.'], 401);
   }
   $token = sign_token($config['admin_session_secret']);
-  setcookie(COOKIE, $token, [
-    'expires' => time() + 60 * 60 * 12,
-    'path' => '/',
-    'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
-    'httponly' => true,
-    'samesite' => 'Lax',
-  ]);
+  $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+  if (PHP_VERSION_ID >= 70300) {
+    setcookie(COOKIE, $token, [
+      'expires' => time() + 60 * 60 * 12,
+      'path' => '/',
+      'secure' => $secure,
+      'httponly' => true,
+      'samesite' => 'Lax',
+    ]);
+  } else {
+    setcookie(COOKIE, $token, time() + 60 * 60 * 12, '/; samesite=Lax', '', $secure, true);
+  }
   json_out(['ok' => true]);
 }
 
@@ -545,12 +595,16 @@ function update_cms_item(PDO $pdo, string $collection, string $id, array $item, 
 
 function cms_table(string $collection): string
 {
-  return match ($collection) {
-    'posts' => 'cms_posts',
-    'features' => 'cms_features',
-    'promotions' => 'cms_promotions',
-    default => 'cms_pricing',
-  };
+  if ($collection === 'posts') {
+    return 'cms_posts';
+  }
+  if ($collection === 'features') {
+    return 'cms_features';
+  }
+  if ($collection === 'promotions') {
+    return 'cms_promotions';
+  }
+  return 'cms_pricing';
 }
 
 /** @return array{posts:array,features:array,promotions:array,pricing:array} */
@@ -852,17 +906,15 @@ function sign_token(string $secret): string
 
 function clear_admin_cookie(): void
 {
-  setcookie(COOKIE, '', [
-    'expires' => time() - 3600,
-    'path' => '/',
-    'httponly' => true,
-    'samesite' => 'Lax',
-  ]);
+  if (PHP_VERSION_ID >= 70300) {
+    setcookie(COOKIE, '', [
+      'expires' => time() - 3600,
+      'path' => '/',
+      'httponly' => true,
+      'samesite' => 'Lax',
+    ]);
+  } else {
+    setcookie(COOKIE, '', time() - 3600, '/', '', false, true);
+  }
 }
 
-function json_out(array $payload, int $status = 200): void
-{
-  http_response_code($status);
-  echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-  exit;
-}
