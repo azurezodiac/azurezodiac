@@ -10,6 +10,13 @@ ZIP_PATH="${ARTIFACT_DIR}/redeemysoul-public_html.zip"
 
 mkdir -p "$ARTIFACT_DIR"
 
+# Keep public PHP copies in sync with cpanel-php source
+cp cpanel-php/index.php public/rs-api.php
+cp cpanel-php/index.php public/rs-api.php.txt
+cp cpanel-php/config.sample.php public/config.sample.php
+cp cpanel-php/config.sample.php public/config.sample.php.txt
+cp cpanel-php/schema.sql public/schema.sql
+
 if [[ -d src/app/api ]]; then
   rm -rf "$API_BACKUP"
   mv src/app/api "$API_BACKUP"
@@ -34,7 +41,6 @@ for route in begin track admin topics pricing blog locations templates; do
   fi
 done
 
-# Nested dynamic routes: out/<section>/<slug>.html -> out/<section>/<slug>/index.html
 flatten_section() {
   local section="$1"
   if [[ -d "out/${section}" ]]; then
@@ -46,7 +52,6 @@ flatten_section() {
         cp "$html" "out/${section}/${base}/index.html"
       fi
     done
-    # Urdu topic pages: out/topics/<slug>/ur.html -> out/topics/<slug>/ur/index.html
     for html in "out/${section}"/*/ur.html; do
       dir="$(dirname "$html")"
       mkdir -p "${dir}/ur"
@@ -60,17 +65,22 @@ flatten_section topics
 flatten_section blog
 flatten_section locations
 
-# Ensure htaccess is present in the static export root.
 if [[ -f public/.htaccess ]]; then
   cp public/.htaccess out/.htaccess
 fi
 
-# Ship PHP MySQL API for cPanel (leads + admin CMS + track)
+# Also keep legacy api/ copies
 rm -rf out/api
 mkdir -p out/api
 cp cpanel-php/index.php cpanel-php/schema.sql cpanel-php/.htaccess out/api/
 cp cpanel-php/config.sample.php out/api/config.sample.php
-# Do not ship real secrets; user copies sample -> config.php on server
+cp cpanel-php/index.php out/api/index.php.txt
+cp cpanel-php/config.sample.php out/api/config.sample.php.txt
+
+# Standalone upload files (host often strips .php from zip extract)
+cp public/rs-api.php.txt "$ARTIFACT_DIR/rs-api.php.txt"
+cp public/config.sample.php.txt "$ARTIFACT_DIR/config.sample.php.txt"
+cp public/schema.sql "$ARTIFACT_DIR/schema.sql"
 
 rm -f "$ZIP_PATH"
 (
@@ -81,31 +91,20 @@ rm -f "$ZIP_PATH"
     -x "*/__next*"
 )
 
-# Helpful upload + DNS cutover note inside the zip root
 printf '%s\n' \
-  "Redeemysoul — cPanel + MySQL (Option B)" \
+  "Redeemysoul cPanel — DO THIS (3 files)" \
   "" \
-  "FILES" \
-  "1) cPanel -> File Manager -> public_html" \
-  "2) Upload redeemysoul-public_html.zip and Extract" \
-  "3) Confirm public_html has: index.html, .htaccess, api/" \
-  "4) Copy api/config.sample.php -> api/config.php and fill MySQL + admin_password" \
-  "5) MySQL user must be Added to Database with ALL PRIVILEGES" \
+  "Your host may delete .php from zip extracts. Upload these TXT files instead:" \
   "" \
-  "DNS (required — domain is currently on Vercel NS)" \
-  "Right now redeemysoul.com uses ns1.vercel-dns.com / ns2.vercel-dns.com" \
-  "Until DNS points to THIS cPanel server, config.php will not control the live site." \
+  "1) File Manager → public_html" \
+  "2) Upload rs-api.php.txt → Rename to rs-api.php" \
+  "3) Upload config.sample.php.txt → Rename to config.php" \
+  "4) Edit config.php: db_name, db_user, db_pass, admin_password" \
+  "5) Upload schema.sql (optional)" \
+  "6) Open /admin and login with admin_password" \
   "" \
-  "Pick ONE:" \
-  "A) Registrar nameservers -> change to your hosting cPanel nameservers" \
-  "   (from hosting welcome email, e.g. ns1.yourhost.com / ns2.yourhost.com)" \
-  "B) Or in DNS panel set A record @ to your cPanel Shared IP" \
-  "   (cPanel -> Server Information) and point www there too; remove Vercel A/ALIAS." \
-  "" \
-  "Wait for DNS (often 5-60 minutes). Live site headers must NOT say server: Vercel." \
-  "Then open /admin and log in with config.php admin_password." \
-  "" \
-  "SEO sitemap: https://redeemysoul.com/sitemap.xml" \
+  "Test URL: https://redeemysoul.com/rs-api.php?__path=cms/public" \
+  "(should return JSON, not 404)" \
   > /tmp/CPANEL-UPLOAD.txt
 (
   cd out
@@ -114,4 +113,6 @@ printf '%s\n' \
 )
 
 ls -lh "$ZIP_PATH"
+ls -lh "$ARTIFACT_DIR/rs-api.php.txt" "$ARTIFACT_DIR/config.sample.php.txt" "$ARTIFACT_DIR/schema.sql"
 echo "ZIP_READY=$ZIP_PATH"
+echo "UPLOAD_THESE=rs-api.php.txt + config.sample.php.txt into public_html then rename"

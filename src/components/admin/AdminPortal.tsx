@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { apiUrl } from "@/lib/client-api";
 import {
   EMPTY_CMS,
   type CmsCollection,
@@ -63,8 +64,8 @@ export function AdminPortal() {
     setError("");
     try {
       const [reqRes, cmsRes] = await Promise.all([
-        fetch("/api/admin/requests"),
-        fetch("/api/admin/cms"),
+        fetch(apiUrl("admin/requests")),
+        fetch(apiUrl("admin/cms")),
       ]);
 
       if (reqRes.status === 404 || cmsRes.status === 404) {
@@ -113,7 +114,7 @@ export function AdminPortal() {
     setError("");
     let response: Response;
     try {
-      response = await fetch("/api/admin/login", {
+      response = await fetch(apiUrl("admin/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
@@ -121,31 +122,33 @@ export function AdminPortal() {
     } catch {
       setApiMode("offline");
       setError(
-        "API not reachable. Upload the latest zip so public_html/api/index.php exists, then create api/config.php.",
+        "API not reachable. Upload rs-api.php.txt into public_html, rename to rs-api.php, and add config.php.",
       );
       return;
     }
     if (response.status === 404 || response.status === 403) {
       setApiMode("offline");
       setError(
-        "API folder missing on cPanel. Extract the latest redeemysoul-public_html.zip into public_html (must include api/index.php + config.php).",
+        "rs-api.php missing in public_html. Upload rs-api.php.txt → rename to rs-api.php.",
       );
       return;
     }
     if (response.status === 503) {
       setError(
-        "api/config.php missing. Copy api/config.sample.php to api/config.php and set admin_password.",
+        "config.php missing next to rs-api.php. Copy config.sample.php.txt → config.php and set admin_password.",
       );
       return;
     }
     if (response.status === 500) {
       setError(
-        "Database connection failed. Check db_name, db_user, db_pass in api/config.php and that the user has ALL PRIVILEGES on the DB.",
+        "Database connection failed. Check db_name / db_user / db_pass in config.php.",
       );
       return;
     }
     if (!response.ok) {
-      setError("Invalid password. Use the admin_password value from api/config.php (not the MySQL password).");
+      setError(
+        "Invalid password. Use admin_password from config.php (not MySQL db_pass).",
+      );
       return;
     }
     setPassword("");
@@ -153,7 +156,7 @@ export function AdminPortal() {
   }
 
   async function logout() {
-    await fetch("/api/admin/logout", { method: "POST" });
+    await fetch(apiUrl("admin/logout"), { method: "POST" });
     setAuthed(false);
     setRequests([]);
     setCms(EMPTY_CMS);
@@ -163,7 +166,7 @@ export function AdminPortal() {
     trackingNumber: string,
     patch: { status?: RequestStatus; statusNote?: string },
   ) {
-    const response = await fetch("/api/admin/requests", {
+    const response = await fetch(apiUrl("admin/requests"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ trackingNumber, ...patch }),
@@ -181,7 +184,7 @@ export function AdminPortal() {
     id?: string,
     item?: Record<string, unknown>,
   ) {
-    const response = await fetch("/api/admin/cms", {
+    const response = await fetch(apiUrl("admin/cms"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action, collection, id, item }),
@@ -214,15 +217,14 @@ export function AdminPortal() {
       <div className="mx-auto w-full max-w-2xl space-y-6">
         <h1 className="font-display text-4xl text-cream">Admin portal</h1>
         <p className="text-base leading-relaxed text-fog">
-          Login API is missing on this host. On cPanel you need the PHP API
-          folder inside <code className="text-gold">public_html/api/</code>.
+          <code className="text-gold">rs-api.php</code> is missing in{" "}
+          <code className="text-gold">public_html</code>.
         </p>
         <ul className="space-y-2 text-sm text-fog">
-          <li>1. Upload latest <code className="text-gold">redeemysoul-public_html.zip</code> into <code className="text-gold">public_html</code> and Extract</li>
-          <li>2. Confirm these files exist: <code className="text-gold">api/index.php</code>, <code className="text-gold">api/schema.sql</code>, <code className="text-gold">.htaccess</code></li>
-          <li>3. Copy <code className="text-gold">api/config.sample.php</code> → <code className="text-gold">api/config.php</code></li>
-          <li>4. Set <code className="text-gold">admin_password</code> in config.php — that is the login password</li>
-          <li>5. MySQL user must be Added to the database with ALL PRIVILEGES</li>
+          <li>1. Upload <code className="text-gold">rs-api.php.txt</code> into public_html → Rename to <code className="text-gold">rs-api.php</code></li>
+          <li>2. Upload <code className="text-gold">config.sample.php.txt</code> → Rename to <code className="text-gold">config.php</code></li>
+          <li>3. Edit config.php: MySQL details + <code className="text-gold">admin_password</code></li>
+          <li>4. Upload <code className="text-gold">schema.sql</code> into public_html (optional)</li>
         </ul>
       </div>
     );

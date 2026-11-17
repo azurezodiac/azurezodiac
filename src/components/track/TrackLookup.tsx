@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { apiUrl } from "@/lib/client-api";
 import { STATUS_LABELS } from "@/lib/types";
 import { useLang } from "@/lib/i18n";
 
@@ -65,7 +66,9 @@ export function TrackLookup() {
     setError("");
     setResult(null);
     try {
-      const response = await fetch(`/api/track/${encodeURIComponent(id)}`);
+      const response = await fetch(
+        apiUrl(`track/${encodeURIComponent(id)}`),
+      );
       if (response.status === 404 || response.status === 405) {
         const local = fromLocalStorage(id);
         if (local) {

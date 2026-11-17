@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import { SeoChrome } from "@/components/SeoChrome";
 import { BLOG_POSTS } from "@/lib/blog";
+import { apiUrl } from "@/lib/client-api";
 import type { CmsPost } from "@/lib/cms-types";
 
 type Card = {
@@ -30,7 +31,7 @@ export function BlogIndexContent() {
     let cancelled = false;
     void (async () => {
       try {
-        const res = await fetch("/api/cms/public");
+        const res = await fetch(apiUrl("cms/public"));
         if (!res.ok) return;
         const data = (await res.json()) as { cms?: { posts?: CmsPost[] } };
         const cmsPosts = data.cms?.posts ?? [];

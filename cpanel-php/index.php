@@ -25,8 +25,11 @@ const COOKIE = 'rs_admin_session';
 
 $configPath = __DIR__ . '/config.php';
 if (!is_file($configPath)) {
+  $configPath = __DIR__ . '/api/config.php';
+}
+if (!is_file($configPath)) {
   json_out([
-    'error' => 'API config missing. Copy config.sample.php to config.php and set MySQL + admin password.',
+    'error' => 'API config missing. Place config.php next to rs-api.php (or in api/) with MySQL + admin_password.',
   ], 503);
 }
 
@@ -732,7 +735,14 @@ function ensure_schema(PDO $pdo): void
   if ($done) {
     return;
   }
-  $sql = file_get_contents(__DIR__ . '/schema.sql');
+  $schemaFile = __DIR__ . '/schema.sql';
+  if (!is_file($schemaFile)) {
+    $schemaFile = __DIR__ . '/api/schema.sql';
+  }
+  if (!is_file($schemaFile)) {
+    return;
+  }
+  $sql = file_get_contents($schemaFile);
   if ($sql === false) {
     return;
   }

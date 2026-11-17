@@ -15,6 +15,7 @@ import {
   emailHref,
   whatsappHref,
 } from "@/lib/consultation";
+import { apiUrl } from "@/lib/client-api";
 import { useLang } from "@/lib/i18n";
 import { openPrepareGuidePdf } from "@/lib/prepare-guide";
 
@@ -303,7 +304,7 @@ export function BeginFlow() {
     const noteWithExtras = buildNoteWithExtras();
 
     try {
-      const response = await fetch("/api/requests", {
+      const response = await fetch(apiUrl("requests"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

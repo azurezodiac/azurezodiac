@@ -36,9 +36,12 @@ DirectoryIndex index.html
   RewriteCond %{HTTP_HOST} ^www\.redeemysoul\.com$ [NC]
   RewriteRule ^ https://redeemysoul.com%{REQUEST_URI} [L,R=301]
 
-  # MySQL PHP API (cPanel) — route /api/* to PHP front controller
-  RewriteRule ^api/?$ /api/index.php [QSA,L]
-  RewriteRule ^api/(.+)$ /api/index.php?__path=$1 [QSA,L]
+  # Do not rewrite the single-file PHP API
+  RewriteRule ^rs-api\.php$ - [L]
+
+  # Legacy /api/* → same PHP controller when present
+  RewriteRule ^api/?$ /rs-api.php [QSA,L]
+  RewriteRule ^api/(.+)$ /rs-api.php?__path=$1 [QSA,L]
 
   # Serve pretty routes from their .html counterparts
   RewriteRule ^begin/?$ /begin/index.html [L]

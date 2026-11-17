@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HealingDisclaimer } from "@/components/HealingDisclaimer";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { apiUrl } from "@/lib/client-api";
 import type { CmsPricingItem } from "@/lib/cms-types";
 import { HADIYA } from "@/lib/consultation";
 import { useLang } from "@/lib/i18n";
@@ -16,7 +17,7 @@ export function PricingContent() {
     let cancelled = false;
     void (async () => {
       try {
-        const res = await fetch("/api/cms/public");
+        const res = await fetch(apiUrl("cms/public"));
         if (!res.ok) return;
         const data = (await res.json()) as {
           cms?: { pricing?: CmsPricingItem[] };

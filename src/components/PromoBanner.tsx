@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { apiUrl } from "@/lib/client-api";
 import type { CmsPromotion } from "@/lib/cms-types";
 
 export function PromoBanner() {
@@ -11,7 +12,7 @@ export function PromoBanner() {
     let cancelled = false;
     void (async () => {
       try {
-        const res = await fetch("/api/cms/public");
+        const res = await fetch(apiUrl("cms/public"));
         if (!res.ok) return;
         const data = (await res.json()) as {
           cms?: { promotions?: CmsPromotion[] };
