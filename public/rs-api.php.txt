@@ -332,8 +332,9 @@ function handle_cms_public(PDO $pdo): void
 function handle_admin_login(array $config): void
 {
   $body = read_json();
-  $password = (string) ($body['password'] ?? '');
-  if ($password === '' || !hash_equals($config['admin_password'], $password)) {
+  $password = trim((string) ($body['password'] ?? ''));
+  $expected = trim((string) $config['admin_password']);
+  if ($password === '' || !hash_equals($expected, $password)) {
     json_out(['error' => 'Invalid password.'], 401);
   }
   $token = sign_token($config['admin_session_secret']);
