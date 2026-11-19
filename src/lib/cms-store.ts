@@ -4,8 +4,11 @@ import path from "path";
 import { BLOG_POSTS } from "@/lib/blog";
 import {
   EMPTY_CMS,
+  emptyLanding,
   type CmsCollection,
   type CmsFeature,
+  type CmsLanding,
+  type CmsLandingLocale,
   type CmsPost,
   type CmsPricingItem,
   type CmsPromotion,
@@ -104,6 +107,49 @@ function seedState(): CmsState {
         updatedAt: stamped,
       },
     ],
+    landing: {
+      en: {
+        brandLine: "Spiritual Healing Shazli · Karachi",
+        headline: "Islamic healing for a heart under pressure.",
+        support:
+          "Ruqyah-centered guidance for nazar, sihr concerns, and spiritual heaviness — private, respectful, and rooted in remembrance.",
+        ctaBegin: "Begin healing",
+        ctaServices: "Explore services",
+      },
+      ur: {
+        brandLine: "سپریچوئل ہیلنگ شاذلی · کراچی",
+        headline: "دباؤ میں دل کے لیے اسلامی شفا۔",
+        support:
+          "نظر، سحر کی پریشانی اور روحانی بوجھ کے لیے رقیہ پر مبنی رہنمائی — نجی، ادب کے ساتھ، اور ذکر پر قائم۔",
+        ctaBegin: "شفا شروع کریں",
+        ctaServices: "خدمات دیکھیں",
+      },
+      updatedAt: stamped,
+    },
+  };
+}
+
+function normalizeLocale(
+  value: Partial<CmsLandingLocale> | undefined,
+): CmsLandingLocale {
+  return {
+    brandLine: String(value?.brandLine ?? "").trim(),
+    headline: String(value?.headline ?? "").trim(),
+    support: String(value?.support ?? "").trim(),
+    ctaBegin: String(value?.ctaBegin ?? "").trim(),
+    ctaServices: String(value?.ctaServices ?? "").trim(),
+  };
+}
+
+function normalizeLanding(value: unknown, fallbackUpdatedAt = ""): CmsLanding {
+  if (!value || typeof value !== "object") {
+    return emptyLanding(fallbackUpdatedAt);
+  }
+  const raw = value as Partial<CmsLanding>;
+  return {
+    en: normalizeLocale(raw.en),
+    ur: normalizeLocale(raw.ur),
+    updatedAt: String(raw.updatedAt || fallbackUpdatedAt || nowIso()),
   };
 }
 
@@ -174,14 +220,57 @@ async function ensureCmsTables(): Promise<void> {
   schemaReady = true;
 }
 
+async function readLandingFromDb(): Promise<CmsLanding> {
+  try {
+    const result = await dbQuery(
+      `SELECT setting_value, updated_at FROM cms_settings WHERE setting_key = ?`,
+      ["landing"],
+    );
+    const row = result.rows[0];
+    if (!row) return emptyLanding();
+    const raw =
+      typeof row.setting_value === "string"
+        ? JSON.parse(String(row.setting_value))
+        : row.setting_value;
+    return normalizeLanding(raw, String(row.updated_at || ""));
+  } catch {
+    return emptyLanding();
+  }
+}
+
+async function writeLandingToDb(landing: CmsLanding): Promise<void> {
+  await ensureCmsTables();
+  const stamped = landing.updatedAt || nowIso();
+  const payload = JSON.stringify(landing);
+  const dialect = getDb()!.dialect;
+  if (dialect === "mysql") {
+    await dbQuery(
+      `INSERT INTO cms_settings (setting_key, setting_value, updated_at)
+       VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = VALUES(updated_at)`,
+      ["landing", payload, stamped],
+    );
+    return;
+  }
+  await dbQuery(
+    `INSERT INTO cms_settings (setting_key, setting_value, updated_at)
+     VALUES (?, ?, ?)
+     ON CONFLICT (setting_key) DO UPDATE SET
+       setting_value = EXCLUDED.setting_value,
+       updated_at = EXCLUDED.updated_at`,
+    ["landing", payload, stamped],
+  );
+}
+
 async function readCmsFromDb(): Promise<CmsState> {
   await ensureCmsTables();
 
-  const [posts, features, promotions, pricing] = await Promise.all([
+  const [posts, features, promotions, pricing, landing] = await Promise.all([
     dbQuery(`SELECT * FROM cms_posts ORDER BY published_at DESC`),
     dbQuery(`SELECT * FROM cms_features ORDER BY sort_order ASC`),
     dbQuery(`SELECT * FROM cms_promotions ORDER BY updated_at DESC`),
     dbQuery(`SELECT * FROM cms_pricing ORDER BY sort_order ASC`),
+    readLandingFromDb(),
   ]);
 
   const state: CmsState = {
@@ -189,6 +278,7 @@ async function readCmsFromDb(): Promise<CmsState> {
     features: features.rows.map(rowFeature),
     promotions: promotions.rows.map(rowPromo),
     pricing: pricing.rows.map(rowPricing),
+    landing,
   };
 
   const empty =
@@ -200,6 +290,13 @@ async function readCmsFromDb(): Promise<CmsState> {
   if (empty) {
     return writeSeedToDb();
   }
+
+  if (!landing.en.headline && !landing.ur.headline) {
+    const seeded = seedState().landing;
+    await writeLandingToDb(seeded);
+    state.landing = seeded;
+  }
+
   return state;
 }
 
@@ -278,6 +375,8 @@ async function writeSeedToDb(): Promise<CmsState> {
     );
   }
 
+  await writeLandingToDb(seeded.landing);
+
   return seeded;
 }
 
@@ -286,12 +385,18 @@ async function readCmsFromFile(): Promise<CmsState> {
   try {
     const raw = await fs.readFile(CMS_FILE, "utf8");
     const parsed = JSON.parse(raw) as Partial<CmsState>;
-    return {
+    const state: CmsState = {
       posts: Array.isArray(parsed.posts) ? parsed.posts : [],
       features: Array.isArray(parsed.features) ? parsed.features : [],
       promotions: Array.isArray(parsed.promotions) ? parsed.promotions : [],
       pricing: Array.isArray(parsed.pricing) ? parsed.pricing : [],
+      landing: normalizeLanding(parsed.landing),
     };
+    if (!parsed.landing) {
+      state.landing = seedState().landing;
+      await writeCmsFile(state);
+    }
+    return state;
   } catch {
     const seeded = seedState();
     await fs.writeFile(CMS_FILE, JSON.stringify(seeded, null, 2));
@@ -318,6 +423,7 @@ export async function getPublicCms(): Promise<{
   features: CmsFeature[];
   promotions: CmsPromotion[];
   pricing: CmsPricingItem[];
+  landing: CmsLanding;
 }> {
   const state = await readCms();
   return {
@@ -331,7 +437,33 @@ export async function getPublicCms(): Promise<{
     pricing: state.pricing
       .filter((p) => p.published)
       .sort((a, b) => a.order - b.order),
+    landing: state.landing,
   };
+}
+
+export async function updateLanding(
+  input: Partial<CmsLanding> & {
+    en?: Partial<CmsLandingLocale>;
+    ur?: Partial<CmsLandingLocale>;
+  },
+): Promise<CmsState> {
+  const stamped = nowIso();
+  const current = await readCms();
+  const next: CmsLanding = {
+    en: normalizeLocale({ ...current.landing.en, ...input.en }),
+    ur: normalizeLocale({ ...current.landing.ur, ...input.ur }),
+    updatedAt: stamped,
+  };
+
+  if (getDb()) {
+    await writeLandingToDb(next);
+    return readCmsFromDb();
+  }
+
+  const state = await readCmsFromFile();
+  state.landing = next;
+  await writeCmsFile(state);
+  return state;
 }
 
 export async function createCmsItem(

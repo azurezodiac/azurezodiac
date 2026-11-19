@@ -4,8 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { apiUrl } from "@/lib/client-api";
 import {
   EMPTY_CMS,
+  emptyLanding,
   type CmsCollection,
   type CmsFeature,
+  type CmsLanding,
+  type CmsLandingLocale,
   type CmsPost,
   type CmsPricingItem,
   type CmsPromotion,
@@ -20,6 +23,7 @@ import {
 
 type Tab =
   | "overview"
+  | "landing"
   | "leads"
   | "track"
   | "posts"
@@ -38,6 +42,7 @@ const statuses: RequestStatus[] = [
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
+  { id: "landing", label: "Landing" },
   { id: "leads", label: "Leads" },
   { id: "track", label: "Track" },
   { id: "posts", label: "Posts" },
@@ -93,7 +98,12 @@ export function AdminPortal() {
       };
       const cmsData = (await cmsRes.json()) as { cms?: CmsState };
       setRequests(reqData.requests ?? []);
-      setCms(cmsData.cms ?? EMPTY_CMS);
+      const nextCms = cmsData.cms ?? EMPTY_CMS;
+      setCms({
+        ...EMPTY_CMS,
+        ...nextCms,
+        landing: nextCms.landing ?? emptyLanding(),
+      });
       setAuthed(true);
       setApiMode("live");
     } catch {
@@ -179,7 +189,7 @@ export function AdminPortal() {
   }
 
   async function cmsAction(
-    action: "create" | "update" | "delete" | "reset",
+    action: "create" | "update" | "delete" | "reset" | "updateLanding",
     collection?: CmsCollection,
     id?: string,
     item?: Record<string, unknown>,
@@ -194,7 +204,13 @@ export function AdminPortal() {
       return;
     }
     const data = (await response.json()) as { cms?: CmsState };
-    if (data.cms) setCms(data.cms);
+    if (data.cms) {
+      setCms({
+        ...EMPTY_CMS,
+        ...data.cms,
+        landing: data.cms.landing ?? emptyLanding(),
+      });
+    }
   }
 
   const filteredTrack = useMemo(() => {
@@ -259,10 +275,10 @@ export function AdminPortal() {
           <p className="eyebrow">Admin</p>
           <h1 className="mt-3 font-display text-4xl text-cream">Control portal</h1>
           <p className="mt-3 max-w-xl text-sm text-fog">
-            Posts, features, promotions, pricing, leads, and track — saved to your
-            cPanel <strong className="font-medium text-parchment">MySQL</strong>{" "}
-            database via <code className="text-gold">/api</code> (PHP on static
-            host, or Node with <code className="text-gold">MYSQL_*</code>).
+            Landing hero copy, posts, features, promotions, pricing, leads, and
+            track — saved via <code className="text-gold">/api</code> (JSON file
+            locally, MySQL on cPanel / Node with{" "}
+            <code className="text-gold">MYSQL_*</code>).
           </p>
         </div>
         <button type="button" onClick={() => void logout()} className="btn-ghost !py-2.5 !text-xs">
@@ -298,7 +314,9 @@ export function AdminPortal() {
           <Stat label="Active promos" value={String(cms.promotions.filter((p) => p.active).length)} />
           <div className="surface-panel sm:col-span-2 lg:col-span-4 px-5 py-5">
             <p className="text-sm text-fog">
-              Tip: publish posts for the blog API, activate one promotion for the homepage banner, and keep pricing items in sync with Hadiya amounts.
+              Tip: edit Landing for homepage hero text, publish posts for the blog
+              API, activate one promotion for the homepage banner, and keep pricing
+              in sync with Hadiya amounts.
             </p>
             <button
               type="button"
@@ -309,6 +327,13 @@ export function AdminPortal() {
             </button>
           </div>
         </section>
+      ) : null}
+
+      {tab === "landing" && !loading ? (
+        <LandingPanel
+          landing={cms.landing ?? emptyLanding()}
+          onSave={(item) => void cmsAction("updateLanding", undefined, undefined, item)}
+        />
       ) : null}
 
       {tab === "leads" && !loading ? (
@@ -371,6 +396,118 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="surface-panel px-5 py-5">
       <p className="text-xs tracking-[0.16em] uppercase text-fog">{label}</p>
       <p className="mt-3 font-display text-4xl text-cream">{value}</p>
+    </div>
+  );
+}
+
+const LANDING_FIELDS: { key: keyof CmsLandingLocale; label: string; multiline?: boolean }[] = [
+  { key: "headline", label: "Headline" },
+  { key: "support", label: "Supporting sentence", multiline: true },
+  { key: "ctaBegin", label: "Primary CTA (Begin)" },
+  { key: "ctaServices", label: "Secondary CTA (Services)" },
+  { key: "brandLine", label: "Brand line (under CTAs)" },
+];
+
+function LandingPanel({
+  landing,
+  onSave,
+}: {
+  landing: CmsLanding;
+  onSave: (item: Record<string, unknown>) => void;
+}) {
+  const [en, setEn] = useState<CmsLandingLocale>(landing.en);
+  const [ur, setUr] = useState<CmsLandingLocale>(landing.ur);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setEn(landing.en);
+    setUr(landing.ur);
+    // Sync when server returns a new stamp after save / reset.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional stamp key
+  }, [landing.updatedAt]);
+
+  function updateLocale(
+    locale: "en" | "ur",
+    key: keyof CmsLandingLocale,
+    value: string,
+  ) {
+    if (locale === "en") setEn((prev) => ({ ...prev, [key]: value }));
+    else setUr((prev) => ({ ...prev, [key]: value }));
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="surface-panel space-y-3 px-5 py-5">
+        <h2 className="font-display text-2xl text-cream">Homepage hero</h2>
+        <p className="text-sm text-fog">
+          Controls the first viewport on redeemysoul.com. Empty fields fall back
+          to the built-in English / Urdu defaults. Brand name “Redeemysoul” stays
+          fixed in the layout.
+        </p>
+        {landing.updatedAt ? (
+          <p className="text-xs text-fog/70">
+            Last saved {new Date(landing.updatedAt).toLocaleString()}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {(["en", "ur"] as const).map((locale) => {
+          const values = locale === "en" ? en : ur;
+          return (
+            <section key={locale} className="surface-panel space-y-4 px-5 py-5">
+              <h3 className="font-display text-xl text-cream">
+                {locale === "en" ? "English" : "Urdu"}
+              </h3>
+              {LANDING_FIELDS.map((field) =>
+                field.multiline ? (
+                  <label key={field.key} className="block space-y-2">
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-fog/70">
+                      {field.label}
+                    </span>
+                    <textarea
+                      className="field-input"
+                      rows={3}
+                      dir={locale === "ur" ? "rtl" : "ltr"}
+                      value={values[field.key]}
+                      onChange={(e) =>
+                        updateLocale(locale, field.key, e.target.value)
+                      }
+                    />
+                  </label>
+                ) : (
+                  <label key={field.key} className="block space-y-2">
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-fog/70">
+                      {field.label}
+                    </span>
+                    <input
+                      className="field-input"
+                      dir={locale === "ur" ? "rtl" : "ltr"}
+                      value={values[field.key]}
+                      onChange={(e) =>
+                        updateLocale(locale, field.key, e.target.value)
+                      }
+                    />
+                  </label>
+                ),
+              )}
+            </section>
+          );
+        })}
+      </div>
+
+      <button
+        type="button"
+        className="btn-primary"
+        disabled={saving}
+        onClick={() => {
+          setSaving(true);
+          onSave({ en, ur });
+          window.setTimeout(() => setSaving(false), 400);
+        }}
+      >
+        {saving ? "Saving…" : "Save landing copy"}
+      </button>
     </div>
   );
 }

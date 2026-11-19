@@ -31,6 +31,7 @@ cleanup() {
 trap cleanup EXIT
 
 export CPANEL_STATIC=1
+export NEXT_PUBLIC_USE_PHP_API=1
 pnpm build
 
 # Apache/cPanel expects folder/index.html for pretty URLs.

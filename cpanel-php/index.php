@@ -322,6 +322,7 @@ function handle_cms_public(PDO $pdo): void
       'features' => array_values(array_filter($cms['features'], function ($f) { return !empty($f['published']); })),
       'promotions' => array_values(array_filter($cms['promotions'], function ($p) { return !empty($p['active']); })),
       'pricing' => array_values(array_filter($cms['pricing'], function ($p) { return !empty($p['published']); })),
+      'landing' => $cms['landing'],
     ],
   ]);
 }
@@ -403,6 +404,19 @@ function handle_admin_cms(PDO $pdo): void
 
   if ($action === 'reset') {
     seed_cms($pdo, true);
+    json_out(['cms' => load_cms($pdo)]);
+  }
+
+  if ($action === 'updateLanding') {
+    $current = load_landing($pdo);
+    $en = is_array($item['en'] ?? null) ? $item['en'] : [];
+    $ur = is_array($item['ur'] ?? null) ? $item['ur'] : [];
+    $next = [
+      'en' => normalize_landing_locale(array_merge($current['en'], $en)),
+      'ur' => normalize_landing_locale(array_merge($current['ur'], $ur)),
+      'updatedAt' => gmdate('Y-m-d\TH:i:s.000\Z'),
+    ];
+    save_landing($pdo, $next);
     json_out(['cms' => load_cms($pdo)]);
   }
 
@@ -609,6 +623,90 @@ function cms_table(string $collection): string
 }
 
 /** @return array{posts:array,features:array,promotions:array,pricing:array} */
+function empty_landing_locale(): array
+{
+  return [
+    'brandLine' => '',
+    'headline' => '',
+    'support' => '',
+    'ctaBegin' => '',
+    'ctaServices' => '',
+  ];
+}
+
+function normalize_landing_locale(array $value): array
+{
+  return [
+    'brandLine' => trim((string) ($value['brandLine'] ?? '')),
+    'headline' => trim((string) ($value['headline'] ?? '')),
+    'support' => trim((string) ($value['support'] ?? '')),
+    'ctaBegin' => trim((string) ($value['ctaBegin'] ?? '')),
+    'ctaServices' => trim((string) ($value['ctaServices'] ?? '')),
+  ];
+}
+
+function default_landing(string $updatedAt = ''): array
+{
+  return [
+    'en' => [
+      'brandLine' => 'Spiritual Healing Shazli · Karachi',
+      'headline' => 'Islamic healing for a heart under pressure.',
+      'support' => 'Ruqyah-centered guidance for nazar, sihr concerns, and spiritual heaviness — private, respectful, and rooted in remembrance.',
+      'ctaBegin' => 'Begin healing',
+      'ctaServices' => 'Explore services',
+    ],
+    'ur' => [
+      'brandLine' => 'سپریچوئل ہیلنگ شاذلی · کراچی',
+      'headline' => 'دباؤ میں دل کے لیے اسلامی شفا۔',
+      'support' => 'نظر، سحر کی پریشانی اور روحانی بوجھ کے لیے رقیہ پر مبنی رہنمائی — نجی، ادب کے ساتھ، اور ذکر پر قائم۔',
+      'ctaBegin' => 'شفا شروع کریں',
+      'ctaServices' => 'خدمات دیکھیں',
+    ],
+    'updatedAt' => $updatedAt !== '' ? $updatedAt : gmdate('Y-m-d\TH:i:s.000\Z'),
+  ];
+}
+
+function load_landing(PDO $pdo): array
+{
+  try {
+    $stmt = $pdo->prepare('SELECT setting_value, updated_at FROM cms_settings WHERE setting_key = ?');
+    $stmt->execute(['landing']);
+    $row = $stmt->fetch();
+    if (!$row) {
+      return default_landing();
+    }
+    $decoded = json_decode((string) $row['setting_value'], true);
+    if (!is_array($decoded)) {
+      return default_landing(sql_to_iso($row['updated_at']));
+    }
+    return [
+      'en' => normalize_landing_locale(is_array($decoded['en'] ?? null) ? $decoded['en'] : []),
+      'ur' => normalize_landing_locale(is_array($decoded['ur'] ?? null) ? $decoded['ur'] : []),
+      'updatedAt' => sql_to_iso($row['updated_at']),
+    ];
+  } catch (Throwable $e) {
+    return default_landing();
+  }
+}
+
+function save_landing(PDO $pdo, array $landing): void
+{
+  $payload = json_encode($landing, JSON_UNESCAPED_UNICODE);
+  if ($payload === false) {
+    $payload = '{}';
+  }
+  $stmt = $pdo->prepare(
+    'INSERT INTO cms_settings (setting_key, setting_value, updated_at)
+     VALUES (?, ?, ?)
+     ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = VALUES(updated_at)'
+  );
+  $stmt->execute([
+    'landing',
+    $payload,
+    iso_to_sql((string) ($landing['updatedAt'] ?? gmdate('Y-m-d\TH:i:s.000\Z'))),
+  ]);
+}
+
 function load_cms(PDO $pdo): array
 {
   $posts = $pdo->query('SELECT * FROM cms_posts ORDER BY published_at DESC')->fetchAll();
@@ -662,6 +760,7 @@ function load_cms(PDO $pdo): array
         'updatedAt' => sql_to_iso($row['updated_at']),
       ];
     }, $pricing),
+    'landing' => load_landing($pdo),
   ];
 }
 
@@ -677,6 +776,11 @@ function maybe_seed_cms(PDO $pdo): void
   )->fetchColumn();
   if ($count === 0) {
     seed_cms($pdo, false);
+    return;
+  }
+  $landing = load_landing($pdo);
+  if (($landing['en']['headline'] ?? '') === '' && ($landing['ur']['headline'] ?? '') === '') {
+    save_landing($pdo, default_landing());
   }
 }
 
@@ -782,6 +886,8 @@ function seed_cms(PDO $pdo, bool $wipe): void
     2,
     iso_to_sql($now),
   ]);
+
+  save_landing($pdo, default_landing($now));
 }
 
 function ensure_schema(PDO $pdo): void

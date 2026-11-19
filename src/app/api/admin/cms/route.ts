@@ -6,8 +6,9 @@ import {
   getCmsState,
   resetCmsToSeed,
   updateCmsItem,
+  updateLanding,
 } from "@/lib/cms-store";
-import type { CmsCollection } from "@/lib/cms-types";
+import type { CmsCollection, CmsLanding } from "@/lib/cms-types";
 
 const COLLECTIONS: CmsCollection[] = [
   "posts",
@@ -42,6 +43,12 @@ export async function POST(request: Request) {
 
   if (body.action === "reset") {
     const cms = await resetCmsToSeed();
+    return NextResponse.json({ cms });
+  }
+
+  if (body.action === "updateLanding") {
+    const landingInput = (body.item ?? {}) as Partial<CmsLanding>;
+    const cms = await updateLanding(landingInput);
     return NextResponse.json({ cms });
   }
 

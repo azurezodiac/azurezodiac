@@ -49,3 +49,9 @@ CREATE INDEX IF NOT EXISTS cms_features_order_idx
 
 CREATE INDEX IF NOT EXISTS cms_pricing_order_idx
   ON cms_pricing (published, sort_order);
+
+CREATE TABLE IF NOT EXISTS cms_settings (
+  setting_key TEXT PRIMARY KEY,
+  setting_value TEXT NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL
+);

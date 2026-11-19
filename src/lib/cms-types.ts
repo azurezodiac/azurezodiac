@@ -45,16 +45,49 @@ export type CmsPricingItem = {
   updatedAt: string;
 };
 
+/** Editable homepage / landing copy (EN + UR). Empty strings mean “use built-in defaults”. */
+export type CmsLandingLocale = {
+  brandLine: string;
+  headline: string;
+  support: string;
+  ctaBegin: string;
+  ctaServices: string;
+};
+
+export type CmsLanding = {
+  en: CmsLandingLocale;
+  ur: CmsLandingLocale;
+  updatedAt: string;
+};
+
 export type CmsState = {
   posts: CmsPost[];
   features: CmsFeature[];
   promotions: CmsPromotion[];
   pricing: CmsPricingItem[];
+  landing: CmsLanding;
 };
+
+export const EMPTY_LANDING_LOCALE: CmsLandingLocale = {
+  brandLine: "",
+  headline: "",
+  support: "",
+  ctaBegin: "",
+  ctaServices: "",
+};
+
+export function emptyLanding(updatedAt = new Date().toISOString()): CmsLanding {
+  return {
+    en: { ...EMPTY_LANDING_LOCALE },
+    ur: { ...EMPTY_LANDING_LOCALE },
+    updatedAt,
+  };
+}
 
 export const EMPTY_CMS: CmsState = {
   posts: [],
   features: [],
   promotions: [],
   pricing: [],
+  landing: emptyLanding(""),
 };

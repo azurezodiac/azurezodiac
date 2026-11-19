@@ -64,3 +64,9 @@ CREATE TABLE IF NOT EXISTS cms_pricing (
   updated_at DATETIME NOT NULL,
   KEY cms_pricing_order_idx (published, sort_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS cms_settings (
+  setting_key VARCHAR(64) PRIMARY KEY,
+  setting_value MEDIUMTEXT NOT NULL,
+  updated_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
