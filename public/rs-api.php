@@ -60,13 +60,22 @@ const STATUS_NOTES_DEFAULT = [
 ];
 const COOKIE = 'rs_admin_session';
 
-$configPath = __DIR__ . '/config.php';
-if (!is_file($configPath)) {
-  $configPath = __DIR__ . '/api/config.php';
+$configCandidates = array(
+  __DIR__ . '/config.php',
+  __DIR__ . '/api/config.php',
+  dirname(__DIR__) . '/config.php',
+  dirname(__DIR__) . '/api/config.php',
+);
+$configPath = '';
+foreach ($configCandidates as $candidate) {
+  if (is_file($candidate)) {
+    $configPath = $candidate;
+    break;
+  }
 }
-if (!is_file($configPath)) {
+if ($configPath === '') {
   json_out([
-    'error' => 'API config missing. Place config.php next to rs-api.php (or in api/) with MySQL + admin_password.',
+    'error' => 'API config missing. Place config.php next to rs-api.php or in api/ with MySQL + admin_password.',
   ], 503);
 }
 

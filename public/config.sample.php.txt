@@ -1,6 +1,7 @@
 <?php
 /**
- * Copy this file to config.php inside public_html/api/ and fill cPanel MySQL values.
+ * Copy to public_html/api/config.php (recommended) or public_html/config.php.
+ * Admin login uses admin_password — not db_pass.
  * Never commit real passwords.
  */
 return [

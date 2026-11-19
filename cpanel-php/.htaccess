@@ -2,6 +2,9 @@ Options -Indexes
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # Prefer root rs-api.php so admin login uses the same config as the main API.
+  RewriteCond %{DOCUMENT_ROOT}/rs-api.php -f
+  RewriteRule ^(?:index\.php/)?(.*)$ /rs-api.php?__path=$1 [QSA,L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule ^ index.php [QSA,L]
 </IfModule>

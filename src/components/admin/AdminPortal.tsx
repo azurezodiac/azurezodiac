@@ -151,13 +151,13 @@ export function AdminPortal() {
     }
     if (response.status === 500) {
       setError(
-        "Database connection failed. Check db_name / db_user / db_pass in config.php.",
+        "API error. On cPanel: replace public_html/api/index.php with a fresh copy of rs-api.php, and confirm api/config.php has admin_password (not only db_pass).",
       );
       return;
     }
     if (!response.ok) {
       setError(
-        "Invalid password. Use admin_password from config.php (not MySQL db_pass).",
+        "Invalid password. Use admin_password from api/config.php (not MySQL db_pass). Local Node uses ADMIN_PASSWORD in .env.local.",
       );
       return;
     }

@@ -39,9 +39,10 @@ DirectoryIndex index.html
   # Do not rewrite the single-file PHP API
   RewriteRule ^rs-api\.php$ - [L]
 
-  # Legacy /api/* → same PHP controller when present
-  RewriteRule ^api/?$ /rs-api.php [QSA,L]
-  RewriteRule ^api/(.+)$ /rs-api.php?__path=$1 [QSA,L]
+  # Force all /api/* through rs-api.php (reads config.php beside it or in api/).
+  # Must win over public_html/api/.htaccess → index.php, which older deploys break.
+  RewriteRule ^api(?:/index\.php)?/?$ /rs-api.php [QSA,L]
+  RewriteRule ^api(?:/index\.php)?/(.+)$ /rs-api.php?__path=$1 [QSA,L]
 
   # Serve pretty routes from their .html counterparts
   RewriteRule ^begin/?$ /begin/index.html [L]
