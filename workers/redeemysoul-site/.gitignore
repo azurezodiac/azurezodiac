@@ -2,3 +2,4 @@
 .hashmap.json
 completion.json
 *.b64
+.account_id
