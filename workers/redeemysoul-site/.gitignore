@@ -1,0 +1,4 @@
+.manifest.json
+.hashmap.json
+completion.json
+*.b64
