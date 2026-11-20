@@ -16,6 +16,7 @@ export function SiteHeader({ variant = "home" }: { variant?: "home" | "page" }) 
     { href: "/pricing", label: t.nav.pricing },
     { href: "#visit", label: t.nav.visit },
     { href: "/begin", label: t.nav.begin },
+    { href: "/admin", label: t.nav.admin },
   ];
 
   useEffect(() => {

@@ -27,6 +27,7 @@ type Dictionary = {
     privacy: string;
     faq: string;
     begin: string;
+    admin: string;
     consultation: string;
     backHome: string;
   };
@@ -257,6 +258,7 @@ const en: Dictionary = {
     privacy: "Privacy",
     faq: "FAQ",
     begin: "Begin",
+    admin: "Admin",
     consultation: "Consultation",
     backHome: "Back home",
   },
@@ -765,6 +767,7 @@ const ur: Dictionary = {
     privacy: "رازداری",
     faq: "سوالات",
     begin: "شروع",
+    admin: "ایڈمن",
     consultation: "مشاورت",
     backHome: "واپس صفحہ اول",
   },
