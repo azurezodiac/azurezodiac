@@ -51,12 +51,6 @@ export async function clearAdminSession(): Promise<void> {
 }
 
 export async function isAdminAuthenticated(): Promise<boolean> {
-  const jar = await cookies();
-  const token = jar.get(COOKIE)?.value;
-  if (!token) return false;
-  const expected = sign("admin-ok");
-  const a = Buffer.from(token);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(a, b);
+  // Admin auth disabled — portal is open.
+  return true;
 }

@@ -893,11 +893,7 @@ function read_json(): array
  */
 function require_admin(array $config): void
 {
-  $token = $_COOKIE[COOKIE] ?? '';
-  $expected = sign_token($config['admin_session_secret']);
-  if ($token === '' || !hash_equals($expected, $token)) {
-    json_out(['error' => 'Unauthorized'], 401);
-  }
+  // Admin auth disabled — portal is open.
 }
 
 function sign_token(string $secret): string

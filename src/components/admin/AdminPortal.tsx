@@ -47,8 +47,6 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 export function AdminPortal() {
-  const [authed, setAuthed] = useState(false);
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [apiMode, setApiMode] = useState<"live" | "offline" | "loading">(
     "loading",
@@ -70,15 +68,6 @@ export function AdminPortal() {
 
       if (reqRes.status === 404 || cmsRes.status === 404) {
         setApiMode("offline");
-        setAuthed(false);
-        return;
-      }
-
-      if (reqRes.status === 401 || cmsRes.status === 401) {
-        setApiMode("live");
-        setAuthed(false);
-        setRequests([]);
-        setCms(EMPTY_CMS);
         return;
       }
 
@@ -94,11 +83,9 @@ export function AdminPortal() {
       const cmsData = (await cmsRes.json()) as { cms?: CmsState };
       setRequests(reqData.requests ?? []);
       setCms(cmsData.cms ?? EMPTY_CMS);
-      setAuthed(true);
       setApiMode("live");
     } catch {
       setApiMode("offline");
-      setAuthed(false);
       setError("Admin API unreachable. Node hosting required for full portal.");
     } finally {
       setLoading(false);
@@ -109,58 +96,6 @@ export function AdminPortal() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- mount bootstrap
     void loadAll();
   }, [loadAll]);
-
-  async function login() {
-    setError("");
-    let response: Response;
-    try {
-      response = await fetch(apiUrl("admin/login"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-    } catch {
-      setApiMode("offline");
-      setError(
-        "API not reachable. Upload rs-api.php.txt into public_html, rename to rs-api.php, and add config.php.",
-      );
-      return;
-    }
-    if (response.status === 404 || response.status === 403) {
-      setApiMode("offline");
-      setError(
-        "rs-api.php missing in public_html. Upload rs-api.php.txt → rename to rs-api.php.",
-      );
-      return;
-    }
-    if (response.status === 503) {
-      setError(
-        "config.php missing next to rs-api.php. Copy config.sample.php.txt → config.php and set admin_password.",
-      );
-      return;
-    }
-    if (response.status === 500) {
-      setError(
-        "Database connection failed. Check db_name / db_user / db_pass in config.php.",
-      );
-      return;
-    }
-    if (!response.ok) {
-      setError(
-        "Invalid password. Use admin_password from config.php (not MySQL db_pass).",
-      );
-      return;
-    }
-    setPassword("");
-    await loadAll();
-  }
-
-  async function logout() {
-    await fetch(apiUrl("admin/logout"), { method: "POST" });
-    setAuthed(false);
-    setRequests([]);
-    setCms(EMPTY_CMS);
-  }
 
   async function patchRequest(
     trackingNumber: string,
@@ -223,31 +158,17 @@ export function AdminPortal() {
         <ul className="space-y-2 text-sm text-fog">
           <li>1. Upload <code className="text-gold">rs-api.php.txt</code> into public_html → Rename to <code className="text-gold">rs-api.php</code></li>
           <li>2. Upload <code className="text-gold">config.sample.php.txt</code> → Rename to <code className="text-gold">config.php</code></li>
-          <li>3. Edit config.php: MySQL details + <code className="text-gold">admin_password</code></li>
+          <li>3. Edit config.php: MySQL details</li>
           <li>4. Upload <code className="text-gold">schema.sql</code> into public_html (optional)</li>
         </ul>
       </div>
     );
   }
 
-  if (!authed) {
+  if (apiMode === "loading") {
     return (
-      <div className="mx-auto w-full max-w-md space-y-6">
-        <h1 className="font-display text-4xl text-cream">Admin portal</h1>
-        <input
-          type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="Admin password"
-          className="field-input"
-          onKeyDown={(event) => {
-            if (event.key === "Enter") void login();
-          }}
-        />
-        {error ? <p className="text-sm text-red-300">{error}</p> : null}
-        <button type="button" onClick={() => void login()} className="btn-primary">
-          Enter portal
-        </button>
+      <div className="mx-auto w-full max-w-6xl">
+        <p className="text-fog">Loading...</p>
       </div>
     );
   }
@@ -265,9 +186,6 @@ export function AdminPortal() {
             host, or Node with <code className="text-gold">MYSQL_*</code>).
           </p>
         </div>
-        <button type="button" onClick={() => void logout()} className="btn-ghost !py-2.5 !text-xs">
-          Log out
-        </button>
       </div>
 
       <nav className="flex flex-wrap gap-2 border-b border-line pb-3">
